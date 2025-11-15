@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "/init-workspace.sh"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "type": "agent",
+        "agent": "/security-check",
+        "matcher": "Bash"
+      }
+    ]
+  }
+}

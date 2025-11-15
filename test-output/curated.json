@@ -1,0 +1,39 @@
+{
+  "name": "test-curated",
+  "commands": [
+    "commands/analyze.md"
+  ],
+  "agents": [
+    "agents/reviewer.md"
+  ],
+  "skills": [
+    "skills/test-skill"
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "/init-workspace.sh"
+      }
+    ]
+  },
+  "mcpServers": {
+    "test-server": {
+      "command": "node",
+      "args": [
+        "server.js"
+      ],
+      "env": {
+        "TEST_API_KEY": "${TEST_API_KEY}"
+      }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/tmp"
+      ]
+    }
+  }
+}

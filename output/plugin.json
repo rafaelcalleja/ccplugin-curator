@@ -1,0 +1,47 @@
+{
+  "name": "curated-plugin",
+  "commands": [
+    "commands/analyze.md",
+    "commands/build.md"
+  ],
+  "agents": [
+    "agents/reviewer.md"
+  ],
+  "skills": [
+    "skills/test-skill"
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "/init-workspace.sh"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "type": "agent",
+        "agent": "/security-check",
+        "matcher": "Bash"
+      }
+    ]
+  },
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/tmp"
+      ]
+    },
+    "test-server": {
+      "command": "node",
+      "args": [
+        "server.js"
+      ],
+      "env": {
+        "TEST_API_KEY": "${TEST_API_KEY}"
+      }
+    }
+  }
+}
