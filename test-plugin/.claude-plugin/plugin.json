@@ -1,0 +1,14 @@
+{
+  "name": "test-plugin",
+  "version": "1.0.0",
+  "description": "Test plugin for integration testing",
+  "author": {
+    "name": "Test Author",
+    "email": "test@example.com",
+    "url": "https://example.com"
+  },
+  "homepage": "https://example.com/test-plugin",
+  "repository": "https://github.com/example/test-plugin",
+  "license": "MIT",
+  "keywords": ["test", "integration", "example"]
+}

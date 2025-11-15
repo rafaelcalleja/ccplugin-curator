@@ -1,0 +1,22 @@
+{
+  "SessionStart": [
+    {
+      "type": "command",
+      "command": "/initialize",
+      "matcher": "*"
+    }
+  ],
+  "PreToolUse": [
+    {
+      "type": "agent",
+      "agent": "/code-reviewer",
+      "matcher": "Bash"
+    }
+  ],
+  "PostToolUse": [
+    {
+      "type": "command",
+      "command": "/cleanup"
+    }
+  ]
+}

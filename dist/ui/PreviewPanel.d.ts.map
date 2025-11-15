@@ -1,0 +1,1 @@
+{"version":3,"file":"PreviewPanel.d.ts","sourceRoot":"","sources":["../../src/ui/PreviewPanel.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,MAAM,OAAO,CAAC;AAE1B,OAAO,KAAK,EAAE,kBAAkB,EAAE,MAAM,mBAAmB,CAAC;AAE5D,UAAU,KAAK;IACb,SAAS,EAAE,kBAAkB,CAAC;IAC9B,OAAO,EAAE,OAAO,CAAC;CAClB;AAED,eAAO,MAAM,YAAY,EAAE,KAAK,CAAC,EAAE,CAAC,KAAK,CAkDxC,CAAC"}

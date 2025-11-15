@@ -1,0 +1,33 @@
+{
+  "name": "curated-plugin",
+  "commands": [
+    "commands/test.md",
+    "commands/deploy.md"
+  ],
+  "agents": [
+    "agents/documentation-writer.md"
+  ],
+  "skills": [
+    "skills/skill-b"
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "/initialize",
+        "matcher": "*"
+      }
+    ]
+  },
+  "mcpServers": {
+    "data-processor": {
+      "command": "node",
+      "args": [
+        "dist/mcp-server.js"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}

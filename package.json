@@ -1,0 +1,45 @@
+{
+  "name": "mk-curator",
+  "version": "0.1.0",
+  "description": "Interactive TUI for curating Claude Code plugins",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "mkcurator": "dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test:integration": "tsx test-integration.ts",
+    "generate-types": "npx json-schema-to-typescript schemas/plugin.schema.json -o src/types/plugin.ts && npx json-schema-to-typescript schemas/normalized-plugin.schema.json -o src/types/normalized.ts",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write src"
+  },
+  "keywords": [
+    "claude",
+    "plugins",
+    "tui",
+    "curator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "glob": "^10.3.10",
+    "ink": "^4.4.1",
+    "keypress": "^0.2.1",
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/react": "^19.2.5",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "json-schema-to-typescript": "^13.1.2",
+    "prettier": "^3.1.1",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}

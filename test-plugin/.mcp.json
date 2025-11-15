@@ -1,0 +1,16 @@
+{
+  "data-processor": {
+    "command": "node",
+    "args": ["dist/mcp-server.js"],
+    "env": {
+      "NODE_ENV": "production"
+    }
+  },
+  "knowledge-base": {
+    "command": "python",
+    "args": ["-m", "knowledge_server"],
+    "env": {
+      "PYTHONUNBUFFERED": "1"
+    }
+  }
+}

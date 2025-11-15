@@ -1,0 +1,6 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { Box, Text } from 'ink';
+export const PluginPanel = ({ plugins, currentIndex, focused, }) => {
+    return (_jsxs(Box, { flexDirection: "column", borderStyle: "single", borderColor: focused ? 'blue' : 'grey', width: "25%", paddingX: 1, children: [_jsx(Text, { bold: true, underline: true, children: "PLUGINS" }), plugins.length === 0 ? (_jsx(Text, { children: "(No plugins found)" })) : (plugins.map((plugin, idx) => (_jsxs(Box, { flexDirection: "column", children: [_jsxs(Text, { children: [idx === currentIndex ? '▼' : '▽', " ", plugin.name, idx === currentIndex ? ' (★)' : ''] }), _jsxs(Box, { marginLeft: 2, flexDirection: "column", children: [_jsxs(Text, { dimColor: true, children: ["\u2022 ", plugin.commands.length, " commands"] }), _jsxs(Text, { dimColor: true, children: ["\u2022 ", plugin.agents.length, " agents"] }), plugin.skills.length > 0 && (_jsxs(Text, { dimColor: true, children: ["\u2022 ", plugin.skills.length, " skills"] })), plugin.hooks.length > 0 && (_jsxs(Text, { dimColor: true, children: ["\u2022 ", plugin.hooks.length, " hooks"] })), plugin.mcps.length > 0 && (_jsxs(Text, { dimColor: true, children: ["\u2022 ", plugin.mcps.length, " mcps"] }))] })] }, plugin.name))))] }));
+};
+//# sourceMappingURL=PluginPanel.js.map
