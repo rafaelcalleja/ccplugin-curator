@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mkcurator.com/schemas/normalized-plugin.json",
+  "title": "Normalized Plugin",
+  "description": "Internal normalized format for plugin representation",
+  "type": "object",
+  "required": ["name", "commands", "agents", "skills", "hooks", "mcps"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Plugin name (required)"
+    },
+    "source": {
+      "type": "string",
+      "description": "Absolute path to plugin directory"
+    },
+    "version": {
+      "type": "string",
+      "description": "Plugin version (default: 0.0.0)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Plugin description (default: empty)"
+    },
+    "author": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "url": { "type": "string" }
+      },
+      "description": "Author information"
+    },
+    "homepage": {
+      "type": "string",
+      "description": "Homepage URL"
+    },
+    "repository": {
+      "type": "string",
+      "description": "Repository URL"
+    },
+    "license": {
+      "type": "string",
+      "description": "License identifier"
+    },
+    "keywords": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Keywords array (always array, never undefined)"
+    },
+    "commands": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Array of command file paths (always array)"
+    },
+    "agents": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Array of agent file paths (always array)"
+    },
+    "skills": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Array of skill directory paths (always array)"
+    },
+    "hooks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "event", "config"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[^:]+:[^:]+:\\d+$",
+            "description": "Format: {pluginName}:{event}:{index}"
+          },
+          "event": {
+            "type": "string",
+            "description": "Hook event name"
+          },
+          "matcher": {
+            "type": "string",
+            "description": "Optional tool matcher regex"
+          },
+          "config": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["command", "agent"]
+              },
+              "command": { "type": "string" },
+              "agent": { "type": "string" },
+              "args": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "description": "Normalized hook configurations (always array)"
+    },
+    "mcps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "config"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[^:]+:[^:]+$",
+            "description": "Format: {pluginName}:{mcpName}"
+          },
+          "name": {
+            "type": "string",
+            "description": "MCP server name"
+          },
+          "config": {
+            "type": "object",
+            "required": ["command"],
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "Executable command"
+              },
+              "args": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Command arguments"
+              },
+              "env": {
+                "type": "object",
+                "additionalProperties": { "type": "string" },
+                "description": "Environment variables"
+              }
+            }
+          }
+        }
+      },
+      "description": "Normalized MCP server configurations (always array)"
+    }
+  },
+  "additionalProperties": false
+}

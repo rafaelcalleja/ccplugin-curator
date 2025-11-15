@@ -1,0 +1,35 @@
+{
+  "name": "mkcurator",
+  "version": "1.0.0",
+  "description": "TUI for curating Claude Code plugin components",
+  "main": "dist/index.js",
+  "bin": {
+    "mkcurator": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "generate-types": "npx json-schema-to-typescript schemas/plugin.schema.json -o src/types/plugin.ts && npx json-schema-to-typescript schemas/normalized-plugin.schema.json -o src/types/normalized.ts",
+    "start": "node dist/cli.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "claude",
+    "plugin",
+    "curator",
+    "tui",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "blessed": "^0.1.81",
+    "glob": "^10.3.10"
+  },
+  "devDependencies": {
+    "@types/blessed": "^0.1.25",
+    "@types/node": "^20.10.5",
+    "json-schema-to-typescript": "^13.1.1",
+    "typescript": "^5.3.3"
+  }
+}
