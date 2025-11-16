@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -28,11 +29,20 @@ async function loadSchemas() {
 }
 
 /**
+ * Create Ajv instance with formats support
+ */
+function createAjv() {
+  const ajv = new Ajv({ allErrors: true });
+  addFormats(ajv);
+  return ajv;
+}
+
+/**
  * Validate official plugin.json format
  */
 export async function validateOfficialFormat(data: any): Promise<{ valid: boolean; errors: string[] }> {
   await loadSchemas();
-  const ajv = new Ajv({ allErrors: true });
+  const ajv = createAjv();
   const validate = ajv.compile(pluginSchema);
   const valid = validate(data);
 
@@ -47,7 +57,7 @@ export async function validateOfficialFormat(data: any): Promise<{ valid: boolea
  */
 export async function validateNormalizedFormat(data: any): Promise<{ valid: boolean; errors: string[] }> {
   await loadSchemas();
-  const ajv = new Ajv({ allErrors: true });
+  const ajv = createAjv();
   const validate = ajv.compile(normalizedSchema);
   const valid = validate(data);
 
@@ -62,7 +72,7 @@ export async function validateNormalizedFormat(data: any): Promise<{ valid: bool
  */
 export async function validateMarketplaceFormat(data: any): Promise<{ valid: boolean; errors: string[] }> {
   await loadSchemas();
-  const ajv = new Ajv({ allErrors: true });
+  const ajv = createAjv();
   const validate = ajv.compile(marketplaceSchema);
   const valid = validate(data);
 
