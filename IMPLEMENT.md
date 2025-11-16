@@ -6,7 +6,8 @@
 
 ## 🎯 Success Criteria
 
-✅ All items in checklist are ✅
+✅ Checklist generated from `docs/` is 100% complete
+✅ All items marked as done
 ✅ Application runs without errors
 
 **CRITICAL RULES**:
@@ -25,75 +26,124 @@
 ultrathink --seq @docs/spec @docs/decisions
 ```
 
-This generates a checklist from all files in `docs/`.
+**This command**:
+- Reads all files in `docs/spec/` and `docs/decisions/`
+- Generates a checklist of completed vs pending items
+- Shows what is already done
+- Shows what needs to be implemented
+
+**Output**: A checklist with items marked as ✅ (done) or ❌ (pending)
 
 ---
 
-## Phase 2: Verify Completeness
+## Phase 2: Review Checklist
 
-**COUNT** the checklist items:
+**CHECK**: Look at the checklist generated in Phase 1.
+
+**STRICT VERIFICATION**:
+
+Count the items:
 - ✅ (done) items: `____`
 - ❌ (pending) items: `____`
+- ⚠️ (incomplete) items: `____`
+- 🔜 (optional/later) items: `____`
 - Total items: `____`
 
-**CHECK 1**: Are ALL items ✅?
-- ✅ items = Total items → Continue to CHECK 2
-- Otherwise → Go to Phase 3
+**PASS criteria**:
+- ✅ items = Total items (100%)
+- ❌ items = 0
+- ⚠️ items = 0
+- 🔜 items = 0
 
-**CHECK 2**: Does the application work?
-- Run tests (if exist)
-- Build application (if buildable)
-- Run application (if runnable)
+**FAIL if**:
+- ANY item is not ✅
+- ANY item is marked "optional", "TODO", "later", "nice to have"
+- Count of ✅ items < Total items
 
-All checks pass → DONE ✅
-Any check fails → Go to Phase 3
+**If FAIL → Go to Phase 3**
+
+**If PASS → Go to Phase 4**
 
 ---
 
-## Phase 3: Implement Pending Items
+## Phase 3: Complete Pending Items
 
-For each ❌ item in checklist:
-1. Read the corresponding file in `docs/`
-2. Implement what it requires
-3. Verify it works
-4. Update checklist to ✅
+**EXECUTE**: For each pending item in the checklist:
 
-When done → Return to Phase 1 (regenerate checklist)
+1. Read the spec/decision file that corresponds to that item
+2. Understand what needs to be implemented
+3. Implement it (write code, tests, config, etc.)
+4. Verify it works (run tests, build, etc.)
+5. Mark item as ✅ in the checklist
+
+**Continue until**: All items in checklist are ✅
+
+**Then**: Return to Phase 1 (regenerate checklist to verify)
+
+---
+
+## Phase 4: Final Verification
+
+**EXECUTE**: Verify the application works end-to-end.
+
+Run whatever verification the project defines:
+- Test suite (if exists)
+- Build process (if exists)
+- Run application (if runnable)
+- Any other project-specific verification
+
+**CHECK**: Do all verifications pass?
+
+**If NO → Return to Phase 3**
+
+**If YES → DONE - Implementation complete**
 
 ---
 
 ## 🔁 EXECUTION LOOP
 
 ```
+START
+  ↓
 Phase 1: Generate checklist
-    ↓
-Phase 2: Verify
-    ↓
-CHECK 1: All ✅? ──NO──┐
-    ↓ YES              │
-CHECK 2: App works? ───NO─→ Phase 3: Implement → Back to Phase 1
-    ↓ YES
-   DONE
+  ↓
+Phase 2: Review checklist
+  ↓
+All ✅? ──NO──→ Phase 3: Complete pending items ──→ Back to Phase 1
+  ↓
+ YES
+  ↓
+Phase 4: Final verification
+  ↓
+Pass? ──NO──→ Phase 3: Fix failures ──→ Back to Phase 1
+  ↓
+YES
+  ↓
+DONE - 100% complete
 ```
 
-**DO NOT STOP** until both checks pass.
+**DO NOT STOP** until checklist is 100% ✅ and all verifications pass.
 
 ---
 
 ## 📊 Why This Works
 
-1. **Checklist-driven**: Tracks what's done vs pending
-2. **Two-level verification**: Checklist ✅ AND app works
-3. **Self-correcting**: Loop back if anything fails
-4. **Content-agnostic**: Works regardless of docs/ content
-5. **Immutable**: Protocol never changes
+1. **Checklist-driven**: Explicit tracking of what's done vs pending
+2. **Self-verifying**: Regenerate checklist after changes to confirm completion
+3. **Content-agnostic**: Works regardless of docs/ content or project structure
+4. **Immutable**: Protocol never changes, only checklist content changes
+5. **Exhaustive**: Loops until 100% of checklist is complete
 
 ---
 
 ## 🚀 START EXECUTION NOW
 
+**BEGIN Phase 1**:
+
 ```bash
 ultrathink --seq @docs/spec @docs/decisions
 ```
 
-Then verify, implement, loop until complete.
+**THEN**: Review the checklist, complete pending items, verify, loop.
+
+**DO NOT STOP** until checklist shows 100% ✅ and all verifications pass.
