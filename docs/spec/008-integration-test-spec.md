@@ -113,12 +113,76 @@ test-plugin/
 ## 2. Integration Test (BDD)
 
 ```gherkin
-Feature: Complete plugin curation workflow with multi-plugin conflict resolution
+Feature: Complete plugin curation workflow
   As a user
-  I want to curate components from multiple plugins
-  So that I can create a custom plugin merging features from different sources
+  I want to curate components from a complex plugin
+  So that I can create a custom plugin with selected features
 
 Background:
+  Given test-plugin exists in "./test-fixtures/test-plugin"
+  And test-plugin contains:
+    | Component | Count |
+    | Commands  | 3     |
+    | Agents    | 2     |
+    | Skills    | 3     |
+    | Hooks     | 4     |
+    | MCPs      | 3     |
+
+Scenario: Full workflow - Load, select, save, verify
+  When I execute "app select ./test-fixtures/test-plugin"
+  Then TUI displays with 3 panels
+  And PLUGINS panel shows "test-plugin"
+  And COMPONENTS panel shows 15 items total
+  And PREVIEW panel is empty
+
+  When I navigate to COMPONENTS panel
+  And I select:
+    | Component Type | Item |
+    | Command        | analyze.md |
+    | Agent          | reviewer.md |
+    | Skill          | skill-alpha |
+    | Hook           | SessionStart: /setup-env.sh |
+    | MCP            | tavily |
+  Then PREVIEW panel shows 5 items selected
+
+  When I press S (Save)
+  Then I see success message with installation instructions
+  And TUI remains open
+
+  # VERIFY OUTPUT FILES
+  And file "./output/curated-plugin/.claude-plugin/marketplace.json" exists
+  And file "./output/curated-plugin/plugins/curated-plugin/.claude-plugin/plugin.json" exists
+  And file "./output/curated-plugin/normalized-plugin.json" exists
+
+  # VERIFY MARKETPLACE FORMAT
+  And marketplace.json is valid JSON
+  And marketplace.json contains plugin "curated-plugin"
+  And marketplace.json source points to "./plugins/curated-plugin"
+
+  # VERIFY OFFICIAL FORMAT (plugin.json)
+  And plugin.json is valid JSON
+  And plugin.json contains:
+    | Field       | Value |
+    | name        | "test-plugin" |
+    | version     | "1.2.3" |
+    | description | "Comprehensive test plugin" |
+  And plugin.json has field "commands" with 1 item
+  And plugin.json has field "agents" with 1 item
+  And plugin.json has field "skills" with 1 item
+  And plugin.json has field "hooks" as object with key "SessionStart"
+  And plugin.json has field "mcpServers" as object with key "tavily"
+
+  # VERIFY FILES COPIED
+  And file "./output/curated-plugin/plugins/curated-plugin/commands/analyze.md" exists
+  And file "./output/curated-plugin/plugins/curated-plugin/agents/reviewer.md" exists
+  And directory "./output/curated-plugin/plugins/curated-plugin/skills/skill-alpha" exists
+  And file "./output/curated-plugin/plugins/curated-plugin/skills/skill-alpha/SKILL.md" exists
+
+  # VERIFY PLUGIN IS USABLE
+  And can install with "/plugin marketplace add ./output/curated-plugin"
+  And can install plugin with "/plugin install curated-plugin"
+
+Scenario: Multi-plugin selection with conflict resolution
   Given test-plugin-a exists in "./test-fixtures/test-plugin-a" with:
     | Component | Path |
     | Command   | commands/build.md |
@@ -137,11 +201,9 @@ Background:
     | Hook      | SessionStart → /setup-b.sh ← MERGE: same event |
     | MCP       | tavily (command: "npx", env: {"KEY": "B"}) ← CONFLICT: same name |
 
-Scenario: Multi-plugin selection with all conflict types resolved
   When I execute "app select ./test-fixtures"
   Then TUI displays with 3 panels
   And PLUGINS panel shows "test-plugin-a" and "test-plugin-b"
-  And COMPONENTS panel shows combined components from both plugins
 
   When I select ALL components from test-plugin-a
   And I select ALL components from test-plugin-b
@@ -153,13 +215,8 @@ Scenario: Multi-plugin selection with all conflict types resolved
     - 2 MCPs (1 + 1)
 
   When I press S (Save)
-  Then I see success message with installation instructions
+  Then I see success message
   And TUI remains open
-
-  # VERIFY OUTPUT FILES
-  And file "./output/curated-plugin/.claude-plugin/marketplace.json" exists
-  And file "./output/curated-plugin/plugins/curated-plugin/.claude-plugin/plugin.json" exists
-  And file "./output/curated-plugin/normalized-plugin.json" exists
 
   # VERIFY COMMANDS - namespace prefix applied
   And file "./output/curated-plugin/plugins/curated-plugin/commands/test-plugin-a--build.md" exists
