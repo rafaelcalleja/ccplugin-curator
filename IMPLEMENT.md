@@ -9,12 +9,21 @@
 When you finish executing this protocol, you MUST have:
 
 ✅ All requirements from `docs/spec/*.md` extracted and documented
+✅ All decisions from `docs/decisions/*.md` verified and implemented
 ✅ Coverage matrix showing requirement → test → implementation mapping
 ✅ All tests passing (unit + integration)
 ✅ Every requirement status = ✅ (100% coverage)
 ✅ Zero gaps remaining
+✅ **EVERY spec file has corresponding implementation** (verified in Phase 6.3)
+✅ **EVERY decision file has corresponding implementation** (verified in Phase 6.4)
+✅ **TUI executable runs and displays correctly** (mandatory check for 003)
 
 **If any criterion is not met, continue implementing until all are ✅**
+
+**CRITICAL**: 100% coverage means:
+- ALL spec files (001-008) → implemented
+- ALL decision files → applied
+- TUI runs without errors
 
 ---
 
@@ -88,6 +97,8 @@ Example:
 **ACTION**: Extract all requirements from every spec file.
 
 For EACH spec file in `EXECUTION_ORDER` (calculated in Phase 1), execute ALL extraction steps below:
+
+**CRITICAL**: Every spec file MUST generate at least one requirement. If pattern-based extraction yields zero requirements, manually create requirements from section headers.
 
 ### 2.1 Extract BDD Scenarios
 
@@ -208,7 +219,57 @@ Scenario: Conflicto de nombres de comandos
 
 ---
 
-### 2.5 Consolidate requirements
+### 2.5 EXECUTE: Handle descriptive/visual specs
+
+**CRITICAL CHECK**: For each spec file processed, if extraction steps 2.1-2.4 yielded ZERO requirements:
+
+**Action**: Manually extract requirements from section headers.
+
+**Pattern**: Find all `##` level headers and create one requirement per major section.
+
+**Example for 003-tui-visual-spec.md**:
+```json
+[
+  {
+    "id": "003::Feature::3PanelLayout",
+    "type": "Visual_Feature",
+    "source": "docs/spec/003-tui-visual-spec.md:22",
+    "description": "Three panel design (PLUGINS | COMPONENTS | PREVIEW)",
+    "content": "Implement 3-panel TUI layout with borders"
+  },
+  {
+    "id": "003::Feature::KeyboardNav",
+    "type": "Visual_Feature",
+    "source": "docs/spec/003-tui-visual-spec.md:53",
+    "description": "Keyboard navigation (←→↑↓ SPACE S Q)",
+    "content": "Implement keyboard controls for navigation and actions"
+  },
+  {
+    "id": "003::Feature::RealtimePreview",
+    "type": "Visual_Feature",
+    "source": "docs/spec/003-tui-visual-spec.md:28",
+    "description": "Real-time JSON preview panel",
+    "content": "Sync preview panel with selection state"
+  }
+]
+```
+
+**Validation**: After this step, verify that EVERY spec file in EXECUTION_ORDER has at least 1 requirement.
+
+```bash
+# Check each spec has requirements
+for spec in $(cat EXECUTION_ORDER.txt); do
+  count=$(grep -c "\"source\": \"docs/spec/$spec" REQUIREMENTS.json)
+  if [ $count -eq 0 ]; then
+    echo "❌ ERROR: Spec $spec has ZERO requirements"
+    exit 1
+  fi
+done
+```
+
+---
+
+### 2.6 Consolidate requirements
 
 **Output**: `REQUIREMENTS.json`
 
@@ -388,16 +449,80 @@ ls -1 EXECUTION_ORDER.txt REQUIREMENTS.json COVERAGE_MATRIX.md GAPS.md
 
 ---
 
-### 6.3 EXECUTE: Manual verification (if applicable)
+### 6.3 EXECUTE: Verify implementation for EACH spec file
 
-Some requirements may need manual verification. Check these if applicable:
+**CRITICAL**: For EVERY spec file in EXECUTION_ORDER, verify implementation exists.
 
-- [ ] TUI displays 3 panels correctly (003)
-- [ ] Keyboard navigation works as specified (003, 004)
-- [ ] Generated plugin installs successfully via `/plugin install` (008)
-- [ ] Visual output matches spec examples (007)
+#### Spec-by-Spec Verification:
 
-**If any manual check fails → Return to Phase 5 and fix the implementation**
+**001-normalization-protocol.md**:
+- [ ] File exists: `src/normalize.ts` or equivalent
+- [ ] Exports normalization function
+- [ ] Tests exist: `tests/normalize.test.ts`
+
+**002-plugin-format-spec.md**:
+- [ ] External reference only (no implementation needed)
+
+**003-tui-visual-spec.md**:
+- [ ] File exists: `src/tui.ts` or `src/ui/` directory
+- [ ] Implements 3-panel layout
+- [ ] Implements keyboard navigation (←→↑↓ SPACE S Q)
+- [ ] Implements real-time preview panel
+- [ ] Entry point exists: `src/index.ts` or `src/cli.ts`
+- [ ] Can run: `node dist/index.js <path>` and TUI appears
+
+**004-user-workflows.md**:
+- [ ] All BDD scenarios have corresponding implementation
+- [ ] Save operation works (verified via tests)
+- [ ] Multi-plugin selection works (verified via tests)
+
+**005-transformation-rules.md**:
+- [ ] Implementation in `src/normalize.ts` (forward transform)
+- [ ] Tests exist: `tests/transform.test.ts`
+
+**006-reverse-transformation-rules.md**:
+- [ ] File exists: `src/reverse-transform.ts`
+- [ ] Tests exist: `tests/reverse-transform.test.ts`
+
+**007-save-operation-rules.md**:
+- [ ] File exists: `src/save.ts` or equivalent
+- [ ] Implements all edge cases (7.1-7.6)
+- [ ] Tests exist: `tests/save.test.ts`
+
+**008-integration-test-spec.md**:
+- [ ] File exists: `tests/integration.test.ts`
+- [ ] Both scenarios implemented (single-plugin + multi-plugin)
+- [ ] All verifications pass
+
+**MANDATORY**: Run executable to verify 003 (TUI):
+```bash
+npm run build
+node dist/index.js ./test-fixtures
+# Should display TUI with 3 panels
+# Press Q to quit
+```
+
+**If ANY spec verification fails → INCOMPLETE, return to Phase 5**
+
+---
+
+### 6.4 EXECUTE: Verify implementation for EACH decision file
+
+**CRITICAL**: For EVERY file in `docs/decisions/*.md`, verify decision is implemented.
+
+#### Decision-by-Decision Verification:
+
+**001-json-schema-to-typescript.md**:
+- [ ] File exists: `package.json` with `json-schema-to-typescript` in devDependencies
+- [ ] Script exists: `package.json` has `generate-types` script
+- [ ] Type files exist: `src/types.ts` or equivalent generated from schemas
+- [ ] Can run: `npm run generate-types` (if schemas exist)
+
+**Additional decisions** (if added in future):
+- [ ] For each decision file, verify corresponding implementation exists
+- [ ] Check that decisions are applied in codebase
+
+**If ANY decision verification fails → INCOMPLETE, return to Phase 5**
 
 ---
 
@@ -420,11 +545,40 @@ test -f REQUIREMENTS.json && echo "✅" || echo "❌ Run Phase 2 again"
 npm test && echo "✅" || echo "❌ Fix failing tests"
 ```
 
+### Check 4: Does TUI executable exist and run?
+```bash
+npm run build 2>/dev/null && \
+  [ -f dist/index.js ] && \
+  echo "✅ TUI executable exists" || \
+  echo "❌ TUI not implemented (003-tui-visual-spec.md incomplete)"
+```
+
+### Check 5: Are ALL specs implemented?
+```bash
+# Verify each spec has implementation (from Phase 6.3)
+# Manual verification required for 003, 004, 008
+echo "⚠️  Manual verification required - see Phase 6.3"
+```
+
+### Check 6: Are ALL decisions applied?
+```bash
+# Verify each decision is implemented (from Phase 6.4)
+grep -q "json-schema-to-typescript" package.json && \
+  echo "✅ Decision 001 applied" || \
+  echo "❌ Decision 001 not applied"
+```
+
 ### IF ANY CHECK FAILS:
 **LOOP BACK** to the failing phase and continue implementation.
 
 ### IF ALL CHECKS PASS:
 **STOP** - Implementation is complete.
+
+**FINAL VALIDATION**: Before declaring complete, manually verify:
+1. TUI runs: `node dist/index.js ./test-fixtures`
+2. TUI displays 3 panels
+3. Keyboard navigation works (←→↑↓ SPACE S Q)
+4. Save operation creates files
 
 ---
 
