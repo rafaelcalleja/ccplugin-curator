@@ -1,0 +1,12 @@
+{
+  "SessionStart": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "/setup-a.sh"
+        }
+      ]
+    }
+  ]
+}
