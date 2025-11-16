@@ -1,0 +1,163 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rafaelcalleja/ccplugin-curator/schemas/normalized-plugin.schema.json",
+  "title": "Normalized Plugin (Internal Format)",
+  "description": "Internal normalized format used by the curator TUI",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Plugin name (always present)"
+    },
+    "source": {
+      "type": "string",
+      "description": "Absolute path to plugin directory"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version (default: 0.0.0)",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description (default: empty string)"
+    },
+    "author": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "required": ["name", "email", "url"],
+      "additionalProperties": false
+    },
+    "homepage": {
+      "type": "string",
+      "description": "Homepage URL (default: empty string)"
+    },
+    "repository": {
+      "type": "string",
+      "description": "Repository URL (default: empty string)"
+    },
+    "license": {
+      "type": "string",
+      "description": "License identifier (default: empty string)"
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Keywords array (default: empty array)"
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of command file paths (relative to plugin root)"
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of agent file paths (relative to plugin root)"
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of skill directory paths (relative to plugin root)"
+    },
+    "hooks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "description": "Hook event name"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["command"]
+          },
+          "command": {
+            "type": "string",
+            "description": "Command to execute"
+          },
+          "matcher": {
+            "type": "string",
+            "description": "Tool matcher pattern (optional)"
+          },
+          "timeout": {
+            "type": "number",
+            "description": "Timeout in seconds (optional)"
+          }
+        },
+        "required": ["event", "type", "command"],
+        "additionalProperties": true
+      },
+      "description": "Array of hooks (flat structure)"
+    },
+    "mcps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "MCP server name"
+          },
+          "command": {
+            "type": "string",
+            "description": "Executable command"
+          },
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Command arguments"
+          },
+          "env": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Environment variables"
+          }
+        },
+        "required": ["name", "command"],
+        "additionalProperties": true
+      },
+      "description": "Array of MCP servers (flat structure)"
+    }
+  },
+  "required": [
+    "name",
+    "source",
+    "version",
+    "description",
+    "author",
+    "homepage",
+    "repository",
+    "license",
+    "keywords",
+    "commands",
+    "agents",
+    "skills",
+    "hooks",
+    "mcps"
+  ],
+  "additionalProperties": false
+}

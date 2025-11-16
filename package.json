@@ -1,0 +1,51 @@
+{
+  "name": "ccplugin-curator",
+  "version": "0.0.10",
+  "description": "TUI for curating and selecting components from Claude Code plugins",
+  "main": "dist/index.js",
+  "type": "module",
+  "bin": {
+    "ccplugin-curator": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "generate-types": "json-schema-to-typescript schemas/plugin.schema.json -o src/types/plugin.ts && json-schema-to-typescript schemas/normalized-plugin.schema.json -o src/types/normalized.ts",
+    "test": "vitest",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:setup-fixtures": "tsx tests/setup-fixtures.ts",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\""
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "plugins",
+    "tui",
+    "curator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ink": "^4.4.1",
+    "react": "^18.2.0",
+    "ajv": "^8.12.0",
+    "glob": "^10.3.10",
+    "commander": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "typescript": "^5.3.3",
+    "tsx": "^4.7.0",
+    "json-schema-to-typescript": "^13.1.1",
+    "vitest": "^1.0.4",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
+    "@typescript-eslint/parser": "^6.16.0",
+    "prettier": "^3.1.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rafaelcalleja/ccplugin-curator/schemas/marketplace.schema.json",
+  "title": "Claude Code Marketplace",
+  "description": "Marketplace configuration for Claude Code",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Marketplace name"
+    },
+    "owner": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        }
+      },
+      "required": ["name", "email"],
+      "additionalProperties": false
+    },
+    "plugins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "description": "Relative path to plugin directory"
+          }
+        },
+        "required": ["name", "source"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["name", "owner", "plugins"],
+  "additionalProperties": false
+}
