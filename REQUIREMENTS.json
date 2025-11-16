@@ -1,0 +1,818 @@
+[
+  {
+    "id": "001::Invariant::1",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:34",
+    "description": "Path Behavior Rules - CRITICAL",
+    "content": "⚠️ CRÍTICO: Las rutas personalizadas COMPLEMENTAN los directorios predeterminados, NO los reemplazan."
+  },
+  {
+    "id": "001::Invariant::2",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:38",
+    "description": "Commands directory loading rule",
+    "content": "Si existe `commands/`, se carga ADEMÁS de las rutas de comandos personalizadas"
+  },
+  {
+    "id": "001::Invariant::3",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:39",
+    "description": "All paths MUST be relative and start with ./",
+    "content": "Todas las rutas deben ser relativas a la raíz del complemento y comenzar con `./`"
+  },
+  {
+    "id": "001::Invariant::4",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:40",
+    "description": "Custom commands follow same naming rules",
+    "content": "Los comandos de rutas personalizadas utilizan las mismas reglas de nomenclatura y espacios de nombres"
+  },
+  {
+    "id": "001::Invariant::5",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:41",
+    "description": "Multiple paths can be specified as arrays",
+    "content": "Se pueden especificar múltiples rutas como matrices para mayor flexibilidad"
+  },
+  {
+    "id": "001::Invariant::6",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:42",
+    "description": "Auto-discovery ALWAYS occurs if default directories exist",
+    "content": "Auto-discovery SIEMPRE ocurre si existen los directorios predeterminados"
+  },
+  {
+    "id": "001::Invariant::7",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:43",
+    "description": "Custom paths are ADDED to auto-discovered paths",
+    "content": "Las rutas personalizadas se SUMAN a las rutas auto-descubiertas"
+  },
+  {
+    "id": "001::Invariant::8",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:201",
+    "description": "Auto-discovery ALWAYS occurs for default directories",
+    "content": "Auto-discovery SIEMPRE ocurre si existen los directorios predeterminados"
+  },
+  {
+    "id": "001::Invariant::9",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:206",
+    "description": "Golden Rule - Custom paths COMPLEMENT auto-discovery",
+    "content": "Regla de Oro: Custom paths COMPLEMENTAN (no reemplazan) auto-discovery"
+  },
+  {
+    "id": "001::Invariant::10",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:393",
+    "description": "All normalized plugins MUST have all fields defined",
+    "content": "All normalized plugins MUST have all fields defined (no undefined values)"
+  },
+  {
+    "id": "001::Invariant::11",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:394",
+    "description": "All array fields MUST be arrays",
+    "content": "All array fields MUST be arrays (never string or undefined)"
+  },
+  {
+    "id": "001::Invariant::12",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:395",
+    "description": "All component paths MUST be relative",
+    "content": "All component paths MUST be relative to plugin source directory"
+  },
+  {
+    "id": "001::Invariant::13",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:396",
+    "description": "All component paths MUST start with ./",
+    "content": "All component paths MUST start with `./` in plugin.json (normalized format removes leading `./`)"
+  },
+  {
+    "id": "001::Invariant::14",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:397",
+    "description": "Source field MUST be absolute path",
+    "content": "`source` field MUST be absolute path to plugin directory"
+  },
+  {
+    "id": "001::Invariant::15",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:398",
+    "description": "Hooks and MCPs MUST be normalized to flat array",
+    "content": "Hooks and MCPs MUST be normalized to flat array format preserving original fields"
+  },
+  {
+    "id": "001::Invariant::16",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:399",
+    "description": "Skills can be defined or auto-discovered",
+    "content": "Skills can be defined in plugin.json (string|array) OR auto-discovered, following same rules as commands/agents"
+  },
+  {
+    "id": "001::Invariant::17",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:400",
+    "description": "CRITICAL - Custom paths COMPLEMENT auto-discovery",
+    "content": "CRÍTICO: Custom paths COMPLEMENTAN auto-discovery, NUNCA lo reemplazan"
+  },
+  {
+    "id": "001::Invariant::18",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:401",
+    "description": "Auto-discovery ALWAYS occurs if default directories exist",
+    "content": "Auto-discovery SIEMPRE ocurre si existen los directorios predeterminados"
+  },
+  {
+    "id": "001::Invariant::19",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:402",
+    "description": "Hooks can be string or object",
+    "content": "Hooks can be string (file path) or object (inline config)"
+  },
+  {
+    "id": "001::Invariant::20",
+    "type": "Invariant",
+    "source": "docs/spec/001-normalization-protocol.md:403",
+    "description": "MCPs can be string or object",
+    "content": "MCPs can be string (file path) or object (inline config)"
+  },
+  {
+    "id": "001::Example::1",
+    "type": "Example",
+    "source": "docs/spec/001-normalization-protocol.md:131",
+    "description": "Complete Example - Official to Normalized transformation",
+    "input": "{\n  \"name\": \"my-plugin\"\n  // All other fields omitted → auto-discovery applies\n}",
+    "expectedOutput": "{\n  \"name\": \"my-plugin\",\n  \"source\": \"/absolute/path/to/my-plugin\",\n  \"version\": \"0.0.0\",\n  \"description\": \"\",\n  \"author\": {\n    \"name\": \"\",\n    \"email\": \"\",\n    \"url\": \"\"\n  },\n  \"homepage\": \"\",\n  \"repository\": \"\",\n  \"license\": \"\",\n  \"keywords\": [],\n  \"commands\": [\"commands/analyze.md\", \"commands/build.md\"],\n  \"agents\": [\"agents/reviewer.md\"],\n  \"skills\": [\"skills/skill-a\", \"skills/skill-b\"],\n  \"hooks\": [\n    {\n      \"event\": \"SessionStart\",\n      \"type\": \"command\",\n      \"command\": \"/setup.sh\"\n    }\n  ],\n  \"mcps\": [\n    {\n      \"name\": \"tavily\",\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@tavily/mcp-server\"],\n      \"env\": {}\n    }\n  ]\n}"
+  },
+  {
+    "id": "001::Example::2",
+    "type": "Example",
+    "source": "docs/spec/001-normalization-protocol.md:230",
+    "description": "Commands Supplementation - Custom paths complement auto-discovery",
+    "input": "{\n  \"name\": \"my-plugin\",\n  \"commands\": \"./custom/cmd.md\"\n}",
+    "expectedOutput": "{\n  \"commands\": [\n    \"custom/cmd.md\",           // Custom path\n    \"commands/default.md\"      // Auto-discovered (AMBOS)\n  ]\n}"
+  },
+  {
+    "id": "001::Example::3",
+    "type": "Example",
+    "source": "docs/spec/001-normalization-protocol.md:259",
+    "description": "Inline Hooks Configuration transformation",
+    "input": "{\n  \"name\": \"my-plugin\",\n  \"hooks\": {\n    \"SessionStart\": [\n      {\n        \"type\": \"command\",\n        \"command\": \"/setup-env.sh\"\n      }\n    ],\n    \"PostToolUse\": [\n      {\n        \"matcher\": \"Write|Edit\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"/format.sh\"\n          }\n        ]\n      }\n    ]\n  }\n}",
+    "expectedOutput": "{\n  \"hooks\": [\n    {\n      \"event\": \"SessionStart\",\n      \"type\": \"command\",\n      \"command\": \"/setup-env.sh\"\n    },\n    {\n      \"event\": \"PostToolUse\",\n      \"type\": \"command\",\n      \"command\": \"/format.sh\",\n      \"matcher\": \"Write|Edit\"\n    }\n  ]\n}"
+  },
+  {
+    "id": "001::Example::4",
+    "type": "Example",
+    "source": "docs/spec/001-normalization-protocol.md:306",
+    "description": "Inline MCP Configuration transformation",
+    "input": "{\n  \"name\": \"my-plugin\",\n  \"mcpServers\": {\n    \"tavily\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@tavily/mcp-server\"],\n      \"env\": {\n        \"TAVILY_API_KEY\": \"${TAVILY_API_KEY}\"\n      }\n    },\n    \"filesystem\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@modelcontextprotocol/server-filesystem\", \"/allowed/path\"]\n    }\n  }\n}",
+    "expectedOutput": "{\n  \"mcps\": [\n    {\n      \"name\": \"tavily\",\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@tavily/mcp-server\"],\n      \"env\": {\n        \"TAVILY_API_KEY\": \"${TAVILY_API_KEY}\"\n      }\n    },\n    {\n      \"name\": \"filesystem\",\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@modelcontextprotocol/server-filesystem\", \"/allowed/path\"],\n      \"env\": {}\n    }\n  ]\n}"
+  },
+  {
+    "id": "001::Example::5",
+    "type": "Example",
+    "source": "docs/spec/001-normalization-protocol.md:350",
+    "description": "Multiple Custom Paths with Auto-Discovery",
+    "input": "{\n  \"name\": \"my-plugin\",\n  \"commands\": [\n    \"./custom-commands/deploy.md\",\n    \"./scripts/cmd.md\"\n  ]\n}",
+    "expectedOutput": "{\n  \"commands\": [\n    \"custom-commands/deploy.md\",  // Custom path 1\n    \"scripts/cmd.md\",              // Custom path 2\n    \"commands/analyze.md\",         // Auto-discovered\n    \"commands/build.md\"            // Auto-discovered\n  ]\n}"
+  },
+  {
+    "id": "004::BDD_Scenario::1",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/004-user-workflows.md:25",
+    "description": "Usuario selecciona componentes",
+    "content": "Scenario: Usuario selecciona componentes\n  Given el usuario tiene plugins en \"./plugins\"\n  When ejecuta \"app select ./plugins\"\n  Then la aplicación escanea el folder\n  And normaliza los plugins al formato interno\n  And muestra TUI con 3 paneles:\n    - Panel izquierdo: lista de plugins\n    - Panel central: componentes del plugin seleccionado\n    - Panel derecho: preview JSON de la selección\n\n  When el usuario navega con flechas ↑↓\n  And presiona SPACE para marcar/desmarcar componentes\n  Then el panel derecho actualiza el preview en tiempo real\n\n  When el usuario presiona S (Save)\n  Then la aplicación guarda la selección como plugin.json\n\n  When el usuario presiona Q (Quit)\n  Then la aplicación cierra"
+  },
+  {
+    "id": "004::BDD_Scenario::2",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/004-user-workflows.md:52",
+    "description": "Inicio - Application startup and plugin scanning",
+    "content": "Given el usuario ejecuta \"app select ./plugins\"\nWhen la app inicia\nThen:\n  - Escanea \"./plugins\" buscando directorios con \".claude-plugin/plugin.json\"\n  - Para cada plugin encontrado:\n    - Lee plugin.json\n    - Ejecuta auto-discovery (commands/, agents/, skills/, hooks/, .mcp.json)\n    - Transforma a formato normalizado (según 001-normalization-protocol.md)\n  - Muestra TUI con primer plugin auto-seleccionado"
+  },
+  {
+    "id": "004::BDD_Scenario::3",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/004-user-workflows.md:67",
+    "description": "Navegar entre plugins",
+    "content": "Scenario: Navegar entre plugins\n  Given la TUI está mostrando plugins\n  When el usuario está en panel izquierdo (PLUGINS)\n  And presiona ↑ o ↓\n  Then cambia el plugin seleccionado\n  And el panel central actualiza mostrando componentes del nuevo plugin"
+  },
+  {
+    "id": "004::BDD_Scenario::4",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/004-user-workflows.md:74",
+    "description": "Navegar entre paneles",
+    "content": "Scenario: Navegar entre paneles\n  Given la TUI está visible\n  When el usuario presiona → (derecha)\n  Then el foco cambia: PLUGINS → COMPONENTS → PREVIEW\n  When el usuario presiona ← (izquierda)\n  Then el foco cambia: PREVIEW → COMPONENTS → PLUGINS"
+  },
+  {
+    "id": "004::BDD_Scenario::5",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/004-user-workflows.md:85",
+    "description": "Seleccionar componentes",
+    "content": "Scenario: Seleccionar componentes\n  Given el usuario está en panel COMPONENTS\n  And el foco está en un componente (comando, agent, hook, mcp, skill)\n  When presiona SPACE\n  Then el checkbox cambia [ ] ↔ [✓]\n  And el panel PREVIEW actualiza mostrando el componente agregado/removido"
+  },
+  {
+    "id": "004::BDD_Scenario::6",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/004-user-workflows.md:92",
+    "description": "Seleccionar de múltiples plugins",
+    "content": "Scenario: Seleccionar de múltiples plugins\n  Given el usuario seleccionó componentes del plugin A\n  When navega al plugin B\n  And selecciona componentes del plugin B\n  Then ambas selecciones se mantienen\n  And el preview muestra todos los componentes seleccionados de todos los plugins"
+  },
+  {
+    "id": "004::BDD_Scenario::7",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/004-user-workflows.md:103",
+    "description": "Guardar selección",
+    "content": "Scenario: Guardar selección\n  Given el usuario tiene componentes seleccionados\n  When presiona S (Save)\n  Then genera:\n    - .claude-plugin/marketplace.json (marketplace)\n    - plugins/curated-plugin/ (plugin con componentes, incluye formato oficial .claude-plugin/plugin.json)\n    - normalized-plugin.json (normalizado)\n  And copia archivos de componentes seleccionados a plugins/curated-plugin/\n  And guarda en \"./output/curated-plugin/\" (o path configurable)\n  And muestra mensaje de éxito con instrucciones de instalación\n  And la TUI permanece abierta"
+  },
+  {
+    "id": "004::BDD_Scenario::8",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/004-user-workflows.md:115",
+    "description": "Guardar sin selección",
+    "content": "Scenario: Guardar sin selección\n  Given el usuario NO tiene componentes seleccionados\n  When presiona S (Save)\n  Then muestra advertencia: \"No hay componentes seleccionados\"\n  And NO guarda nada"
+  },
+  {
+    "id": "004::BDD_Scenario::9",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/004-user-workflows.md:125",
+    "description": "Conflicto de nombres de comandos",
+    "content": "Scenario: Conflicto de nombres de comandos\n  Given plugin-a tiene \"commands/build.md\"\n  And plugin-b tiene \"commands/build.md\"\n  When selecciono ambos comandos\n  And presiono S (Save)\n  Then ambos archivos se copian con namespace prefix:\n    - commands/plugin-a--build.md\n    - commands/plugin-b--build.md\n  And plugin.json lista ambos con prefix"
+  },
+  {
+    "id": "004::BDD_Scenario::10",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/004-user-workflows.md:135",
+    "description": "Conflicto de nombres de agentes",
+    "content": "Scenario: Conflicto de nombres de agentes\n  Given plugin-a tiene \"agents/reviewer.md\"\n  And plugin-b tiene \"agents/reviewer.md\"\n  When selecciono ambos agentes\n  And presiono S (Save)\n  Then ambos archivos se copian con namespace prefix:\n    - agents/plugin-a--reviewer.md\n    - agents/plugin-b--reviewer.md"
+  },
+  {
+    "id": "004::BDD_Scenario::11",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/004-user-workflows.md:144",
+    "description": "Conflicto de nombres de MCPs",
+    "content": "Scenario: Conflicto de nombres de MCPs\n  Given plugin-a tiene MCP \"tavily\" con config A\n  And plugin-b tiene MCP \"tavily\" con config B\n  When selecciono ambos MCPs\n  And presiono S (Save)\n  Then plugin.json contiene ambos con prefix:\n    - \"plugin-a--tavily\": { config A }\n    - \"plugin-b--tavily\": { config B }"
+  },
+  {
+    "id": "004::BDD_Scenario::12",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/004-user-workflows.md:153",
+    "description": "Conflicto de directorios de skills",
+    "content": "Scenario: Conflicto de directorios de skills\n  Given plugin-a tiene \"skills/chrome-devtools/\"\n  And plugin-b tiene \"skills/chrome-devtools/\"\n  When selecciono ambos skills\n  And presiono S (Save)\n  Then ambos directorios se copian con namespace prefix:\n    - skills/plugin-a--chrome-devtools/\n    - skills/plugin-b--chrome-devtools/"
+  },
+  {
+    "id": "004::BDD_Scenario::13",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/004-user-workflows.md:162",
+    "description": "Merge de hooks del mismo evento",
+    "content": "Scenario: Merge de hooks del mismo evento\n  Given plugin-a tiene hook SessionStart → /setup-a.sh\n  And plugin-b tiene hook SessionStart → /setup-b.sh\n  When selecciono ambos hooks\n  And presiono S (Save)\n  Then plugin.json mergea automáticamente:\n    \"SessionStart\": [\n      { \"hooks\": [\n        { \"command\": \"/setup-a.sh\" },\n        { \"command\": \"/setup-b.sh\" }\n      ] }\n    ]\n  And el orden preserva el orden de selección en TUI"
+  },
+  {
+    "id": "004::BDD_Scenario::14",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/004-user-workflows.md:180",
+    "description": "Salir de la aplicación",
+    "content": "Scenario: Salir de la aplicación\n  Given la TUI está abierta\n  When el usuario presiona Q (Quit)\n  Then la aplicación cierra inmediatamente\n  And NO pregunta por cambios sin guardar (simpleza)"
+  },
+  {
+    "id": "005::Example::1",
+    "type": "Example",
+    "source": "docs/spec/005-transformation-rules.md:28",
+    "description": "Commands/Agents - String path transformation",
+    "input": "{ \"commands\": \"custom-dir\" }",
+    "expectedOutput": "{ commands: [\"custom-dir/cmd1.md\", \"custom-dir/cmd2.md\"] }"
+  },
+  {
+    "id": "005::Example::2",
+    "type": "Example",
+    "source": "docs/spec/005-transformation-rules.md:41",
+    "description": "Commands/Agents - Array (no transformation)",
+    "input": "{ \"commands\": [\"cmd1.md\", \"cmd2.md\"] }",
+    "expectedOutput": "{ commands: [\"cmd1.md\", \"cmd2.md\"] }"
+  },
+  {
+    "id": "005::Example::3",
+    "type": "Example",
+    "source": "docs/spec/005-transformation-rules.md:55",
+    "description": "Skills Discovery - Undefined to discovered array",
+    "input": "{ }",
+    "expectedOutput": "{ skills: [\"skills/skill-a\", \"skills/skill-b\"] }"
+  },
+  {
+    "id": "005::Example::4",
+    "type": "Example",
+    "source": "docs/spec/005-transformation-rules.md:72",
+    "description": "Hooks - Nested to Flat Array transformation",
+    "input": "{\n  \"hooks\": {\n    \"SessionStart\": [\n      {\n        \"hooks\": [\n          { \"type\": \"command\", \"command\": \"/setup.sh\" }\n        ]\n      }\n    ],\n    \"PostToolUse\": [\n      {\n        \"matcher\": \"Write|Edit\",\n        \"hooks\": [\n          { \"type\": \"command\", \"command\": \"/format.sh\" }\n        ]\n      }\n    ]\n  }\n}",
+    "expectedOutput": "{\n  \"hooks\": [\n    {\n      \"event\": \"SessionStart\",\n      \"type\": \"command\",\n      \"command\": \"/setup.sh\"\n    },\n    {\n      \"event\": \"PostToolUse\",\n      \"type\": \"command\",\n      \"command\": \"/format.sh\",\n      \"matcher\": \"Write|Edit\"\n    }\n  ]\n}"
+  },
+  {
+    "id": "005::Example::5",
+    "type": "Example",
+    "source": "docs/spec/005-transformation-rules.md:153",
+    "description": "MCPs - Object to Array transformation",
+    "input": "{\n  \"mcpServers\": {\n    \"tavily\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@tavily/mcp-server\"],\n      \"env\": { \"TAVILY_API_KEY\": \"${TAVILY_API_KEY}\" }\n    },\n    \"filesystem\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@modelcontextprotocol/server-filesystem\", \"/path\"]\n    }\n  }\n}",
+    "expectedOutput": "{\n  \"mcps\": [\n    {\n      \"name\": \"tavily\",\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@tavily/mcp-server\"],\n      \"env\": { \"TAVILY_API_KEY\": \"${TAVILY_API_KEY}\" }\n    },\n    {\n      \"name\": \"filesystem\",\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@modelcontextprotocol/server-filesystem\", \"/path\"],\n      \"env\": {}\n    }\n  ]\n}"
+  },
+  {
+    "id": "005::Example::6",
+    "type": "Example",
+    "source": "docs/spec/005-transformation-rules.md:233",
+    "description": "Complete Example - Official to Normalized",
+    "input": "{\n  \"name\": \"my-plugin\",\n  \"commands\": \"scripts\",\n  \"hooks\": \"hooks/custom.json\"\n}",
+    "expectedOutput": "{\n  \"name\": \"my-plugin\",\n  \"source\": \"/absolute/path/to/my-plugin\",\n  \"version\": \"0.0.0\",\n  \"description\": \"\",\n  \"author\": { \"name\": \"\", \"email\": \"\", \"url\": \"\" },\n  \"homepage\": \"\",\n  \"repository\": \"\",\n  \"license\": \"\",\n  \"keywords\": [],\n  \"commands\": [\"scripts/cmd1.md\", \"scripts/cmd2.md\"],\n  \"agents\": [],\n  \"skills\": [\"skills/skill-a\"],\n  \"hooks\": [\n    {\n      \"event\": \"SessionStart\",\n      \"type\": \"command\",\n      \"command\": \"/init.sh\"\n    }\n  ],\n  \"mcps\": []\n}"
+  },
+  {
+    "id": "005::Invariant::1",
+    "type": "Invariant",
+    "source": "docs/spec/005-transformation-rules.md:292",
+    "description": "No undefined values guarantee",
+    "content": "No undefined values: All fields always defined"
+  },
+  {
+    "id": "005::Invariant::2",
+    "type": "Invariant",
+    "source": "docs/spec/005-transformation-rules.md:293",
+    "description": "Arrays never undefined",
+    "content": "Arrays never undefined: Empty arrays `[]` used instead"
+  },
+  {
+    "id": "005::Invariant::3",
+    "type": "Invariant",
+    "source": "docs/spec/005-transformation-rules.md:294",
+    "description": "Flat structure for hooks/mcps",
+    "content": "Flat structure: Nested hooks/mcps converted to flat arrays"
+  },
+  {
+    "id": "005::Invariant::4",
+    "type": "Invariant",
+    "source": "docs/spec/005-transformation-rules.md:295",
+    "description": "Event extraction from original keys",
+    "content": "Event extraction: Hook events extracted from original keys"
+  },
+  {
+    "id": "005::Invariant::5",
+    "type": "Invariant",
+    "source": "docs/spec/005-transformation-rules.md:296",
+    "description": "Name extraction for MCPs",
+    "content": "Name extraction: MCP names extracted from original keys"
+  },
+  {
+    "id": "005::Invariant::6",
+    "type": "Invariant",
+    "source": "docs/spec/005-transformation-rules.md:297",
+    "description": "Field preservation guarantee",
+    "content": "Field preservation: All original fields preserved (spread into new structure)"
+  },
+  {
+    "id": "005::Invariant::7",
+    "type": "Invariant",
+    "source": "docs/spec/005-transformation-rules.md:298",
+    "description": "Path normalization rule",
+    "content": "Path normalization: Leading `./` removed from all paths"
+  },
+  {
+    "id": "005::EdgeCase::1",
+    "type": "EdgeCase",
+    "source": "docs/spec/005-transformation-rules.md:304",
+    "description": "Empty Plugin",
+    "content": "// Input\n{}\n\n// Output\n{\n  \"name\": \"plugin-dir-name\",\n  \"source\": \"/absolute/path\",\n  \"version\": \"0.0.0\",\n  \"description\": \"\",\n  \"author\": { \"name\": \"\", \"email\": \"\", \"url\": \"\" },\n  \"homepage\": \"\",\n  \"repository\": \"\",\n  \"license\": \"\",\n  \"keywords\": [],\n  \"commands\": [],\n  \"agents\": [],\n  \"skills\": [],\n  \"hooks\": [],\n  \"mcps\": []\n}"
+  },
+  {
+    "id": "005::EdgeCase::2",
+    "type": "EdgeCase",
+    "source": "docs/spec/005-transformation-rules.md:329",
+    "description": "Multiple Hooks Same Event",
+    "content": "// Input\n{\n  \"hooks\": {\n    \"Stop\": [\n      {\n        \"hooks\": [\n          { \"type\": \"command\", \"command\": \"/first.sh\" },\n          { \"type\": \"command\", \"command\": \"/second.sh\" }\n        ]\n      }\n    ]\n  }\n}\n\n// Output\n{\n  \"hooks\": [\n    { \"event\": \"Stop\", \"type\": \"command\", \"command\": \"/first.sh\" },\n    { \"event\": \"Stop\", \"type\": \"command\", \"command\": \"/second.sh\" }\n  ]\n}"
+  },
+  {
+    "id": "005::EdgeCase::3",
+    "type": "EdgeCase",
+    "source": "docs/spec/005-transformation-rules.md:354",
+    "description": "MCP Name Collisions",
+    "content": "Note: If multiple plugins have MCPs with the same name (e.g., \"tavily\"), collision handling is responsibility of the application logic (TUI/save), NOT the normalization process."
+  },
+  {
+    "id": "006::Invariant::1",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:14",
+    "description": "Minimalism - Generate clean, minimal plugin.json files",
+    "content": "Minimalism: Generate clean, minimal `plugin.json` files"
+  },
+  {
+    "id": "006::Invariant::2",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:15",
+    "description": "Validity - Output must be valid Claude Code plugin format",
+    "content": "Validity: Output must be valid Claude Code plugin format"
+  },
+  {
+    "id": "006::Invariant::3",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:16",
+    "description": "Readability - Prefer human-readable structures",
+    "content": "Readability: Prefer human-readable structures when possible"
+  },
+  {
+    "id": "006::Invariant::4",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:17",
+    "description": "Compatibility - Ensure auto-discovery still works",
+    "content": "Compatibility: Ensure auto-discovery still works"
+  },
+  {
+    "id": "006::Invariant::5",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:46",
+    "description": "Omit default values to keep plugin.json minimal",
+    "content": "Rule: Omit fields that have default values to keep plugin.json minimal"
+  },
+  {
+    "id": "006::Invariant::6",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:119",
+    "description": "Always output commands/agents as explicit array with ./ prefix",
+    "content": "Rule: Always output as explicit array with `\"./\"` prefix. Do NOT try to reconstruct string paths."
+  },
+  {
+    "id": "006::Invariant::7",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:333",
+    "description": "NEVER include source field in official format",
+    "content": "Rule: NEVER include in official format (internal field only)"
+  },
+  {
+    "id": "006::Invariant::8",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:875",
+    "description": "Output is valid official Claude Code plugin format",
+    "content": "✅ Output is valid official Claude Code plugin format"
+  },
+  {
+    "id": "006::Invariant::9",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:876",
+    "description": "All non-default metadata is preserved",
+    "content": "✅ All non-default metadata is preserved"
+  },
+  {
+    "id": "006::Invariant::10",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:877",
+    "description": "Component arrays are explicit and unambiguous",
+    "content": "✅ Component arrays are explicit and unambiguous"
+  },
+  {
+    "id": "006::Invariant::11",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:878",
+    "description": "Hooks are grouped by event correctly",
+    "content": "✅ Hooks are grouped by event correctly"
+  },
+  {
+    "id": "006::Invariant::12",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:879",
+    "description": "MCPs are keyed by name correctly",
+    "content": "✅ MCPs are keyed by name correctly"
+  },
+  {
+    "id": "006::Invariant::13",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:880",
+    "description": "Custom fields in hooks/MCPs are preserved",
+    "content": "✅ Custom fields in hooks/MCPs are preserved"
+  },
+  {
+    "id": "006::Invariant::14",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:881",
+    "description": "Output is minimal (defaults omitted)",
+    "content": "✅ Output is minimal (defaults omitted)"
+  },
+  {
+    "id": "006::Invariant::15",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:884",
+    "description": "Non-Guarantee - Original path format not preserved",
+    "content": "❌ Original path format (string vs array) is not preserved"
+  },
+  {
+    "id": "006::Invariant::16",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:885",
+    "description": "Non-Guarantee - External file references become inline",
+    "content": "❌ External file references (hooks.json, .mcp.json) become inline"
+  },
+  {
+    "id": "006::Invariant::17",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:886",
+    "description": "Non-Guarantee - Cannot distinguish auto-discovered vs explicit",
+    "content": "❌ Cannot distinguish auto-discovered vs explicitly defined components"
+  },
+  {
+    "id": "006::Invariant::18",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:793",
+    "description": "Preserve all fields except event when converting hooks",
+    "content": "Rule: Preserve all fields except `event` when converting."
+  },
+  {
+    "id": "006::Invariant::19",
+    "type": "Invariant",
+    "source": "docs/spec/006-reverse-transformation-rules.md:827",
+    "description": "Preserve all fields except name when converting MCPs",
+    "content": "Rule: Preserve all fields except `name` when converting."
+  },
+  {
+    "id": "006::Example::1",
+    "type": "Example",
+    "source": "docs/spec/006-reverse-transformation-rules.md:49",
+    "description": "Metadata Fields - Omit defaults",
+    "input": "{\n  version: \"0.0.0\",\n  description: \"\",\n  author: {\n    name: \"\",\n    email: \"\",\n    url: \"\"\n  },\n  homepage: \"\",\n  license: \"\",\n  keywords: []\n}",
+    "expectedOutput": "{\n  // Fields omitted - will use defaults\n}"
+  },
+  {
+    "id": "006::Example::2",
+    "type": "Example",
+    "source": "docs/spec/006-reverse-transformation-rules.md:72",
+    "description": "Metadata Fields - Include non-default",
+    "input": "{\n  version: \"1.2.0\",\n  description: \"My plugin\",\n  license: \"MIT\",\n  keywords: [\"ai\", \"tools\"]\n}",
+    "expectedOutput": "{\n  \"version\": \"1.2.0\",\n  \"description\": \"My plugin\",\n  \"license\": \"MIT\",\n  \"keywords\": [\"ai\", \"tools\"]\n}"
+  },
+  {
+    "id": "006::Example::3",
+    "type": "Example",
+    "source": "docs/spec/006-reverse-transformation-rules.md:129",
+    "description": "Commands & Agents - Explicit arrays with ./ prefix",
+    "input": "{\n  commands: [\"commands/cmd1.md\", \"commands/cmd2.md\"],\n  agents: [\"agents/agent1.md\"]\n}",
+    "expectedOutput": "{\n  \"commands\": [\"./commands/cmd1.md\", \"./commands/cmd2.md\"],\n  \"agents\": [\"./agents/agent1.md\"]\n}"
+  },
+  {
+    "id": "006::Example::4",
+    "type": "Example",
+    "source": "docs/spec/006-reverse-transformation-rules.md:195",
+    "description": "Hooks - Array to Nested Object transformation",
+    "input": "{\n  hooks: [\n    {\n      event: \"SessionStart\",\n      type: \"command\",\n      command: \"/init.sh\"\n    },\n    {\n      event: \"PostToolUse\",\n      type: \"command\",\n      command: \"/format.sh\",\n      matcher: \"Write|Edit\"\n    }\n  ]\n}",
+    "expectedOutput": "{\n  \"hooks\": {\n    \"SessionStart\": [\n      {\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"/init.sh\"\n          }\n        ]\n      }\n    ],\n    \"PostToolUse\": [\n      {\n        \"matcher\": \"Write|Edit\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"/format.sh\"\n          }\n        ]\n      }\n    ]\n  }\n}"
+  },
+  {
+    "id": "006::Example::5",
+    "type": "Example",
+    "source": "docs/spec/006-reverse-transformation-rules.md:281",
+    "description": "MCPs - Array to Nested Object transformation",
+    "input": "{\n  mcps: [\n    {\n      name: \"tavily\",\n      command: \"npx\",\n      args: [\"-y\", \"@tavily/mcp-server\"],\n      env: {\n        \"TAVILY_API_KEY\": \"${TAVILY_API_KEY}\"\n      }\n    },\n    {\n      name: \"filesystem\",\n      command: \"npx\",\n      args: [\"-y\", \"@modelcontextprotocol/server-filesystem\", \"/path\"],\n      env: {}\n    }\n  ]\n}",
+    "expectedOutput": "{\n  \"mcpServers\": {\n    \"tavily\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@tavily/mcp-server\"],\n      \"env\": {\n        \"TAVILY_API_KEY\": \"${TAVILY_API_KEY}\"\n      }\n    },\n    \"filesystem\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@modelcontextprotocol/server-filesystem\", \"/path\"]\n    }\n  }\n}"
+  },
+  {
+    "id": "006::Example::6",
+    "type": "Example",
+    "source": "docs/spec/006-reverse-transformation-rules.md:353",
+    "description": "Complete Example - Minimal Plugin",
+    "input": "{\n  \"name\": \"my-plugin\",\n  \"source\": \"/absolute/path\",\n  \"version\": \"0.0.0\",\n  \"description\": \"\",\n  \"author\": { \"name\": \"\", \"email\": \"\", \"url\": \"\" },\n  \"homepage\": \"\",\n  \"repository\": \"\",\n  \"license\": \"\",\n  \"keywords\": [],\n  \"commands\": [\"commands/cmd1.md\"],\n  \"agents\": [],\n  \"skills\": [],\n  \"hooks\": [],\n  \"mcps\": []\n}",
+    "expectedOutput": "{\n  \"name\": \"my-plugin\",\n  \"commands\": [\"./commands/cmd1.md\"]\n}"
+  },
+  {
+    "id": "006::Example::7",
+    "type": "Example",
+    "source": "docs/spec/006-reverse-transformation-rules.md:390",
+    "description": "Complete Example - Full-Featured Plugin",
+    "input": "{\n  \"name\": \"personal-ai\",\n  \"source\": \"/absolute/path\",\n  \"version\": \"1.0.0\",\n  \"description\": \"Personal AI tools\",\n  \"author\": {\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"url\": \"\"\n  },\n  \"homepage\": \"https://example.com\",\n  \"license\": \"MIT\",\n  \"keywords\": [\"ai\", \"tools\"],\n  \"commands\": [\n    \"commands/analyze.md\",\n    \"commands/optimize.md\"\n  ],\n  \"agents\": [\n    \"agents/context-agent.md\"\n  ],\n  \"skills\": [\n    \"skills/skill-a\",\n    \"skills/skill-b\"\n  ],\n  \"hooks\": [\n    {\n      \"event\": \"SessionStart\",\n      \"type\": \"command\",\n      \"command\": \"/init.sh\"\n    },\n    {\n      \"event\": \"PostToolUse\",\n      \"type\": \"command\",\n      \"command\": \"/format.sh\",\n      \"matcher\": \"Write|Edit\"\n    }\n  ],\n  \"mcps\": [\n    {\n      \"name\": \"tavily\",\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@tavily/mcp-server\"],\n      \"env\": {\n        \"TAVILY_API_KEY\": \"${TAVILY_API_KEY}\"\n      }\n    }\n  ]\n}",
+    "expectedOutput": "{\n  \"name\": \"personal-ai\",\n  \"version\": \"1.0.0\",\n  \"description\": \"Personal AI tools\",\n  \"author\": {\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\"\n  },\n  \"homepage\": \"https://example.com\",\n  \"license\": \"MIT\",\n  \"keywords\": [\"ai\", \"tools\"],\n  \"commands\": [\n    \"./commands/analyze.md\",\n    \"./commands/optimize.md\"\n  ],\n  \"agents\": [\n    \"./agents/context-agent.md\"\n  ],\n  \"skills\": [\n    \"./skills/skill-a\",\n    \"./skills/skill-b\"\n  ],\n  \"hooks\": {\n    \"SessionStart\": [\n      {\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"/init.sh\"\n          }\n        ]\n      }\n    ],\n    \"PostToolUse\": [\n      {\n        \"matcher\": \"Write|Edit\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"/format.sh\"\n          }\n        ]\n      }\n    ]\n  },\n  \"mcpServers\": {\n    \"tavily\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@tavily/mcp-server\"],\n      \"env\": {\n        \"TAVILY_API_KEY\": \"${TAVILY_API_KEY}\"\n      }\n    }\n  }\n}"
+  },
+  {
+    "id": "006::EdgeCase::1",
+    "type": "EdgeCase",
+    "source": "docs/spec/006-reverse-transformation-rules.md:762",
+    "description": "Empty Plugin",
+    "content": "// Normalized input\n{\n  \"name\": \"empty-plugin\",\n  \"source\": \"/path\",\n  \"version\": \"0.0.0\",\n  \"description\": \"\",\n  \"author\": { \"name\": \"\", \"email\": \"\", \"url\": \"\" },\n  \"homepage\": \"\",\n  \"repository\": \"\",\n  \"license\": \"\",\n  \"keywords\": [],\n  \"commands\": [],\n  \"agents\": [],\n  \"skills\": [],\n  \"hooks\": [],\n  \"mcps\": []\n}\n\n// Official output (minimal)\n{\n  \"name\": \"empty-plugin\"\n}"
+  },
+  {
+    "id": "006::EdgeCase::2",
+    "type": "EdgeCase",
+    "source": "docs/spec/006-reverse-transformation-rules.md:791",
+    "description": "Hooks with Extra Fields",
+    "content": "// Normalized input\n{\n  \"hooks\": [\n    {\n      \"event\": \"SessionStart\",\n      \"type\": \"command\",\n      \"command\": \"/init.sh\",\n      \"customField\": \"customValue\",\n      \"anotherField\": 42\n    }\n  ]\n}\n\n// Official output (custom fields preserved)\n{\n  \"hooks\": {\n    \"SessionStart\": [\n      {\n        \"type\": \"command\",\n        \"command\": \"/init.sh\",\n        \"customField\": \"customValue\",\n        \"anotherField\": 42\n      }\n    ]\n  }\n}"
+  },
+  {
+    "id": "006::EdgeCase::3",
+    "type": "EdgeCase",
+    "source": "docs/spec/006-reverse-transformation-rules.md:826",
+    "description": "MCPs with Extra Fields",
+    "content": "// Normalized input\n{\n  \"mcps\": [\n    {\n      \"name\": \"custom-server\",\n      \"command\": \"node\",\n      \"args\": [\"server.js\"],\n      \"env\": {},\n      \"customConfig\": {\n        \"timeout\": 5000\n      }\n    }\n  ]\n}\n\n// Official output (custom fields preserved, empty env omitted)\n{\n  \"mcpServers\": {\n    \"custom-server\": {\n      \"command\": \"node\",\n      \"args\": [\"server.js\"],\n      \"customConfig\": {\n        \"timeout\": 5000\n      }\n    }\n  }\n}"
+  },
+  {
+    "id": "007::EdgeCase::1",
+    "type": "EdgeCase",
+    "source": "docs/spec/007-save-operation-rules.md:167",
+    "description": "Empty Selection",
+    "content": "IF selection.length === 0\nTHEN show \"⚠ No hay componentes seleccionados\"\nAND do NOT save"
+  },
+  {
+    "id": "007::EdgeCase::2",
+    "type": "EdgeCase",
+    "source": "docs/spec/007-save-operation-rules.md:176",
+    "description": "Output Directory Exists",
+    "content": "IF output directory exists\nTHEN ask \"Output directory exists. Overwrite? [Y/n]\"\nAND if yes → delete and recreate\nAND if no → cancel operation"
+  },
+  {
+    "id": "007::EdgeCase::3",
+    "type": "EdgeCase",
+    "source": "docs/spec/007-save-operation-rules.md:185",
+    "description": "File Name Conflicts (Commands & Agents)",
+    "content": "IF plugin-a has \"commands/build.md\"\nAND plugin-b has \"commands/build.md\"\nAND both selected\n\nTHEN apply namespace prefix:\n  - Copy plugin-a/commands/build.md → curated-plugin/commands/plugin-a--build.md\n  - Copy plugin-b/commands/build.md → curated-plugin/commands/plugin-b--build.md\n\nAND in plugin.json:\n  \"commands\": [\n    \"./commands/plugin-a--build.md\",\n    \"./commands/plugin-b--build.md\"\n  ]"
+  },
+  {
+    "id": "007::EdgeCase::4",
+    "type": "EdgeCase",
+    "source": "docs/spec/007-save-operation-rules.md:209",
+    "description": "MCP Name Conflicts",
+    "content": "IF plugin-a has MCP \"tavily\" with config A\nAND plugin-b has MCP \"tavily\" with config B\nAND both selected\n\nTHEN apply namespace prefix to MCP name:\n  \"mcpServers\": {\n    \"plugin-a--tavily\": { ...config A },\n    \"plugin-b--tavily\": { ...config B }\n  }\n\nRationale: MCP configs can differ (env vars, args), merging would lose data."
+  },
+  {
+    "id": "007::EdgeCase::5",
+    "type": "EdgeCase",
+    "source": "docs/spec/007-save-operation-rules.md:230",
+    "description": "Hook Event Merging",
+    "content": "IF plugin-a has Hook(event: \"SessionStart\", command: \"/setup-a.sh\")\nAND plugin-b has Hook(event: \"SessionStart\", command: \"/setup-b.sh\")\nAND both selected\n\nTHEN merge into same event array (already supported by 006-reverse-transformation-rules.md):\n  \"hooks\": {\n    \"SessionStart\": [\n      {\n        \"hooks\": [\n          { \"type\": \"command\", \"command\": \"/setup-a.sh\" },\n          { \"type\": \"command\", \"command\": \"/setup-b.sh\" }\n        ]\n      }\n    ]\n  }\n\nOrder: Preserve selection order from TUI.\n\nNo conflicts - this is valid Claude Code behavior (multiple hooks per event)."
+  },
+  {
+    "id": "007::EdgeCase::6",
+    "type": "EdgeCase",
+    "source": "docs/spec/007-save-operation-rules.md:257",
+    "description": "Skill Directory Conflicts",
+    "content": "IF plugin-a has \"skills/chrome-devtools/\"\nAND plugin-b has \"skills/chrome-devtools/\"\nAND both selected\n\nTHEN apply namespace prefix to directory name:\n  - Copy plugin-a/skills/chrome-devtools/ → curated-plugin/skills/plugin-a--chrome-devtools/\n  - Copy plugin-b/skills/chrome-devtools/ → curated-plugin/skills/plugin-b--chrome-devtools/\n\nAND in plugin.json:\n  \"skills\": [\n    \"./skills/plugin-a--chrome-devtools\",\n    \"./skills/plugin-b--chrome-devtools\"\n  ]\n\nRationale: Skills pattern is `skills/*/SKILL.md` - the `*` is the skill name."
+  },
+  {
+    "id": "007::Invariant::1",
+    "type": "Invariant",
+    "source": "docs/spec/007-save-operation-rules.md:155",
+    "description": "Validate normalized format before saving",
+    "content": "✅ Validate normalized format → 001-normalization-protocol.md"
+  },
+  {
+    "id": "007::Invariant::2",
+    "type": "Invariant",
+    "source": "docs/spec/007-save-operation-rules.md:156",
+    "description": "Apply transformation before saving",
+    "content": "✅ Apply transformation → 006-reverse-transformation-rules.md"
+  },
+  {
+    "id": "007::Invariant::3",
+    "type": "Invariant",
+    "source": "docs/spec/007-save-operation-rules.md:157",
+    "description": "Validate official format before saving",
+    "content": "✅ Validate official format → 002-plugin-format-spec.md"
+  },
+  {
+    "id": "008::BDD_Scenario::1",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/008-integration-test-spec.md:131",
+    "description": "Full workflow - Load, select, save, verify",
+    "content": "Scenario: Full workflow - Load, select, save, verify\n  When I execute \"app select ./test-fixtures/test-plugin\"\n  Then TUI displays with 3 panels\n  And PLUGINS panel shows \"test-plugin\"\n  And COMPONENTS panel shows 15 items total\n  And PREVIEW panel is empty\n\n  When I navigate to COMPONENTS panel\n  And I select:\n    | Component Type | Item |\n    | Command        | analyze.md |\n    | Agent          | reviewer.md |\n    | Skill          | skill-alpha |\n    | Hook           | SessionStart: /setup-env.sh |\n    | MCP            | tavily |\n  Then PREVIEW panel shows 5 items selected\n\n  When I press S (Save)\n  Then I see success message with installation instructions\n  And TUI remains open\n\n  # VERIFY OUTPUT FILES\n  And file \"./output/curated-plugin/.claude-plugin/marketplace.json\" exists\n  And file \"./output/curated-plugin/plugins/curated-plugin/.claude-plugin/plugin.json\" exists\n  And file \"./output/curated-plugin/normalized-plugin.json\" exists\n\n  # VERIFY MARKETPLACE FORMAT\n  And marketplace.json is valid JSON\n  And marketplace.json contains plugin \"curated-plugin\"\n  And marketplace.json source points to \"./plugins/curated-plugin\"\n\n  # VERIFY OFFICIAL FORMAT (plugin.json)\n  And plugin.json is valid JSON\n  And plugin.json contains:\n    | Field       | Value |\n    | name        | \"test-plugin\" |\n    | version     | \"1.2.3\" |\n    | description | \"Comprehensive test plugin\" |\n  And plugin.json has field \"commands\" with 1 item\n  And plugin.json has field \"agents\" with 1 item\n  And plugin.json has field \"skills\" with 1 item\n  And plugin.json has field \"hooks\" as object with key \"SessionStart\"\n  And plugin.json has field \"mcpServers\" as object with key \"tavily\"\n\n  # VERIFY FILES COPIED\n  And file \"./output/curated-plugin/plugins/curated-plugin/commands/analyze.md\" exists\n  And file \"./output/curated-plugin/plugins/curated-plugin/agents/reviewer.md\" exists\n  And directory \"./output/curated-plugin/plugins/curated-plugin/skills/skill-alpha\" exists\n  And file \"./output/curated-plugin/plugins/curated-plugin/skills/skill-alpha/SKILL.md\" exists\n\n  # VERIFY PLUGIN IS USABLE\n  And can install with \"/plugin marketplace add ./output/curated-plugin\"\n  And can install plugin with \"/plugin install curated-plugin\""
+  },
+  {
+    "id": "008::BDD_Scenario::2",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/008-integration-test-spec.md:185",
+    "description": "Multi-plugin selection with conflict resolution",
+    "content": "Scenario: Multi-plugin selection with conflict resolution\n  Given test-plugin-a exists in \"./test-fixtures/test-plugin-a\" with:\n    | Component | Path |\n    | Command   | commands/build.md |\n    | Command   | commands/deploy.md |\n    | Agent     | agents/reviewer.md |\n    | Skill     | skills/chrome-devtools/SKILL.md |\n    | Hook      | SessionStart → /setup-a.sh |\n    | MCP       | tavily (command: \"npx\", env: {\"KEY\": \"A\"}) |\n\n  And test-plugin-b exists in \"./test-fixtures/test-plugin-b\" with:\n    | Component | Path |\n    | Command   | commands/build.md          ← CONFLICT: same name |\n    | Command   | commands/test.md |\n    | Agent     | agents/reviewer.md         ← CONFLICT: same name |\n    | Skill     | skills/chrome-devtools/    ← CONFLICT: same directory |\n    | Hook      | SessionStart → /setup-b.sh ← MERGE: same event |\n    | MCP       | tavily (command: \"npx\", env: {\"KEY\": \"B\"}) ← CONFLICT: same name |\n\n  When I execute \"app select ./test-fixtures\"\n  Then TUI displays with 3 panels\n  And PLUGINS panel shows \"test-plugin-a\" and \"test-plugin-b\"\n\n  When I select ALL components from test-plugin-a\n  And I select ALL components from test-plugin-b\n  Then PREVIEW panel shows:\n    - 4 commands (2 + 2)\n    - 2 agents (1 + 1)\n    - 2 skills (1 + 1)\n    - 2 hooks merged into 1 event\n    - 2 MCPs (1 + 1)\n\n  When I press S (Save)\n  Then I see success message\n  And TUI remains open\n\n  # VERIFY COMMANDS - namespace prefix applied\n  And file \"./output/curated-plugin/plugins/curated-plugin/commands/test-plugin-a--build.md\" exists\n  And file \"./output/curated-plugin/plugins/curated-plugin/commands/test-plugin-b--build.md\" exists\n  And file \"./output/curated-plugin/plugins/curated-plugin/commands/test-plugin-a--deploy.md\" exists\n  And file \"./output/curated-plugin/plugins/curated-plugin/commands/test-plugin-b--test.md\" exists\n\n  # VERIFY AGENTS - namespace prefix applied\n  And file \"./output/curated-plugin/plugins/curated-plugin/agents/test-plugin-a--reviewer.md\" exists\n  And file \"./output/curated-plugin/plugins/curated-plugin/agents/test-plugin-b--reviewer.md\" exists\n\n  # VERIFY SKILLS - namespace prefix applied to directory\n  And directory \"./output/curated-plugin/plugins/curated-plugin/skills/test-plugin-a--chrome-devtools\" exists\n  And file \"./output/curated-plugin/plugins/curated-plugin/skills/test-plugin-a--chrome-devtools/SKILL.md\" exists\n  And directory \"./output/curated-plugin/plugins/curated-plugin/skills/test-plugin-b--chrome-devtools\" exists\n  And file \"./output/curated-plugin/plugins/curated-plugin/skills/test-plugin-b--chrome-devtools/SKILL.md\" exists\n\n  # VERIFY OFFICIAL FORMAT (plugin.json)\n  And plugin.json is valid JSON\n  And plugin.json contains:\n    ```json\n    {\n      \"name\": \"curated-plugin\",\n      \"commands\": [\n        \"./commands/test-plugin-a--build.md\",\n        \"./commands/test-plugin-a--deploy.md\",\n        \"./commands/test-plugin-b--build.md\",\n        \"./commands/test-plugin-b--test.md\"\n      ],\n      \"agents\": [\n        \"./agents/test-plugin-a--reviewer.md\",\n        \"./agents/test-plugin-b--reviewer.md\"\n      ],\n      \"skills\": [\n        \"./skills/test-plugin-a--chrome-devtools\",\n        \"./skills/test-plugin-b--chrome-devtools\"\n      ],\n      \"hooks\": {\n        \"SessionStart\": [\n          {\n            \"hooks\": [\n              { \"type\": \"command\", \"command\": \"/setup-a.sh\" },\n              { \"type\": \"command\", \"command\": \"/setup-b.sh\" }\n            ]\n          }\n        ]\n      },\n      \"mcpServers\": {\n        \"test-plugin-a--tavily\": {\n          \"command\": \"npx\",\n          \"env\": { \"KEY\": \"A\" }\n        },\n        \"test-plugin-b--tavily\": {\n          \"command\": \"npx\",\n          \"env\": { \"KEY\": \"B\" }\n        }\n      }\n    }\n    ```\n\n  # VERIFY PLUGIN IS USABLE\n  And can install with \"/plugin marketplace add ./output/curated-plugin\"\n  And can install plugin with \"/plugin install curated-plugin\""
+  },
+  {
+    "id": "008::BDD_Scenario::3",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/008-integration-test-spec.md:290",
+    "description": "Save with no selection",
+    "content": "Scenario: Save with no selection\n  Given TUI is open\n  And no components are selected\n  When I press S (Save)\n  Then I see warning \"⚠ No hay componentes seleccionados\"\n  And no files are created"
+  },
+  {
+    "id": "008::BDD_Scenario::4",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/008-integration-test-spec.md:297",
+    "description": "Output directory already exists",
+    "content": "Scenario: Output directory already exists\n  Given \"./output/curated-plugin/\" already exists\n  When I press S (Save)\n  Then I see prompt \"Output directory exists. Overwrite? [Y/n]\"\n  When I press Y\n  Then old directory is deleted\n  And new files are created"
+  },
+  {
+    "id": "008::BDD_Scenario::5",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/008-integration-test-spec.md:305",
+    "description": "Select from multiple plugins",
+    "content": "Scenario: Select from multiple plugins\n  Given multiple plugins loaded\n  When I select components from plugin A\n  And I select components from plugin B\n  And I press S (Save)\n  Then output contains components from both plugins\n  And plugin.json merges all selections"
+  },
+  {
+    "id": "008::BDD_Scenario::6",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/008-integration-test-spec.md:313",
+    "description": "Plugin with missing files",
+    "content": "Scenario: Plugin with missing files\n  Given plugin.json references \"./commands/missing.md\"\n  But file does not exist\n  When I press S (Save)\n  Then I see error \"Command file not found: ./commands/missing.md\"\n  And save operation is cancelled"
+  },
+  {
+    "id": "008::BDD_Scenario::7",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/008-integration-test-spec.md:326",
+    "description": "Different path formats produce same result",
+    "content": "Scenario Outline: Different path formats produce same result\n  Given plugin.json with <component> = <path_format>\n  When I load the plugin\n  Then COMPONENTS panel shows <expected_count> items\n\n  Examples:\n    | component | path_format          | expected_count |\n    | commands  | \"./commands\"         | 3              |\n    | commands  | [\"./commands/*.md\"]  | 3              |\n    | agents    | \"./agents/\"          | 2              |\n    | skills    | \"./skills/\"          | 3              |"
+  },
+  {
+    "id": "008::BDD_Scenario::8",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/008-integration-test-spec.md:338",
+    "description": "Empty components are handled correctly",
+    "content": "Scenario: Empty components are handled correctly\n  Given plugin.json with no commands, agents, or skills defined\n  When I load the plugin\n  Then COMPONENTS panel shows only hooks and MCPs\n  When I press S (Save)\n  Then plugin.json omits empty component fields"
+  },
+  {
+    "id": "008::BDD_Scenario::9",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/008-integration-test-spec.md:345",
+    "description": "Hooks transform correctly",
+    "content": "Scenario: Hooks transform correctly\n  Given plugin has 2 hooks for \"SessionStart\" event\n  When I select both hooks\n  And I press S (Save)\n  Then plugin.json has:\n    ```json\n    {\n      \"hooks\": {\n        \"SessionStart\": [\n          { \"type\": \"command\", \"command\": \"/setup-env.sh\" },\n          { \"type\": \"command\", \"command\": \"/init-workspace.sh\" }\n        ]\n      }\n    }\n    ```"
+  },
+  {
+    "id": "008::BDD_Scenario::10",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/008-integration-test-spec.md:361",
+    "description": "MCPs transform correctly",
+    "content": "Scenario: MCPs transform correctly\n  Given plugin has 3 MCPs\n  When I select \"tavily\" MCP\n  And I press S (Save)\n  Then plugin.json has:\n    ```json\n    {\n      \"mcpServers\": {\n        \"tavily\": {\n          \"command\": \"npx\",\n          \"args\": [\"-y\", \"@tavily/mcp-server\"],\n          \"env\": { \"TAVILY_API_KEY\": \"${TAVILY_API_KEY}\" }\n        }\n      }\n    }\n    ```"
+  },
+  {
+    "id": "008::BDD_Scenario::11",
+    "type": "BDD_Scenario",
+    "source": "docs/spec/008-integration-test-spec.md:378",
+    "description": "Default values are omitted",
+    "content": "Scenario: Default values are omitted\n  Given I create a minimal selection\n  When I press S (Save)\n  Then plugin.json does NOT contain:\n    - version: \"0.0.0\" (if not changed)\n    - description: \"\" (if empty)\n    - empty arrays\n    - empty objects"
+  },
+  {
+    "id": "008::Invariant::1",
+    "type": "Invariant",
+    "source": "docs/spec/008-integration-test-spec.md:428",
+    "description": "Can load test-plugin without errors",
+    "content": "✅ Can load test-plugin without errors"
+  },
+  {
+    "id": "008::Invariant::2",
+    "type": "Invariant",
+    "source": "docs/spec/008-integration-test-spec.md:429",
+    "description": "All 15 components visible in TUI",
+    "content": "✅ All 15 components visible in TUI"
+  },
+  {
+    "id": "008::Invariant::3",
+    "type": "Invariant",
+    "source": "docs/spec/008-integration-test-spec.md:430",
+    "description": "Selection works correctly",
+    "content": "✅ Selection works correctly"
+  },
+  {
+    "id": "008::Invariant::4",
+    "type": "Invariant",
+    "source": "docs/spec/008-integration-test-spec.md:431",
+    "description": "Save generates both output files",
+    "content": "✅ Save generates both output files"
+  },
+  {
+    "id": "008::Invariant::5",
+    "type": "Invariant",
+    "source": "docs/spec/008-integration-test-spec.md:432",
+    "description": "Official plugin.json is valid",
+    "content": "✅ Official plugin.json is valid"
+  },
+  {
+    "id": "008::Invariant::6",
+    "type": "Invariant",
+    "source": "docs/spec/008-integration-test-spec.md:433",
+    "description": "All selected files copied to output",
+    "content": "✅ All selected files copied to output"
+  },
+  {
+    "id": "008::Invariant::7",
+    "type": "Invariant",
+    "source": "docs/spec/008-integration-test-spec.md:434",
+    "description": "Output plugin can be loaded by Claude Code",
+    "content": "✅ Output plugin can be loaded by Claude Code"
+  },
+  {
+    "id": "008::Invariant::8",
+    "type": "Invariant",
+    "source": "docs/spec/008-integration-test-spec.md:437",
+    "description": "No crashes or unhandled errors",
+    "content": "✅ No crashes or unhandled errors"
+  },
+  {
+    "id": "008::Invariant::9",
+    "type": "Invariant",
+    "source": "docs/spec/008-integration-test-spec.md:438",
+    "description": "Clear error messages for invalid states",
+    "content": "✅ Clear error messages for invalid states"
+  },
+  {
+    "id": "008::Invariant::10",
+    "type": "Invariant",
+    "source": "docs/spec/008-integration-test-spec.md:439",
+    "description": "All edge cases handled gracefully",
+    "content": "✅ All edge cases handled gracefully"
+  }
+]
