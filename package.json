@@ -1,0 +1,49 @@
+{
+  "name": "ccplugin-curator",
+  "version": "0.0.5",
+  "description": "TUI for curating Claude Code plugins from multiple sources",
+  "main": "dist/index.js",
+  "bin": {
+    "ccplugin-curator": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/cli.ts",
+    "start": "node dist/cli.js",
+    "test": "vitest",
+    "test:integration": "vitest run --testNamePattern=\"Integration\"",
+    "generate-types": "npx json-schema-to-typescript schemas/plugin.schema.json -o src/types/plugin.ts && npx json-schema-to-typescript schemas/normalized-plugin.schema.json -o src/types/normalized.ts",
+    "lint": "eslint src --ext .ts,.tsx",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\""
+  },
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "curator",
+    "tui",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ink": "^4.4.1",
+    "react": "^18.2.0",
+    "fast-glob": "^3.3.2",
+    "ajv": "^8.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "typescript": "^5.3.3",
+    "tsx": "^4.7.0",
+    "vitest": "^1.1.0",
+    "json-schema-to-typescript": "^13.1.1",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/parser": "^6.16.0",
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
+    "prettier": "^3.1.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
