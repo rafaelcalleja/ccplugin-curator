@@ -4,6 +4,9 @@
   "description": "Claude Code plugin curator - Select and merge plugin components",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "ccplugin-curator": "./dist/cli.js"
+  },
   "scripts": {
     "build": "tsc",
     "test": "jest",
@@ -32,6 +35,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "commander": "^11.1.0",
     "glob": "^10.3.10"
   }
 }
