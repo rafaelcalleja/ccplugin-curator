@@ -125,7 +125,8 @@ async function normalizeComponentPaths(
 
 /**
  * Normalize skills
- * Discovery pattern: skills/*/SKILL.md → return parent directory paths
+ * Discovery pattern: skills/STAR/SKILL.md -> return parent directory paths
+ * (where STAR means any directory name)
  */
 async function normalizeSkills(
   pluginDir: string,

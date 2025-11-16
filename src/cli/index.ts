@@ -67,13 +67,11 @@ async function selectCommand(pluginFolder: string) {
     console.log(`  - ${plugin.name} (${plugin.source})`);
   }
 
-  // Launch TUI (placeholder - will be implemented with React/Ink)
-  console.log('\nTUI not yet implemented - displaying plugin data:\n');
-  console.log(JSON.stringify(plugins, null, 2));
+  console.log('\nLaunching TUI...\n');
 
-  // TODO: Launch TUI
-  // const { TUIApp } = await import('../tui/app');
-  // await TUIApp({ plugins });
+  // Launch TUI
+  const { launchTUI } = await import('../tui/app');
+  await launchTUI(plugins);
 }
 
 /**

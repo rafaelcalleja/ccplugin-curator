@@ -236,6 +236,7 @@ Instalación:
 /**
  * Merge selections from multiple plugins
  * Handles conflicts with namespace prefixes
+ * Implements: docs/spec/007-save-operation-rules.md sections 7.3-7.6
  */
 export function mergeSelections(selections: NormalizedPlugin[]): NormalizedPlugin {
   if (selections.length === 0) {
@@ -256,26 +257,44 @@ export function mergeSelections(selections: NormalizedPlugin[]): NormalizedPlugi
     mcps: [],
   };
 
-  // Track conflicts
+  // PASS 1: Count occurrences to detect conflicts
   const commandNames = new Map<string, number>();
   const agentNames = new Map<string, number>();
   const skillNames = new Map<string, number>();
   const mcpNames = new Map<string, number>();
 
+  for (const selection of selections) {
+    for (const cmdPath of selection.commands) {
+      const fileName = path.basename(cmdPath);
+      commandNames.set(fileName, (commandNames.get(fileName) || 0) + 1);
+    }
+
+    for (const agentPath of selection.agents) {
+      const fileName = path.basename(agentPath);
+      agentNames.set(fileName, (agentNames.get(fileName) || 0) + 1);
+    }
+
+    for (const skillPath of selection.skills) {
+      const skillName = path.basename(skillPath);
+      skillNames.set(skillName, (skillNames.get(skillName) || 0) + 1);
+    }
+
+    for (const mcp of selection.mcps) {
+      mcpNames.set(mcp.name, (mcpNames.get(mcp.name) || 0) + 1);
+    }
+  }
+
+  // PASS 2: Apply namespace prefixes to ALL items with conflicts (count > 1)
+
   // Merge commands with conflict resolution
   for (const selection of selections) {
     for (const cmdPath of selection.commands) {
       const fileName = path.basename(cmdPath);
-      const count = commandNames.get(fileName) || 0;
-      commandNames.set(fileName, count + 1);
+      const hasConflict = (commandNames.get(fileName) || 0) > 1;
 
-      const newPath =
-        count > 0
-          ? path.join(
-              path.dirname(cmdPath),
-              `${selection.name}--${fileName}`
-            )
-          : cmdPath;
+      const newPath = hasConflict
+        ? path.join(path.dirname(cmdPath), `${selection.name}--${fileName}`)
+        : cmdPath;
 
       merged.commands.push(newPath);
     }
@@ -285,16 +304,11 @@ export function mergeSelections(selections: NormalizedPlugin[]): NormalizedPlugi
   for (const selection of selections) {
     for (const agentPath of selection.agents) {
       const fileName = path.basename(agentPath);
-      const count = agentNames.get(fileName) || 0;
-      agentNames.set(fileName, count + 1);
+      const hasConflict = (agentNames.get(fileName) || 0) > 1;
 
-      const newPath =
-        count > 0
-          ? path.join(
-              path.dirname(agentPath),
-              `${selection.name}--${fileName}`
-            )
-          : agentPath;
+      const newPath = hasConflict
+        ? path.join(path.dirname(agentPath), `${selection.name}--${fileName}`)
+        : agentPath;
 
       merged.agents.push(newPath);
     }
@@ -304,22 +318,18 @@ export function mergeSelections(selections: NormalizedPlugin[]): NormalizedPlugi
   for (const selection of selections) {
     for (const skillPath of selection.skills) {
       const skillName = path.basename(skillPath);
-      const count = skillNames.get(skillName) || 0;
-      skillNames.set(skillName, count + 1);
+      const hasConflict = (skillNames.get(skillName) || 0) > 1;
 
-      const newPath =
-        count > 0
-          ? path.join(
-              path.dirname(skillPath),
-              `${selection.name}--${skillName}`
-            )
-          : skillPath;
+      const newPath = hasConflict
+        ? path.join(path.dirname(skillPath), `${selection.name}--${skillName}`)
+        : skillPath;
 
       merged.skills.push(newPath);
     }
   }
 
   // Merge hooks (same event → merge into hooks array)
+  // No conflicts - hooks with same event are merged
   for (const selection of selections) {
     merged.hooks.push(...selection.hooks);
   }
@@ -327,13 +337,11 @@ export function mergeSelections(selections: NormalizedPlugin[]): NormalizedPlugi
   // Merge MCPs with conflict resolution
   for (const selection of selections) {
     for (const mcp of selection.mcps) {
-      const count = mcpNames.get(mcp.name) || 0;
-      mcpNames.set(mcp.name, count + 1);
+      const hasConflict = (mcpNames.get(mcp.name) || 0) > 1;
 
-      const newMcp =
-        count > 0
-          ? { ...mcp, name: `${selection.name}--${mcp.name}` }
-          : mcp;
+      const newMcp = hasConflict
+        ? { ...mcp, name: `${selection.name}--${mcp.name}` }
+        : mcp;
 
       merged.mcps.push(newMcp);
     }
