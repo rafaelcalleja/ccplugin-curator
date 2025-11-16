@@ -6,13 +6,13 @@
 
 ## 🎯 Success Criteria
 
-✅ Every file in `docs/spec/` is implemented
-✅ Every file in `docs/decisions/` is applied
+✅ Checklist generated from `docs/` is 100% complete
+✅ All items marked as done
 ✅ Application runs without errors
 
 ---
 
-## Phase 1: Read All Documentation
+## Phase 1: Generate Checklist
 
 **EXECUTE**:
 
@@ -20,130 +20,62 @@
 ultrathink --seq @docs/spec @docs/decisions
 ```
 
-This reads all documentation and generates an implementation plan.
+**This command**:
+- Reads all files in `docs/spec/` and `docs/decisions/`
+- Generates a checklist of completed vs pending items
+- Shows what is already done
+- Shows what needs to be implemented
+
+**Output**: A checklist with items marked as ✅ (done) or ❌ (pending)
 
 ---
 
-## Phase 2: Implement Everything
+## Phase 2: Review Checklist
 
-**PROCESS**:
+**CHECK**: Look at the checklist generated in Phase 1.
 
-For each file discovered in `docs/`:
+**Questions**:
+- Are ALL items marked as ✅ (done)?
+- Are there any ❌ (pending) items?
+- Are there any ⚠️ (incomplete) items?
 
-1. **Identify requirements** - What does this file require?
-2. **Check current state** - Is it already implemented?
-3. **Implement gaps** - Write code/tests/config for missing requirements
-4. **Verify** - Confirm the requirement is now satisfied
-5. **Next file** - Move to next file in `docs/`
+**If YES (there are pending/incomplete items) → Go to Phase 3**
 
-**Continue until**: All files in `docs/` are processed.
-
----
-
-## Phase 3: Verify Completeness
-
-**CRITICAL**: Every file in `docs/` MUST have implementation evidence.
-
-### 3.1 Verify ALL spec files are implemented
-
-**EXECUTE** (content-agnostic verification):
-
-```bash
-echo "=== Verifying ALL spec files ==="
-
-for spec in docs/spec/*.md; do
-  [ -f "$spec" ] || continue
-  [ "$(basename "$spec")" = "README.md" ] && continue
-
-  filename=$(basename "$spec" .md)
-  echo "Checking: $spec"
-
-  # Search for ANY reference to this spec outside of docs/
-  # This is content-agnostic: looks for filename OR keywords from title
-  refs=$(git grep -il "$filename" -- ':!docs/' 2>/dev/null | wc -l)
-
-  if [ "$refs" -eq 0 ]; then
-    echo "❌ FAIL: No implementation found for $spec"
-    echo "   Expected: Code, tests, or config files referencing this spec"
-    exit 1
-  fi
-
-  echo "✅ $spec - Found $refs references"
-done
-
-echo "✅ All spec files have implementation evidence"
-```
-
-**If fails**: Spec file has no implementation → return to Phase 2
+**If NO (all items are ✅) → Go to Phase 4**
 
 ---
 
-### 3.2 Verify ALL decision files are applied
+## Phase 3: Complete Pending Items
 
-**EXECUTE** (content-agnostic verification):
+**EXECUTE**: For each pending item in the checklist:
 
-```bash
-echo "=== Verifying ALL decision files ==="
+1. Read the spec/decision file that corresponds to that item
+2. Understand what needs to be implemented
+3. Implement it (write code, tests, config, etc.)
+4. Verify it works (run tests, build, etc.)
+5. Mark item as ✅ in the checklist
 
-for decision in docs/decisions/*.md; do
-  [ -f "$decision" ] || continue
-  [ "$(basename "$decision")" = "README.md" ] && continue
+**Continue until**: All items in checklist are ✅
 
-  filename=$(basename "$decision" .md)
-  echo "Checking: $decision"
-
-  # Search for ANY reference to this decision outside of docs/
-  refs=$(git grep -il "$filename" -- ':!docs/' 2>/dev/null | wc -l)
-
-  if [ "$refs" -eq 0 ]; then
-    echo "⚠️  WARNING: No references found for $decision"
-    echo "   This may be informational, or implementation is missing"
-  else
-    echo "✅ $decision - Found $refs references"
-  fi
-done
-
-echo "✅ All decision files verified"
-```
-
-**If fails**: Decision not applied → return to Phase 2
-
----
-
-### 3.3 Conceptual Verification
-
-**CHECK**: Answer these questions for ALL files:
-
-#### For each file in `docs/spec/`:
-- ❓ Are the behaviors described in this spec file implemented?
-- ❓ Does the application exhibit these behaviors?
-- ❓ Are there tests validating these behaviors?
-
-**If any answer is NO → return to Phase 2 for that file**
-
-#### For each file in `docs/decisions/`:
-- ❓ Is the decision applied in the codebase?
-- ❓ Does the project structure reflect this decision?
-- ❓ Are the tools/libraries mentioned in the decision present?
-
-**If any answer is NO → return to Phase 2 for that file**
+**Then**: Return to Phase 1 (regenerate checklist to verify)
 
 ---
 
 ## Phase 4: Final Verification
 
-**EXECUTE**: Run whatever verification exists in the project.
+**EXECUTE**: Verify the application works end-to-end.
 
-This could be:
-- Running test suite (if exists)
-- Building the application (if buildable)
-- Running the application (if runnable)
-- Linting (if configured)
-- Any other verification defined by the project
+Run whatever verification the project defines:
+- Test suite (if exists)
+- Build process (if exists)
+- Run application (if runnable)
+- Any other project-specific verification
 
 **CHECK**: Do all verifications pass?
 
-**If NO → return to Phase 2**
+**If NO → Return to Phase 3**
+
+**If YES → DONE - Implementation complete**
 
 ---
 
@@ -152,32 +84,34 @@ This could be:
 ```
 START
   ↓
-Read docs/ (Phase 1)
+Phase 1: Generate checklist
   ↓
-Implement all (Phase 2)
+Phase 2: Review checklist
   ↓
-Verify completeness (Phase 3)
-  ↓
-Final verification (Phase 4)
-  ↓
-ALL PASS? ──NO──→ Return to Phase 2
+All ✅? ──NO──→ Phase 3: Complete pending items ──→ Back to Phase 1
   ↓
  YES
+  ↓
+Phase 4: Final verification
+  ↓
+Pass? ──NO──→ Phase 3: Fix failures ──→ Back to Phase 1
+  ↓
+YES
   ↓
 DONE - 100% complete
 ```
 
-**DO NOT STOP** until all phases pass.
+**DO NOT STOP** until checklist is 100% ✅ and all verifications pass.
 
 ---
 
 ## 📊 Why This Works
 
-1. **Content-agnostic**: No assumptions about project structure, language, or tools
-2. **Self-discovering**: Finds all files in `docs/` dynamically
-3. **Immutable**: Protocol never changes, only `docs/` content changes
-4. **Verifiable**: Each phase has clear pass/fail criteria
-5. **Exhaustive**: Loops until 100% of `docs/` is implemented
+1. **Checklist-driven**: Explicit tracking of what's done vs pending
+2. **Self-verifying**: Regenerate checklist after changes to confirm completion
+3. **Content-agnostic**: Works regardless of docs/ content or project structure
+4. **Immutable**: Protocol never changes, only checklist content changes
+5. **Exhaustive**: Loops until 100% of checklist is complete
 
 ---
 
@@ -189,6 +123,6 @@ DONE - 100% complete
 ultrathink --seq @docs/spec @docs/decisions
 ```
 
-**THEN**: Follow Phases 2-4 until all verification passes.
+**THEN**: Review the checklist, complete pending items, verify, loop.
 
-**DO NOT STOP** until 100% complete.
+**DO NOT STOP** until checklist shows 100% ✅ and all verifications pass.
