@@ -10,6 +10,12 @@
 ✅ All items marked as done
 ✅ Application runs without errors
 
+**CRITICAL RULES**:
+- **NO item can be marked as "optional"** - Everything in `docs/` is MANDATORY
+- **NO "partial completion"** - Each item is either ✅ (done) or ❌ (not done)
+- **NO "TODO for later"** - All items must be ✅ before declaring complete
+- **100% means 100%** - Not 90%, not "mostly done", not "core features complete"
+
 ---
 
 ## Phase 1: Generate Checklist
@@ -34,14 +40,29 @@ ultrathink --seq @docs/spec @docs/decisions
 
 **CHECK**: Look at the checklist generated in Phase 1.
 
-**Questions**:
-- Are ALL items marked as ✅ (done)?
-- Are there any ❌ (pending) items?
-- Are there any ⚠️ (incomplete) items?
+**STRICT VERIFICATION**:
 
-**If YES (there are pending/incomplete items) → Go to Phase 3**
+Count the items:
+- ✅ (done) items: `____`
+- ❌ (pending) items: `____`
+- ⚠️ (incomplete) items: `____`
+- 🔜 (optional/later) items: `____`
+- Total items: `____`
 
-**If NO (all items are ✅) → Go to Phase 4**
+**PASS criteria**:
+- ✅ items = Total items (100%)
+- ❌ items = 0
+- ⚠️ items = 0
+- 🔜 items = 0
+
+**FAIL if**:
+- ANY item is not ✅
+- ANY item is marked "optional", "TODO", "later", "nice to have"
+- Count of ✅ items < Total items
+
+**If FAIL → Go to Phase 3**
+
+**If PASS → Go to Phase 4**
 
 ---
 
@@ -102,6 +123,47 @@ DONE - 100% complete
 ```
 
 **DO NOT STOP** until checklist is 100% ✅ and all verifications pass.
+
+---
+
+## ❌ INCORRECT Example (DO NOT DO THIS)
+
+**WRONG**:
+```
+Checklist:
+✅ 001-normalization-protocol.md - Implemented
+✅ 002-plugin-format-spec.md - Implemented
+✅ 003-tui-visual-spec.md - Implemented
+✅ 004-user-workflows.md - Implemented
+✅ 005-transformation-rules.md - Implemented
+✅ 006-reverse-transformation-rules.md - Implemented
+✅ 007-save-operation-rules.md - Implemented
+⏭️ 008-integration-test-spec.md - OPTIONAL (TODO for later)
+
+Status: Application 100% functional ✅
+```
+
+**WHY THIS IS WRONG**:
+- 008 is marked "OPTIONAL" → This violates the protocol
+- Only 7/8 items are ✅ → This is 87.5%, NOT 100%
+- Claiming "100% functional" when checklist shows pending items → FALSE
+
+**CORRECT**:
+```
+Checklist:
+✅ 001-normalization-protocol.md - Implemented
+✅ 002-plugin-format-spec.md - Implemented
+✅ 003-tui-visual-spec.md - Implemented
+✅ 004-user-workflows.md - Implemented
+✅ 005-transformation-rules.md - Implemented
+✅ 006-reverse-transformation-rules.md - Implemented
+✅ 007-save-operation-rules.md - Implemented
+✅ 008-integration-test-spec.md - Implemented
+
+Status: All items ✅ (100%) - Implementation complete ✅
+```
+
+**If 008 is NOT ✅ → Return to Phase 3 and implement it**
 
 ---
 
