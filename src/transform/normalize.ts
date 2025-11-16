@@ -153,7 +153,7 @@ async function normalizeAgents(
 }
 
 /**
- * Normalize skills - auto-discovery of skills/*/SKILL.md pattern
+ * Normalize skills - auto-discovery of skills pattern (skills star SKILL.md)
  */
 async function normalizeSkills(
   pluginPath: string,
