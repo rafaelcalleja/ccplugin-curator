@@ -1,0 +1,7 @@
+{
+  "tavily": {
+    "command": "npx",
+    "args": ["-y", "@tavily/mcp-server"],
+    "env": { "KEY": "A" }
+  }
+}

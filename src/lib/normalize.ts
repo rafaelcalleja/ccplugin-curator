@@ -102,9 +102,13 @@ async function normalizeCommands(pluginRoot: string, commands?: string | string[
   const discovered = await discoverCommands(pluginRoot);
   const custom = await resolveComponentPaths(pluginRoot, commands, '**/*.md');
 
+  // Normalize paths first, then combine to remove duplicates
+  const discoveredNormalized = discovered.map(normalizePath);
+  const customNormalized = custom.map(normalizePath);
+
   // Combine discovered + custom (COMPLEMENT, not replace)
-  const combined = [...new Set([...custom, ...discovered])];
-  return combined.map(normalizePath);
+  const combined = [...new Set([...customNormalized, ...discoveredNormalized])];
+  return combined;
 }
 
 /**
@@ -114,8 +118,12 @@ async function normalizeAgents(pluginRoot: string, agents?: string | string[]): 
   const discovered = await discoverAgents(pluginRoot);
   const custom = await resolveComponentPaths(pluginRoot, agents, '**/*.md');
 
-  const combined = [...new Set([...custom, ...discovered])];
-  return combined.map(normalizePath);
+  // Normalize paths first, then combine to remove duplicates
+  const discoveredNormalized = discovered.map(normalizePath);
+  const customNormalized = custom.map(normalizePath);
+
+  const combined = [...new Set([...customNormalized, ...discoveredNormalized])];
+  return combined;
 }
 
 /**
@@ -132,8 +140,12 @@ async function normalizeSkills(pluginRoot: string, skills?: string | string[]): 
   // Skills are directories, so extract parent directories from SKILL.md paths
   const customDirs = custom.map(p => path.dirname(p));
 
-  const combined = [...new Set([...customDirs, ...discovered])];
-  return combined.map(normalizePath);
+  // Normalize paths first, then combine to remove duplicates
+  const discoveredNormalized = discovered.map(normalizePath);
+  const customNormalized = customDirs.map(normalizePath);
+
+  const combined = [...new Set([...customNormalized, ...discoveredNormalized])];
+  return combined;
 }
 
 /**
