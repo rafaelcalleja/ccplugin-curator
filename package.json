@@ -1,0 +1,24 @@
+{
+  "name": "ccplugin-curator",
+  "version": "0.0.7",
+  "description": "Spec-driven implementation of Claude Code Plugin Curator",
+  "main": "dist/index.js",
+  "scripts": {
+    "extract-requirements": "node scripts/extract-requirements.js",
+    "generate-coverage": "node scripts/generate-coverage-matrix.js",
+    "find-gaps": "node scripts/find-gaps.js",
+    "validate": "node scripts/validate.js",
+    "protocol": "npm run extract-requirements && npm run generate-coverage && npm run find-gaps",
+    "test": "echo 'No tests yet' && exit 0"
+  },
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "curator",
+    "spec-driven"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}

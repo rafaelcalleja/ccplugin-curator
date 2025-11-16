@@ -1,0 +1,8 @@
+001-normalization-protocol.md
+002-plugin-format-spec.md
+003-tui-visual-spec.md
+004-user-workflows.md
+005-transformation-rules.md
+006-reverse-transformation-rules.md
+007-save-operation-rules.md
+008-integration-test-spec.md
