@@ -200,9 +200,8 @@ async function normalizeHooks(
     for (const defaultPath of defaultPaths) {
       if (fs.existsSync(defaultPath)) {
         const content = JSON.parse(fs.readFileSync(defaultPath, 'utf-8'));
-        if (content.hooks) {
-          hooks.push(...flattenHooks(content.hooks));
-        }
+        // Content is already the hooks object (not wrapped in {hooks: {...}})
+        hooks.push(...flattenHooks(content));
         break;
       }
     }
@@ -211,9 +210,8 @@ async function normalizeHooks(
     const filePath = path.join(pluginDir, normalizePath(configValue));
     if (fs.existsSync(filePath)) {
       const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-      if (content.hooks) {
-        hooks.push(...flattenHooks(content.hooks));
-      }
+      // Content is already the hooks object (not wrapped in {hooks: {...}})
+      hooks.push(...flattenHooks(content));
     }
   } else {
     // Inline configuration

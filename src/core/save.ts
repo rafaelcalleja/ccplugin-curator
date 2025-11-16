@@ -13,6 +13,7 @@ export interface SaveOptions {
   outputDir: string;
   pluginName?: string;
   overwrite?: boolean;
+  sourceMappings?: Array<{ pluginName: string; sourceDir: string }>;
 }
 
 export interface SaveResult {
@@ -68,7 +69,7 @@ export async function saveSelection(
   fs.mkdirSync(marketplaceDir, { recursive: true });
 
   // Copy component files
-  await copyComponents(selection, pluginDir);
+  await copyComponents(selection, pluginDir, options.sourceMappings);
 
   // Apply reverse transformation
   const officialFormat = denormalizePlugin(selection);
@@ -123,31 +124,111 @@ function isEmptySelection(selection: NormalizedPlugin): boolean {
 
 /**
  * Copy component files to output directory
+ * Handles namespace-prefixed paths from multi-plugin merges
  */
 async function copyComponents(
   selection: NormalizedPlugin,
-  outputDir: string
+  outputDir: string,
+  sourceMappings?: Array<{ pluginName: string; sourceDir: string }>
 ): Promise<void> {
   // Copy commands
   for (const cmdPath of selection.commands) {
-    const srcPath = path.join(selection.source, cmdPath);
-    const destPath = path.join(outputDir, cmdPath);
+    const { srcPath, destPath } = resolveComponentPaths(
+      selection.source,
+      cmdPath,
+      outputDir,
+      sourceMappings
+    );
     copyFile(srcPath, destPath);
   }
 
   // Copy agents
   for (const agentPath of selection.agents) {
-    const srcPath = path.join(selection.source, agentPath);
-    const destPath = path.join(outputDir, agentPath);
+    const { srcPath, destPath } = resolveComponentPaths(
+      selection.source,
+      agentPath,
+      outputDir,
+      sourceMappings
+    );
     copyFile(srcPath, destPath);
   }
 
   // Copy skills (directories)
   for (const skillPath of selection.skills) {
-    const srcPath = path.join(selection.source, skillPath);
-    const destPath = path.join(outputDir, skillPath);
+    const { srcPath, destPath } = resolveComponentPaths(
+      selection.source,
+      skillPath,
+      outputDir,
+      sourceMappings
+    );
     copyDirectory(srcPath, destPath);
   }
+}
+
+/**
+ * Resolve source and destination paths for components
+ * Handles namespace prefixes from multi-plugin merges
+ * Example: "commands/test-plugin-a--build.md" -> finds "commands/build.md" in test-plugin-a source
+ */
+function resolveComponentPaths(
+  defaultSourceDir: string,
+  componentPath: string,
+  outputDir: string,
+  sourceMappings?: Array<{ pluginName: string; sourceDir: string }>
+): { srcPath: string; destPath: string } {
+  const destPath = path.join(outputDir, componentPath);
+
+  // Check if path has namespace prefix pattern: "plugin-name--filename"
+  const fileName = path.basename(componentPath);
+  const dirName = path.dirname(componentPath);
+  const namespaceMatch = fileName.match(/^(.+?)--(.+)$/);
+
+  if (namespaceMatch && sourceMappings) {
+    // Has namespace prefix - extract plugin name and original filename
+    const [, pluginName, originalFileName] = namespaceMatch;
+    const originalPath = path.join(dirName, originalFileName);
+
+    // Find the source directory for this plugin
+    const mapping = sourceMappings.find((m) => m.pluginName === pluginName);
+    if (mapping) {
+      const srcPath = path.join(mapping.sourceDir, originalPath);
+      if (fs.existsSync(srcPath)) {
+        return { srcPath, destPath };
+      }
+    }
+  }
+
+  if (namespaceMatch) {
+    // Has namespace prefix but no mapping - try to extract original filename
+    const [, pluginName, originalFileName] = namespaceMatch;
+    const originalPath = path.join(dirName, originalFileName);
+    const srcPath = path.join(defaultSourceDir, originalPath);
+
+    // Try original path first
+    if (fs.existsSync(srcPath)) {
+      return { srcPath, destPath };
+    }
+
+    // If not found, maybe source itself contains the prefix already
+    const srcPathWithPrefix = path.join(defaultSourceDir, componentPath);
+    if (fs.existsSync(srcPathWithPrefix)) {
+      return { srcPath: srcPathWithPrefix, destPath };
+    }
+  }
+
+  // No namespace prefix - try all source mappings if available
+  if (sourceMappings) {
+    for (const mapping of sourceMappings) {
+      const srcPath = path.join(mapping.sourceDir, componentPath);
+      if (fs.existsSync(srcPath)) {
+        return { srcPath, destPath };
+      }
+    }
+  }
+
+  // Fallback: use default source directory
+  const srcPath = path.join(defaultSourceDir, componentPath);
+  return { srcPath, destPath };
 }
 
 /**

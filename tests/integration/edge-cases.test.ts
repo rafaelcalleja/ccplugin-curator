@@ -3,7 +3,7 @@
  * Implements: docs/spec/008-integration-test-spec.md (edge cases scenario)
  */
 
-import { describe, test, expect, afterAll } from 'vitest';
+import { describe, test, expect, beforeAll, afterAll } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 import { saveSelection } from '../../src/core/save';
@@ -11,11 +11,25 @@ import type { NormalizedPlugin } from '../../src/types/normalized';
 
 describe('Edge Cases', () => {
   const outputDir = path.join(__dirname, '../../test-output-edge');
+  const tmpTestDir = '/tmp/test';
+
+  beforeAll(() => {
+    // Setup test files for edge case tests
+    fs.mkdirSync(path.join(tmpTestDir, 'commands'), { recursive: true });
+    fs.writeFileSync(
+      path.join(tmpTestDir, 'commands', 'test.md'),
+      '# Test Command\n'
+    );
+  });
 
   afterAll(() => {
     // Cleanup test output
     if (fs.existsSync(outputDir)) {
       fs.rmSync(outputDir, { recursive: true, force: true });
+    }
+    // Cleanup temp test files
+    if (fs.existsSync(tmpTestDir)) {
+      fs.rmSync(tmpTestDir, { recursive: true, force: true });
     }
   });
 

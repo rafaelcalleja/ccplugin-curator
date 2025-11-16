@@ -132,6 +132,10 @@ describe('Multi-Plugin Conflicts', () => {
       outputDir,
       pluginName: 'merged-plugin',
       overwrite: true,
+      sourceMappings: [
+        { pluginName: 'test-plugin-a', sourceDir: testPluginADir },
+        { pluginName: 'test-plugin-b', sourceDir: testPluginBDir },
+      ],
     });
 
     expect(result.success).toBe(true);
