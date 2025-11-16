@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude.ai/schemas/normalized-plugin.json",
+  "title": "Normalized Plugin Format",
+  "description": "Internal normalized format used by the curator TUI (from 001-normalization-protocol.md lines 59-84)",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Plugin name (always present)"
+    },
+    "source": {
+      "type": "string",
+      "description": "Absolute path to plugin directory"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version (default: '0.0.0')",
+      "default": "0.0.0"
+    },
+    "description": {
+      "type": "string",
+      "description": "Plugin description (default: '')",
+      "default": ""
+    },
+    "author": {
+      "type": "object",
+      "description": "Author information (default: all empty strings)",
+      "properties": {
+        "name": { "type": "string", "default": "" },
+        "email": { "type": "string", "default": "" },
+        "url": { "type": "string", "default": "" }
+      },
+      "required": ["name", "email", "url"]
+    },
+    "homepage": {
+      "type": "string",
+      "description": "Homepage URL (default: '')",
+      "default": ""
+    },
+    "repository": {
+      "type": "string",
+      "description": "Repository URL (default: '')",
+      "default": ""
+    },
+    "license": {
+      "type": "string",
+      "description": "License identifier (default: '')",
+      "default": ""
+    },
+    "keywords": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Keywords array (default: [])",
+      "default": []
+    },
+    "commands": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Command file paths (ALWAYS array, never undefined)"
+    },
+    "agents": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Agent file paths (ALWAYS array, never undefined)"
+    },
+    "skills": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Skill directory paths (ALWAYS array, never undefined)"
+    },
+    "hooks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "description": "Event name (e.g., SessionStart, PostToolUse)"
+          },
+          "type": {
+            "type": "string",
+            "description": "Hook type (only 'command' supported)",
+            "enum": ["command"]
+          },
+          "command": {
+            "type": "string",
+            "description": "Command path to execute"
+          },
+          "matcher": {
+            "type": "string",
+            "description": "Optional tool matcher pattern"
+          },
+          "timeout": {
+            "type": "number",
+            "description": "Optional timeout in seconds"
+          }
+        },
+        "required": ["event", "type", "command"],
+        "additionalProperties": true
+      },
+      "description": "Hooks array (ALWAYS array, never undefined)"
+    },
+    "mcps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "MCP server name"
+          },
+          "command": {
+            "type": "string",
+            "description": "Executable command"
+          },
+          "args": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Command arguments"
+          },
+          "env": {
+            "type": "object",
+            "description": "Environment variables",
+            "additionalProperties": { "type": "string" }
+          }
+        },
+        "required": ["name", "command"],
+        "additionalProperties": true
+      },
+      "description": "MCP servers array (ALWAYS array, never undefined)"
+    }
+  },
+  "required": [
+    "name",
+    "source",
+    "version",
+    "description",
+    "author",
+    "homepage",
+    "repository",
+    "license",
+    "keywords",
+    "commands",
+    "agents",
+    "skills",
+    "hooks",
+    "mcps"
+  ],
+  "additionalProperties": false
+}
