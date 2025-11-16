@@ -1,0 +1,41 @@
+{
+  "name": "mkcurator",
+  "version": "0.0.4",
+  "description": "Claude Code plugin curator - TUI for selecting and combining plugin components",
+  "main": "dist/index.js",
+  "bin": {
+    "mkcurator": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "generate-types": "npx json-schema-to-typescript schemas/plugin.schema.json -o src/types/plugin.ts && npx json-schema-to-typescript schemas/normalized-plugin.schema.json -o src/types/normalized.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:setup-fixtures": "node scripts/setup-fixtures.js"
+  },
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "curator",
+    "tui"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@vitest/ui": "^4.0.9",
+    "json-schema-to-typescript": "^15.0.4",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.9"
+  },
+  "dependencies": {
+    "@types/blessed": "^0.1.25",
+    "ajv": "^8.17.1",
+    "blessed": "^0.1.81",
+    "glob": "^11.0.3"
+  }
+}

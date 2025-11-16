@@ -1,0 +1,413 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude.com/schemas/plugin.schema.json",
+  "title": "Claude Code Plugin Manifest",
+  "description": "JSON Schema for validating Claude Code plugin.json files (official format). Only 'name' is required; all other fields are optional and supplement auto-discovery.",
+  "type": "object",
+  "required": ["name"],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Unique plugin identifier in kebab-case format (lowercase, hyphen-separated, no spaces or special characters)",
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+      "minLength": 1,
+      "maxLength": 100,
+      "examples": [
+        "my-plugin",
+        "deployment-tools",
+        "personal-ai-infrastructure"
+      ]
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version following semver specification (MAJOR.MINOR.PATCH)",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+      "examples": [
+        "1.0.0",
+        "2.1.3",
+        "1.0.0-beta.1",
+        "3.0.0-rc.2+build.123"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief explanation of plugin purpose and capabilities",
+      "minLength": 1,
+      "maxLength": 500,
+      "examples": [
+        "Deployment automation tools for CI/CD pipelines",
+        "Personal AI infrastructure management"
+      ]
+    },
+    "author": {
+      "type": "object",
+      "description": "Plugin author information",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Author's full name or organization name",
+          "minLength": 1,
+          "maxLength": 200,
+          "examples": ["John Doe", "Acme Corp", "Development Team"]
+        },
+        "email": {
+          "type": "string",
+          "description": "Contact email address",
+          "format": "email",
+          "examples": ["[email protected]", "[email protected]"]
+        },
+        "url": {
+          "type": "string",
+          "description": "Author's website or profile URL",
+          "format": "uri",
+          "pattern": "^https?://",
+          "examples": [
+            "https://github.com/johndoe",
+            "https://acme.com/team"
+          ]
+        }
+      }
+    },
+    "homepage": {
+      "type": "string",
+      "description": "Plugin documentation or homepage URL",
+      "format": "uri",
+      "pattern": "^https?://",
+      "examples": [
+        "https://docs.example.com/plugin",
+        "https://github.com/user/plugin#readme"
+      ]
+    },
+    "repository": {
+      "type": "string",
+      "description": "Source code repository URL (typically GitHub, GitLab, or Bitbucket)",
+      "format": "uri",
+      "pattern": "^https?://",
+      "examples": [
+        "https://github.com/user/plugin",
+        "https://gitlab.com/org/plugin"
+      ]
+    },
+    "license": {
+      "type": "string",
+      "description": "SPDX license identifier or custom license name",
+      "minLength": 1,
+      "maxLength": 100,
+      "examples": [
+        "MIT",
+        "Apache-2.0",
+        "GPL-3.0",
+        "BSD-3-Clause",
+        "ISC",
+        "Proprietary"
+      ]
+    },
+    "keywords": {
+      "type": "array",
+      "description": "Search and discovery tags for plugin categorization",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50,
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      },
+      "uniqueItems": true,
+      "maxItems": 20,
+      "examples": [
+        ["deployment", "ci-cd", "automation"],
+        ["security", "audit", "compliance"],
+        ["ai", "context", "knowledge-graph"]
+      ]
+    },
+    "commands": {
+      "description": "Additional command files or directories (supplements auto-discovery of commands/ directory)",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Single command file or directory path",
+          "pattern": "^\\./[^\\s]+\\.md$|^\\./[^\\s]+/$",
+          "examples": ["./custom/deploy.md", "./utilities/"]
+        },
+        {
+          "type": "array",
+          "description": "Multiple command file or directory paths",
+          "items": {
+            "type": "string",
+            "pattern": "^\\./[^\\s]+\\.md$|^\\./[^\\s]+/$"
+          },
+          "uniqueItems": true,
+          "examples": [
+            ["./custom/deploy.md", "./utilities/batch.md"],
+            ["./specialized/", "./extras/commands/"]
+          ]
+        }
+      ]
+    },
+    "agents": {
+      "description": "Additional agent files or directories (supplements auto-discovery of agents/ directory)",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Single agent file or directory path",
+          "pattern": "^\\./[^\\s]+\\.md$|^\\./[^\\s]+/$",
+          "examples": ["./custom/reviewer.md", "./specialized-agents/"]
+        },
+        {
+          "type": "array",
+          "description": "Multiple agent file or directory paths",
+          "items": {
+            "type": "string",
+            "pattern": "^\\./[^\\s]+\\.md$|^\\./[^\\s]+/$"
+          },
+          "uniqueItems": true,
+          "examples": [
+            ["./custom/reviewer.md", "./custom/tester.md"],
+            ["./specialized-agents/", "./domain-agents/"]
+          ]
+        }
+      ]
+    },
+    "hooks": {
+      "description": "Hook configuration: file path to hooks.json OR inline configuration object",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Path to external hooks.json file",
+          "pattern": "^\\./[^\\s]+\\.json$",
+          "examples": ["./hooks/hooks.json", "./config/hooks.json"]
+        },
+        {
+          "type": "object",
+          "description": "Inline hook configuration with event names as keys",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^(SessionStart|SessionEnd|PreToolUse|PostToolUse|UserPromptSubmit|Notification|Stop|SubagentStop|PreCompact)$": {
+              "type": "array",
+              "description": "Array of hook handlers for this event",
+              "items": {
+                "type": "object",
+                "required": ["hooks"],
+                "additionalProperties": false,
+                "properties": {
+                  "matcher": {
+                    "type": "string",
+                    "description": "Tool name matcher (regex pattern) - only for PreToolUse/PostToolUse events",
+                    "examples": ["Write|Edit", "Bash", "Read.*"]
+                  },
+                  "hooks": {
+                    "type": "array",
+                    "description": "Hook actions to execute when event/matcher triggers",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "required": ["type"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": ["command", "agent"],
+                          "description": "Hook action type: 'command' for shell scripts, 'agent' for subagent invocation"
+                        },
+                        "command": {
+                          "type": "string",
+                          "description": "Shell command to execute (required when type=command). Use ${CLAUDE_PLUGIN_ROOT} for plugin-relative paths",
+                          "examples": [
+                            "${CLAUDE_PLUGIN_ROOT}/scripts/format.sh",
+                            "/usr/local/bin/validate"
+                          ]
+                        },
+                        "agent": {
+                          "type": "string",
+                          "description": "Agent name to invoke (required when type=agent). Prefix with / for plugin agents",
+                          "pattern": "^/[a-z][a-z0-9-]*$",
+                          "examples": ["/security-check", "/code-reviewer"]
+                        },
+                        "args": {
+                          "type": "array",
+                          "description": "Arguments to pass to command or agent",
+                          "items": {
+                            "type": "string"
+                          },
+                          "examples": [["--strict", "--format=json"], ["--config", "${CLAUDE_PLUGIN_ROOT}/config.yaml"]]
+                        }
+                      },
+                      "oneOf": [
+                        {
+                          "properties": {
+                            "type": { "const": "command" }
+                          },
+                          "required": ["command"]
+                        },
+                        {
+                          "properties": {
+                            "type": { "const": "agent" }
+                          },
+                          "required": ["agent"]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "examples": [
+            {
+              "SessionStart": [
+                {
+                  "hooks": [
+                    {
+                      "type": "command",
+                      "command": "${CLAUDE_PLUGIN_ROOT}/scripts/setup.sh"
+                    }
+                  ]
+                }
+              ],
+              "PostToolUse": [
+                {
+                  "matcher": "Write|Edit",
+                  "hooks": [
+                    {
+                      "type": "command",
+                      "command": "${CLAUDE_PLUGIN_ROOT}/scripts/format-code.sh"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "mcpServers": {
+      "description": "MCP server configuration: file path to .mcp.json OR inline configuration object",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Path to external MCP configuration file",
+          "pattern": "^\\./[^\\s]+\\.json$",
+          "examples": ["./.mcp.json", "./config/mcp-servers.json"]
+        },
+        {
+          "type": "object",
+          "description": "Inline MCP server configurations with server names as keys",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-z][a-z0-9-]*$": {
+              "type": "object",
+              "required": ["command"],
+              "additionalProperties": false,
+              "properties": {
+                "command": {
+                  "type": "string",
+                  "description": "Executable command to start MCP server. Use ${CLAUDE_PLUGIN_ROOT} for plugin-relative paths",
+                  "minLength": 1,
+                  "examples": [
+                    "npx",
+                    "node",
+                    "${CLAUDE_PLUGIN_ROOT}/bin/server",
+                    "python3"
+                  ]
+                },
+                "args": {
+                  "type": "array",
+                  "description": "Command-line arguments for the MCP server",
+                  "items": {
+                    "type": "string"
+                  },
+                  "examples": [
+                    ["-y", "@tavily/mcp-server"],
+                    ["${CLAUDE_PLUGIN_ROOT}/servers/custom-server.js"],
+                    ["--config", "${CLAUDE_PLUGIN_ROOT}/config.json"]
+                  ]
+                },
+                "env": {
+                  "type": "object",
+                  "description": "Environment variables for the MCP server process",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "examples": [
+                    {
+                      "TAVILY_API_KEY": "${TAVILY_API_KEY}",
+                      "DB_PATH": "${CLAUDE_PLUGIN_ROOT}/data"
+                    }
+                  ]
+                },
+                "cwd": {
+                  "type": "string",
+                  "description": "Working directory for MCP server process. Use ${CLAUDE_PLUGIN_ROOT} for plugin-relative paths",
+                  "examples": [
+                    "${CLAUDE_PLUGIN_ROOT}",
+                    "${CLAUDE_PLUGIN_ROOT}/servers"
+                  ]
+                }
+              }
+            }
+          },
+          "examples": [
+            {
+              "tavily": {
+                "command": "npx",
+                "args": ["-y", "@tavily/mcp-server"],
+                "env": {
+                  "TAVILY_API_KEY": "${TAVILY_API_KEY}"
+                }
+              },
+              "filesystem": {
+                "command": "npx",
+                "args": [
+                  "-y",
+                  "@modelcontextprotocol/server-filesystem",
+                  "/allowed/path"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "examples": [
+    {
+      "name": "my-plugin"
+    },
+    {
+      "name": "deployment-tools",
+      "version": "2.1.0",
+      "description": "Deployment automation for CI/CD pipelines",
+      "author": {
+        "name": "Dev Team",
+        "email": "[email protected]"
+      },
+      "license": "MIT",
+      "keywords": ["deployment", "ci-cd", "automation"]
+    },
+    {
+      "name": "personal-ai-infrastructure",
+      "version": "1.0.0",
+      "description": "Personal AI context and workflow management",
+      "commands": ["./custom/sync-knowledge.md"],
+      "hooks": {
+        "SessionStart": [
+          {
+            "hooks": [
+              {
+                "type": "command",
+                "command": "${CLAUDE_PLUGIN_ROOT}/scripts/load-context.sh"
+              }
+            ]
+          }
+        ]
+      },
+      "mcpServers": {
+        "knowledge-graph": {
+          "command": "node",
+          "args": ["${CLAUDE_PLUGIN_ROOT}/servers/graph.js"]
+        }
+      }
+    }
+  ]
+}
