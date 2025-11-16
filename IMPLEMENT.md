@@ -42,16 +42,86 @@ For each file discovered in `docs/`:
 
 ## Phase 3: Verify Completeness
 
-**CHECK**: Answer these questions for ALL files in `docs/`:
+**CRITICAL**: Every file in `docs/` MUST have implementation evidence.
 
-### For each file in `docs/spec/`:
+### 3.1 Verify ALL spec files are implemented
+
+**EXECUTE** (content-agnostic verification):
+
+```bash
+echo "=== Verifying ALL spec files ==="
+
+for spec in docs/spec/*.md; do
+  [ -f "$spec" ] || continue
+  [ "$(basename "$spec")" = "README.md" ] && continue
+
+  filename=$(basename "$spec" .md)
+  echo "Checking: $spec"
+
+  # Search for ANY reference to this spec outside of docs/
+  # This is content-agnostic: looks for filename OR keywords from title
+  refs=$(git grep -il "$filename" -- ':!docs/' 2>/dev/null | wc -l)
+
+  if [ "$refs" -eq 0 ]; then
+    echo "❌ FAIL: No implementation found for $spec"
+    echo "   Expected: Code, tests, or config files referencing this spec"
+    exit 1
+  fi
+
+  echo "✅ $spec - Found $refs references"
+done
+
+echo "✅ All spec files have implementation evidence"
+```
+
+**If fails**: Spec file has no implementation → return to Phase 2
+
+---
+
+### 3.2 Verify ALL decision files are applied
+
+**EXECUTE** (content-agnostic verification):
+
+```bash
+echo "=== Verifying ALL decision files ==="
+
+for decision in docs/decisions/*.md; do
+  [ -f "$decision" ] || continue
+  [ "$(basename "$decision")" = "README.md" ] && continue
+
+  filename=$(basename "$decision" .md)
+  echo "Checking: $decision"
+
+  # Search for ANY reference to this decision outside of docs/
+  refs=$(git grep -il "$filename" -- ':!docs/' 2>/dev/null | wc -l)
+
+  if [ "$refs" -eq 0 ]; then
+    echo "⚠️  WARNING: No references found for $decision"
+    echo "   This may be informational, or implementation is missing"
+  else
+    echo "✅ $decision - Found $refs references"
+  fi
+done
+
+echo "✅ All decision files verified"
+```
+
+**If fails**: Decision not applied → return to Phase 2
+
+---
+
+### 3.3 Conceptual Verification
+
+**CHECK**: Answer these questions for ALL files:
+
+#### For each file in `docs/spec/`:
 - ❓ Are the behaviors described in this spec file implemented?
 - ❓ Does the application exhibit these behaviors?
 - ❓ Are there tests validating these behaviors?
 
 **If any answer is NO → return to Phase 2 for that file**
 
-### For each file in `docs/decisions/`:
+#### For each file in `docs/decisions/`:
 - ❓ Is the decision applied in the codebase?
 - ❓ Does the project structure reflect this decision?
 - ❓ Are the tools/libraries mentioned in the decision present?
