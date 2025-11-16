@@ -119,7 +119,62 @@ Scenario: Guardar sin selección
   And NO guarda nada
 ```
 
-### 5. Salir
+### 5. Conflictos Multi-Plugin
+
+```gherkin
+Scenario: Conflicto de nombres de comandos
+  Given plugin-a tiene "commands/build.md"
+  And plugin-b tiene "commands/build.md"
+  When selecciono ambos comandos
+  And presiono S (Save)
+  Then ambos archivos se copian con namespace prefix:
+    - commands/plugin-a--build.md
+    - commands/plugin-b--build.md
+  And plugin.json lista ambos con prefix
+
+Scenario: Conflicto de nombres de agentes
+  Given plugin-a tiene "agents/reviewer.md"
+  And plugin-b tiene "agents/reviewer.md"
+  When selecciono ambos agentes
+  And presiono S (Save)
+  Then ambos archivos se copian con namespace prefix:
+    - agents/plugin-a--reviewer.md
+    - agents/plugin-b--reviewer.md
+
+Scenario: Conflicto de nombres de MCPs
+  Given plugin-a tiene MCP "tavily" con config A
+  And plugin-b tiene MCP "tavily" con config B
+  When selecciono ambos MCPs
+  And presiono S (Save)
+  Then plugin.json contiene ambos con prefix:
+    - "plugin-a--tavily": { config A }
+    - "plugin-b--tavily": { config B }
+
+Scenario: Conflicto de directorios de skills
+  Given plugin-a tiene "skills/chrome-devtools/"
+  And plugin-b tiene "skills/chrome-devtools/"
+  When selecciono ambos skills
+  And presiono S (Save)
+  Then ambos directorios se copian con namespace prefix:
+    - skills/plugin-a--chrome-devtools/
+    - skills/plugin-b--chrome-devtools/
+
+Scenario: Merge de hooks del mismo evento
+  Given plugin-a tiene hook SessionStart → /setup-a.sh
+  And plugin-b tiene hook SessionStart → /setup-b.sh
+  When selecciono ambos hooks
+  And presiono S (Save)
+  Then plugin.json mergea automáticamente:
+    "SessionStart": [
+      { "hooks": [
+        { "command": "/setup-a.sh" },
+        { "command": "/setup-b.sh" }
+      ] }
+    ]
+  And el orden preserva el orden de selección en TUI
+```
+
+### 6. Salir
 
 ```gherkin
 Scenario: Salir de la aplicación

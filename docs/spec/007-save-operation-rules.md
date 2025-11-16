@@ -182,13 +182,99 @@ AND if yes → delete and recreate
 AND if no → cancel operation
 ```
 
-### 7.3 Duplicate Paths
+### 7.3 File Name Conflicts (Commands & Agents)
+
+**Conflict**: Same filename from different plugins.
 
 ```
-IF same path selected from multiple plugins
-THEN show error "Duplicate path: {path}"
-AND prevent save
+IF plugin-a has "commands/build.md"
+AND plugin-b has "commands/build.md"
+AND both selected
+
+THEN apply namespace prefix:
+  - Copy plugin-a/commands/build.md → curated-plugin/commands/plugin-a--build.md
+  - Copy plugin-b/commands/build.md → curated-plugin/commands/plugin-b--build.md
+
+AND in plugin.json:
+  "commands": [
+    "./commands/plugin-a--build.md",
+    "./commands/plugin-b--build.md"
+  ]
 ```
+
+**Same rule applies to agents.**
+
+---
+
+### 7.4 MCP Name Conflicts
+
+**Conflict**: Same MCP server name from different plugins.
+
+```
+IF plugin-a has MCP "tavily" with config A
+AND plugin-b has MCP "tavily" with config B
+AND both selected
+
+THEN apply namespace prefix to MCP name:
+  "mcpServers": {
+    "plugin-a--tavily": { ...config A },
+    "plugin-b--tavily": { ...config B }
+  }
+```
+
+**Rationale**: MCP configs can differ (env vars, args), merging would lose data.
+
+---
+
+### 7.5 Hook Event Merging
+
+**Scenario**: Same event from different plugins.
+
+```
+IF plugin-a has Hook(event: "SessionStart", command: "/setup-a.sh")
+AND plugin-b has Hook(event: "SessionStart", command: "/setup-b.sh")
+AND both selected
+
+THEN merge into same event array (already supported by 006-reverse-transformation-rules.md):
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "/setup-a.sh" },
+          { "type": "command", "command": "/setup-b.sh" }
+        ]
+      }
+    ]
+  }
+```
+
+**Order**: Preserve selection order from TUI.
+
+**No conflicts** - this is valid Claude Code behavior (multiple hooks per event).
+
+---
+
+### 7.6 Skill Directory Conflicts
+
+**Conflict**: Same skill directory name from different plugins.
+
+```
+IF plugin-a has "skills/chrome-devtools/"
+AND plugin-b has "skills/chrome-devtools/"
+AND both selected
+
+THEN apply namespace prefix to directory name:
+  - Copy plugin-a/skills/chrome-devtools/ → curated-plugin/skills/plugin-a--chrome-devtools/
+  - Copy plugin-b/skills/chrome-devtools/ → curated-plugin/skills/plugin-b--chrome-devtools/
+
+AND in plugin.json:
+  "skills": [
+    "./skills/plugin-a--chrome-devtools",
+    "./skills/plugin-b--chrome-devtools"
+  ]
+```
+
+**Rationale**: Skills pattern is `skills/*/SKILL.md` - the `*` is the skill name.
 
 ---
 
