@@ -6,144 +6,118 @@
 
 ## 🎯 Success Criteria
 
-✅ Checklist generated from `docs/` is 100% complete
-✅ All items marked as done
+✅ **Convergence**: 2 consecutive iterations find NOTHING to implement
 ✅ Application runs without errors
 
 **CRITICAL RULES**:
+- **Must re-read ALL docs/ every iteration** - No assumptions from previous iteration
+- **Only stop after 2 iterations with ZERO pending items** - One is not enough
 - **NO item can be marked as "optional"** - Everything in `docs/` is MANDATORY
-- **NO "partial completion"** - Each item is either ✅ (done) or ❌ (not done)
-- **NO "TODO for later"** - All items must be ✅ before declaring complete
 - **100% means 100%** - Not 90%, not "mostly done", not "core features complete"
 
 ---
 
-## Phase 1: Generate Checklist
+## The Loop (Run Until Convergence)
 
-**EXECUTE**:
+### Iteration N:
 
+#### Step 1: Read ALL documentation
 ```bash
 ultrathink --seq @docs/spec @docs/decisions
 ```
 
-**This command**:
-- Reads all files in `docs/spec/` and `docs/decisions/`
-- Generates a checklist of completed vs pending items
-- Shows what is already done
-- Shows what needs to be implemented
-
-**Output**: A checklist with items marked as ✅ (done) or ❌ (pending)
+Read EVERY file in `docs/spec/` and `docs/decisions/`.
 
 ---
 
-## Phase 2: Review Checklist
+#### Step 2: Identify what's missing
 
-**CHECK**: Look at the checklist generated in Phase 1.
+For EACH file read:
+- Is this requirement/decision implemented?
+- Is there code/tests/config for it?
+- Does the app exhibit this behavior?
 
-**STRICT VERIFICATION**:
-
-Count the items:
-- ✅ (done) items: `____`
-- ❌ (pending) items: `____`
-- ⚠️ (incomplete) items: `____`
-- 🔜 (optional/later) items: `____`
-- Total items: `____`
-
-**PASS criteria**:
-- ✅ items = Total items (100%)
-- ❌ items = 0
-- ⚠️ items = 0
-- 🔜 items = 0
-
-**FAIL if**:
-- ANY item is not ✅
-- ANY item is marked "optional", "TODO", "later", "nice to have"
-- Count of ✅ items < Total items
-
-**If FAIL → Go to Phase 3**
-
-**If PASS → Go to Phase 4**
+Create list of pending items:
+```
+Pending items found in iteration N:
+- [ ] Item 1 from file X
+- [ ] Item 2 from file Y
+- [ ] Item 3 from file Z
+...
+Total: ___ pending items
+```
 
 ---
 
-## Phase 3: Complete Pending Items
+#### Step 3: Check convergence
 
-**EXECUTE**: For each pending item in the checklist:
+**IF** pending items = 0:
+  - Increment convergence counter
+  - **IF** convergence counter = 2:
+    - **DONE** - Go to Final Verification
+  - **ELSE**:
+    - Continue to Step 1 (next iteration)
 
-1. Read the spec/decision file that corresponds to that item
-2. Understand what needs to be implemented
-3. Implement it (write code, tests, config, etc.)
-4. Verify it works (run tests, build, etc.)
-5. Mark item as ✅ in the checklist
-
-**Continue until**: All items in checklist are ✅
-
-**Then**: Return to Phase 1 (regenerate checklist to verify)
+**IF** pending items > 0:
+  - Reset convergence counter to 0
+  - Continue to Step 4
 
 ---
 
-## Phase 4: Final Verification
+#### Step 4: Implement pending items
 
-**EXECUTE**: Verify the application works end-to-end.
+For EACH pending item:
+1. Read the spec/decision file again
+2. Implement what's required
+3. Write tests
+4. Verify it works
 
-Run whatever verification the project defines:
-- Test suite (if exists)
-- Build process (if exists)
+Mark each item as done when complete.
+
+---
+
+#### Step 5: Next iteration
+
+Return to Step 1 (re-read ALL docs/ from scratch)
+
+---
+
+## Final Verification
+
+Only reached after 2 consecutive iterations found 0 pending items.
+
+**EXECUTE**:
+- Run test suite (if exists)
+- Build application (if buildable)
 - Run application (if runnable)
-- Any other project-specific verification
 
-**CHECK**: Do all verifications pass?
+**IF** any verification fails:
+- Reset convergence counter to 0
+- Return to Step 1
 
-**If NO → Return to Phase 3**
-
-**If YES → DONE - Implementation complete**
-
----
-
-## 🔁 EXECUTION LOOP
-
-```
-START
-  ↓
-Phase 1: Generate checklist
-  ↓
-Phase 2: Review checklist
-  ↓
-All ✅? ──NO──→ Phase 3: Complete pending items ──→ Back to Phase 1
-  ↓
- YES
-  ↓
-Phase 4: Final verification
-  ↓
-Pass? ──NO──→ Phase 3: Fix failures ──→ Back to Phase 1
-  ↓
-YES
-  ↓
-DONE - 100% complete
-```
-
-**DO NOT STOP** until checklist is 100% ✅ and all verifications pass.
+**IF** all verifications pass:
+- **DONE** - 100% complete
 
 ---
 
 ## 📊 Why This Works
 
-1. **Checklist-driven**: Explicit tracking of what's done vs pending
-2. **Self-verifying**: Regenerate checklist after changes to confirm completion
-3. **Content-agnostic**: Works regardless of docs/ content or project structure
-4. **Immutable**: Protocol never changes, only checklist content changes
-5. **Exhaustive**: Loops until 100% of checklist is complete
+1. **Exhaustive re-reading**: Every iteration re-reads ALL docs/ from scratch
+2. **Convergence detection**: Stops only when 2 iterations find nothing
+3. **Self-correcting**: Can't skip items - will find them in next iteration
+4. **No memory assumptions**: Each iteration treats docs/ as new
+5. **Content-agnostic**: Works regardless of docs/ content
 
 ---
 
 ## 🚀 START EXECUTION NOW
 
-**BEGIN Phase 1**:
+**Iteration 1 - Step 1**: Read all documentation
 
 ```bash
 ultrathink --seq @docs/spec @docs/decisions
 ```
 
-**THEN**: Review the checklist, complete pending items, verify, loop.
+**Then**: Follow steps 2-5, loop until convergence (2x zero pending).
 
-**DO NOT STOP** until checklist shows 100% ✅ and all verifications pass.
+**Convergence counter**: 0
