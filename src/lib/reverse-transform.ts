@@ -19,20 +19,52 @@ function cleanAuthor(author: NormalizedPluginInternalFormat['author']): any {
 }
 
 /**
- * Group hooks by event name
+ * Group hooks by event name and matcher
+ * Spec 006-reverse-transformation-rules.md:187-258
+ *
+ * Structure: { "EventName": [{ "matcher"?: string, "hooks": [...] }] }
  */
 function groupHooksByEvent(hooks: NormalizedPluginInternalFormat['hooks']): any {
-  const grouped: any = {};
+  const grouped: Record<string, any[]> = {};
 
   for (const hook of hooks) {
     const event = hook.event;
+    const matcher = hook.matcher;
+
+    // Remove event and matcher from the config (spec 006:192-194)
     const config: any = { ...hook };
     delete config.event;
+    delete config.matcher;
 
+    // Initialize event array if needed
     if (!grouped[event]) {
       grouped[event] = [];
     }
-    grouped[event].push(config);
+
+    // Find existing matcher group or create new one
+    // Hooks with same event+matcher should be grouped together
+    let matcherGroup = grouped[event].find((g: any) => {
+      // Both have matcher and they match
+      if (matcher !== undefined && g.matcher !== undefined) {
+        return g.matcher === matcher;
+      }
+      // Both have no matcher
+      if (matcher === undefined && g.matcher === undefined) {
+        return true;
+      }
+      return false;
+    });
+
+    if (!matcherGroup) {
+      matcherGroup = { hooks: [] };
+      if (matcher !== undefined) {
+        matcherGroup.matcher = matcher;
+      }
+      grouped[event].push(matcherGroup);
+    }
+
+    // Add hook to the matcher group's hooks array
+    matcherGroup.hooks.push(config);
   }
 
   return grouped;
@@ -92,19 +124,19 @@ export function reverseTransform(normalized: NormalizedPluginInternalFormat): an
     output.keywords = normalized.keywords;
   }
 
-  // 3. Commands (only if non-empty)
+  // 3. Commands (only if non-empty, add "./" prefix)
   if (normalized.commands.length > 0) {
-    output.commands = normalized.commands;
+    output.commands = normalized.commands.map(p => p.startsWith('./') ? p : `./${p}`);
   }
 
-  // 4. Agents (only if non-empty)
+  // 4. Agents (only if non-empty, add "./" prefix)
   if (normalized.agents.length > 0) {
-    output.agents = normalized.agents;
+    output.agents = normalized.agents.map(p => p.startsWith('./') ? p : `./${p}`);
   }
 
-  // 5. Skills (only if non-empty)
+  // 5. Skills (only if non-empty, add "./" prefix)
   if (normalized.skills.length > 0) {
-    output.skills = normalized.skills;
+    output.skills = normalized.skills.map(p => p.startsWith('./') ? p : `./${p}`);
   }
 
   // 6. Hooks (group by event, only if non-empty)

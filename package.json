@@ -12,7 +12,9 @@
     "cli": "tsx src/cli.tsx",
     "build": "echo 'Using tsx - no build needed. Run: npm start'",
     "generate-types": "json-schema-to-typescript schemas/plugin.schema.json -o src/types/plugin.ts && json-schema-to-typescript schemas/normalized-plugin.schema.json -o src/types/normalized.ts",
-    "test": "tsx test/functional.test.ts"
+    "test": "npm run test:integration",
+    "test:integration": "node --import tsx --test test/integration.test.ts",
+    "test:watch": "node --import tsx --test --watch test/integration.test.ts"
   },
   "keywords": [
     "claude-code",

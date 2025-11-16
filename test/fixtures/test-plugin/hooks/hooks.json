@@ -1,0 +1,12 @@
+{
+  "SessionStart": [
+    { "type": "command", "command": "/setup-env.sh" },
+    { "type": "command", "command": "/init-workspace.sh" }
+  ],
+  "PreToolUse": [
+    { "type": "agent", "agent": "/security-check", "matcher": "Bash" }
+  ],
+  "PostToolUse": [
+    { "type": "command", "command": "/cleanup.sh", "matcher": "Write" }
+  ]
+}

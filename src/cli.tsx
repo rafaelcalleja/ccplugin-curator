@@ -79,10 +79,46 @@ Examples:
         plugins={plugins}
         onSave={async (selections) => {
           try {
-            await saveCuratedPlugin(plugins, selections, outputPath, name);
-            console.log(`✓ Saved curated plugin to: ${path.resolve(outputPath)}`);
+            const successMessage = await saveCuratedPlugin(plugins, selections, outputPath, name, false);
+            console.log('\n' + successMessage);
           } catch (error) {
-            console.error('Error saving plugin:', error);
+            if (error instanceof Error) {
+              // Handle OUTPUT_DIR_EXISTS error with prompt (spec 007-save-operation-rules.md:178-183)
+              if (error.message === 'OUTPUT_DIR_EXISTS') {
+                // Import readline for user prompt
+                const readline = await import('readline');
+                const rl = readline.createInterface({
+                  input: process.stdin,
+                  output: process.stdout
+                });
+
+                const answer = await new Promise<string>((resolve) => {
+                  rl.question('\n⚠️  Output directory exists. Overwrite? [Y/n] ', (ans) => {
+                    rl.close();
+                    resolve(ans);
+                  });
+                });
+
+                if (answer.toLowerCase() === 'y' || answer === '') {
+                  try {
+                    const successMessage = await saveCuratedPlugin(plugins, selections, outputPath, name, true);
+                    console.log('\n' + successMessage);
+                  } catch (retryError) {
+                    if (retryError instanceof Error) {
+                      console.error('\n' + retryError.message);
+                    } else {
+                      console.error('\nError saving plugin:', retryError);
+                    }
+                  }
+                } else {
+                  console.log('\nSave cancelled.');
+                }
+              } else {
+                console.error('\n' + error.message);
+              }
+            } else {
+              console.error('\nError saving plugin:', error);
+            }
           }
         }}
       />

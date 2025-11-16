@@ -8,8 +8,8 @@
     ],
     "PreToolUse": [
       {
-        "type": "agent",
-        "agent": "/security-check",
+        "type": "command",
+        "command": "/security-check",
         "matcher": "Bash"
       }
     ]
