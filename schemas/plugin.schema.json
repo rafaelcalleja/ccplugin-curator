@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude.ai/schemas/plugin.json",
+  "title": "Claude Code Plugin (Official Format)",
+  "description": "Official plugin format for Claude Code as defined in docs/spec/002-plugin-format-spec.md",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Plugin name (kebab-case format)",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief explanation of plugin purpose"
+    },
+    "author": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "email": {"type": "string", "format": "email"},
+        "url": {"type": "string", "format": "uri"}
+      }
+    },
+    "homepage": {
+      "type": "string",
+      "format": "uri",
+      "description": "Documentation URL"
+    },
+    "repository": {
+      "type": "string",
+      "format": "uri",
+      "description": "Source code URL"
+    },
+    "license": {
+      "type": "string",
+      "description": "License identifier (e.g., MIT, Apache-2.0)"
+    },
+    "keywords": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Discovery tags"
+    },
+    "commands": {
+      "oneOf": [
+        {"type": "string"},
+        {"type": "array", "items": {"type": "string"}}
+      ],
+      "description": "Command file paths (string path or array)"
+    },
+    "agents": {
+      "oneOf": [
+        {"type": "string"},
+        {"type": "array", "items": {"type": "string"}}
+      ],
+      "description": "Agent file paths (string path or array)"
+    },
+    "skills": {
+      "oneOf": [
+        {"type": "string"},
+        {"type": "array", "items": {"type": "string"}}
+      ],
+      "description": "Skill directory paths (string path or array)"
+    },
+    "hooks": {
+      "oneOf": [
+        {"type": "string"},
+        {"type": "object"}
+      ],
+      "description": "Hooks configuration (file path or inline object)"
+    },
+    "mcpServers": {
+      "oneOf": [
+        {"type": "string"},
+        {"type": "object"}
+      ],
+      "description": "MCP server configuration (file path or inline object)"
+    }
+  },
+  "required": []
+}

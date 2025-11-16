@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude.ai/schemas/normalized-plugin.json",
+  "title": "Normalized Plugin (Internal Format)",
+  "description": "Internal normalized plugin format as defined in docs/spec/001-normalization-protocol.md",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Plugin name (always present)"
+    },
+    "source": {
+      "type": "string",
+      "description": "Absolute path to plugin directory"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version (default: 0.0.0)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Plugin description (default: empty string)"
+    },
+    "author": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "email": {"type": "string"},
+        "url": {"type": "string"}
+      },
+      "required": ["name", "email", "url"]
+    },
+    "homepage": {
+      "type": "string",
+      "description": "Homepage URL (default: empty string)"
+    },
+    "repository": {
+      "type": "string",
+      "description": "Repository URL (default: empty string)"
+    },
+    "license": {
+      "type": "string",
+      "description": "License identifier (default: empty string)"
+    },
+    "keywords": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Keywords array (default: empty array)"
+    },
+    "commands": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Command file paths (always array, never undefined)"
+    },
+    "agents": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Agent file paths (always array, never undefined)"
+    },
+    "skills": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Skill directory paths (always array, never undefined)"
+    },
+    "hooks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "event": {"type": "string"},
+          "type": {"type": "string", "enum": ["command"]},
+          "command": {"type": "string"},
+          "matcher": {"type": "string"},
+          "timeout": {"type": "number"}
+        },
+        "required": ["event", "type", "command"]
+      },
+      "description": "Hooks array (always array, never undefined)"
+    },
+    "mcps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "command": {"type": "string"},
+          "args": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "env": {
+            "type": "object",
+            "additionalProperties": {"type": "string"}
+          }
+        },
+        "required": ["name", "command"]
+      },
+      "description": "MCP servers array (always array, never undefined)"
+    }
+  },
+  "required": ["name", "source", "version", "description", "author", "homepage", "repository", "license", "keywords", "commands", "agents", "skills", "hooks", "mcps"]
+}
