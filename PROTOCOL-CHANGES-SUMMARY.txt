@@ -1,0 +1,145 @@
+RESUMEN DE CAMBIOS AL PROTOCOLO IMPLEMENT.md
+================================================================================
+
+CAMBIO 1: Nueva regla - NUMBERS RULE (agregar después de CRITICAL RULES)
+--------------------------------------------------------------------------------
+If a spec mentions a number/count (e.g., "3 commands", "15 items total"):
+- These are EXACT requirements, NOT approximations
+- 2 ≠ 3, 14 ≠ 15
+- When checking: Count actual vs spec count
+- If mismatch → Pending item
+
+
+CAMBIO 2: Nueva regla - GRANULARITY RULE (agregar después de NUMBERS RULE)
+--------------------------------------------------------------------------------
+Pending items must be ATOMIC:
+- Atomic = Can be verified in ONE check
+- Non-atomic = Requires multiple checks
+
+Examples:
+❌ "Implement 008-integration-test-spec.md" (non-atomic)
+✅ "Create fixture with 3 commands not 2" (atomic)
+✅ "Add test: Scenario 1 - Load workflow" (atomic)
+
+
+CAMBIO 3: Step 2 - Leer línea por línea (reemplazar texto actual)
+--------------------------------------------------------------------------------
+ANTES:
+"For EACH file read:
+ - Is this requirement/decision implemented?"
+
+DESPUÉS:
+"For EACH file read:
+ - Read line by line
+ - For EACH requirement/assertion/example/scenario in the file:
+   → Is THIS SPECIFIC thing implemented?
+   → Create ONE pending item PER requirement found
+
+ To answer 'implemented' as YES, you MUST:
+ 1. Quote the EXACT line from spec
+ 2. Point to EXACT code/test/file that satisfies it
+ 3. Verify match is COMPLETE (not partial)
+
+ If unsure → Answer is NO → Add to pending"
+
+
+CAMBIO 4: Step 2 - Formato de pending items (actualizar ejemplo)
+--------------------------------------------------------------------------------
+ANTES:
+```
+Pending items found in iteration N:
+- [ ] Item 1 from file X
+- [ ] Item 2 from file Y
+Total: ___ pending items
+```
+
+DESPUÉS:
+```
+Pending items found in iteration N:
+- [ ] Item 1 from file X (quote: "line from spec")
+- [ ] Item 2 from file Y (quote: "line from spec")
+Total: ___ pending items
+```
+
+
+CAMBIO 5: Step 3 - Verificación obligatoria (agregar antes de convergencia)
+--------------------------------------------------------------------------------
+Agregar después de "IF pending items = 0:":
+
+BEFORE declaring convergence, perform:
+1. Re-scan docs/ directory
+2. Pick 3 random spec files
+3. For each, verify 3 random requirements
+4. Can you point to EXACT implementation?
+
+IF ANY verification fails:
+  → You missed items
+  → Return to Step 2 (recount more carefully)
+
+IF all verifications pass:
+  → Proceed with convergence check
+
+
+CAMBIO 6: Step 4 - Criterio de exactitud (agregar al paso 3)
+--------------------------------------------------------------------------------
+Agregar en "3. Verify completion:":
+
+- Can quote spec line → point to exact implementation
+- Spec says N → Implementation has N (not N-1, not N+1)
+- Test passes (if applicable)
+- Code works (if applicable)
+
+
+CAMBIO 7: Nueva sección - Anti-patterns (agregar antes de Final Verification)
+--------------------------------------------------------------------------------
+## ⚠️ Common Mistakes (Anti-patterns)
+
+❌ WRONG: Broad pending items
+"- [ ] Implement integration tests"
+→ Too vague, impossible to verify
+
+✅ CORRECT: Atomic pending items
+"- [ ] Create test-plugin/commands/nested/deep-cmd.md
+ - [ ] Add test function: 'Full workflow scenario'"
+
+---
+
+❌ WRONG: Partial implementation = done
+Spec: "Test plugin has 3 commands"
+Reality: 2 commands exist
+Marking: "Commands implemented ✓" → INCORRECT
+
+✅ CORRECT: Exact match required
+Spec: "Test plugin has 3 commands"
+Reality: 2 commands exist
+Marking: "Pending: Add 3rd command"
+
+---
+
+❌ WRONG: "Feature works" = "Spec done"
+normalize() works → "008 spec done" ✓ → INCORRECT
+
+✅ CORRECT: Check each requirement individually
+normalize() works ✓
+BUT 008 line 125 says "3 commands" → have 2 → NOT done
+
+
+CAMBIO 8: "Why This Works" - Agregar nuevos puntos (6-10)
+--------------------------------------------------------------------------------
+Agregar al final de la lista existente:
+
+6. NEW: Line-by-line granularity - Forces atomic items
+7. NEW: Exact matching - Prevents partial implementation acceptance
+8. NEW: Numbers verification - Catches count mismatches
+9. NEW: Mandatory verification - Random sampling before convergence
+10. NEW: Anti-patterns - Examples of what NOT to do
+
+
+================================================================================
+TODOS LOS CAMBIOS MANTIENEN CONTENT-AGNOSTIC
+================================================================================
+
+Ningún cambio menciona tipos específicos de archivos o contenido.
+Todos son reglas de PROCESO aplicables a cualquier docs/.
+
+================================================================================
