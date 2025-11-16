@@ -1,0 +1,39 @@
+{
+  "name": "ccplugin-curator",
+  "version": "0.0.9",
+  "description": "TUI tool to curate and combine Claude Code plugin components",
+  "main": "dist/index.js",
+  "bin": {
+    "ccplugin-curator": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/cli.ts",
+    "test": "vitest",
+    "test:integration": "vitest run --config vitest.config.integration.ts",
+    "generate-types": "json-schema-to-typescript schemas/plugin.schema.json -o src/types/plugin.ts && json-schema-to-typescript schemas/normalized-plugin.schema.json -o src/types/normalized.ts",
+    "start": "node dist/cli.js"
+  },
+  "keywords": [
+    "claude",
+    "plugin",
+    "curator",
+    "tui",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "json-schema-to-typescript": "^13.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "blessed": "^0.1.81",
+    "@types/blessed": "^0.1.25",
+    "glob": "^10.3.0",
+    "fast-glob": "^3.3.0"
+  }
+}

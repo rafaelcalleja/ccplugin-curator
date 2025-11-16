@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NormalizedPlugin",
+  "description": "Internal normalized plugin format used by curator",
+  "type": "object",
+  "required": [
+    "name",
+    "source",
+    "version",
+    "description",
+    "author",
+    "homepage",
+    "repository",
+    "license",
+    "keywords",
+    "commands",
+    "agents",
+    "skills",
+    "hooks",
+    "mcps"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Plugin name"
+    },
+    "source": {
+      "type": "string",
+      "description": "Absolute path to plugin directory"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version (default: '0.0.0')"
+    },
+    "description": {
+      "type": "string",
+      "description": "Plugin description (default: '')"
+    },
+    "author": {
+      "type": "object",
+      "required": ["name", "email", "url"],
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "url": { "type": "string" }
+      },
+      "description": "Author info (default: all empty strings)"
+    },
+    "homepage": {
+      "type": "string",
+      "description": "Homepage URL (default: '')"
+    },
+    "repository": {
+      "type": "string",
+      "description": "Repository URL (default: '')"
+    },
+    "license": {
+      "type": "string",
+      "description": "License (default: '')"
+    },
+    "keywords": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Keywords (default: [])"
+    },
+    "commands": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Command file paths (always array, never undefined)"
+    },
+    "agents": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Agent file paths (always array, never undefined)"
+    },
+    "skills": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Skill directory paths (always array, never undefined)"
+    },
+    "hooks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["event", "type", "command"],
+        "properties": {
+          "event": { "type": "string" },
+          "type": { "type": "string" },
+          "command": { "type": "string" },
+          "matcher": { "type": "string" },
+          "timeout": { "type": "number" }
+        },
+        "additionalProperties": true
+      },
+      "description": "Hooks in flat array format (always array, never undefined)"
+    },
+    "mcps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "command"],
+        "properties": {
+          "name": { "type": "string" },
+          "command": { "type": "string" },
+          "args": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "env": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        },
+        "additionalProperties": true
+      },
+      "description": "MCP servers in array format (always array, never undefined)"
+    }
+  },
+  "additionalProperties": false
+}

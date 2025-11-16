@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PluginJson",
+  "description": "Official Claude Code plugin format (.claude-plugin/plugin.json)",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Plugin name (kebab-case)"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version"
+    },
+    "description": {
+      "type": "string",
+      "description": "Plugin description"
+    },
+    "author": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "url": { "type": "string" }
+      }
+    },
+    "homepage": {
+      "type": "string",
+      "description": "Documentation URL"
+    },
+    "repository": {
+      "type": "string",
+      "description": "Source code URL"
+    },
+    "license": {
+      "type": "string",
+      "description": "License identifier"
+    },
+    "keywords": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Search keywords"
+    },
+    "commands": {
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      ],
+      "description": "Command files/directories"
+    },
+    "agents": {
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      ],
+      "description": "Agent files/directories"
+    },
+    "skills": {
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      ],
+      "description": "Skill directories"
+    },
+    "hooks": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" }
+      ],
+      "description": "Hooks configuration (file path or inline config)"
+    },
+    "mcpServers": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" }
+      ],
+      "description": "MCP servers configuration (file path or inline config)"
+    }
+  }
+}
