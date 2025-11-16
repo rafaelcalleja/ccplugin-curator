@@ -73,7 +73,7 @@ export function savePlugin(selections: NormalizedPlugin[], options: SaveOptions)
   validateOfficialPlugin(officialPlugin);
 
   // Copy component files
-  copyComponentFiles(mergedPlugin, pluginDir);
+  copyComponentFiles(selections, mergedPlugin, pluginDir);
 
   // Write output files
   writeOutputFiles(outputDir, pluginDir, pluginName, officialPlugin, mergedPlugin);
@@ -281,25 +281,130 @@ function validateOfficialPlugin(plugin: PluginJson): void {
 
 /**
  * Copy component files to output directory
+ * Implements real file copying from source plugins to output directory
  */
-function copyComponentFiles(plugin: NormalizedPlugin, targetDir: string): void {
-  // Note: In the actual implementation, this would need to access the original
-  // plugin source directories from the selections array. For now, we'll create
-  // placeholder files for testing.
-
-  // Create component directories
-  if (plugin.commands.length > 0) {
+function copyComponentFiles(
+  selections: NormalizedPlugin[],
+  mergedPlugin: NormalizedPlugin,
+  targetDir: string
+): void {
+  // Create base directories for components that exist
+  if (mergedPlugin.commands.length > 0) {
     fs.mkdirSync(path.join(targetDir, 'commands'), { recursive: true });
   }
-  if (plugin.agents.length > 0) {
+  if (mergedPlugin.agents.length > 0) {
     fs.mkdirSync(path.join(targetDir, 'agents'), { recursive: true });
   }
-  if (plugin.skills.length > 0) {
+  if (mergedPlugin.skills.length > 0) {
     fs.mkdirSync(path.join(targetDir, 'skills'), { recursive: true });
   }
 
-  // Note: Actual file copying would happen here from original sources
-  // For now, tests will handle file creation
+  // Build a map of component paths to their source directories
+  const componentSources = new Map<string, { pluginName: string; source: string }>();
+
+  // Track which components in merged plugin came from which source
+  for (const selection of selections) {
+    for (const cmd of selection.commands) {
+      componentSources.set(cmd, {
+        pluginName: selection.name,
+        source: selection.source,
+      });
+    }
+    for (const agent of selection.agents) {
+      componentSources.set(agent, {
+        pluginName: selection.name,
+        source: selection.source,
+      });
+    }
+    for (const skill of selection.skills) {
+      componentSources.set(skill, {
+        pluginName: selection.name,
+        source: selection.source,
+      });
+    }
+  }
+
+  // Copy commands
+  for (const cmdPath of mergedPlugin.commands) {
+    // Extract original path (without namespace prefix if present)
+    const originalPath = cmdPath.includes('--')
+      ? cmdPath.replace(/^([^/]+)\/[^-]+--/, '$1/')
+      : cmdPath;
+
+    const sourceInfo = componentSources.get(originalPath);
+    if (!sourceInfo) {
+      continue; // Skip if source not found
+    }
+
+    const sourcePath = path.join(sourceInfo.source, originalPath);
+    const destPath = path.join(targetDir, cmdPath);
+
+    if (fs.existsSync(sourcePath)) {
+      fs.mkdirSync(path.dirname(destPath), { recursive: true });
+      fs.copyFileSync(sourcePath, destPath);
+    }
+  }
+
+  // Copy agents
+  for (const agentPath of mergedPlugin.agents) {
+    // Extract original path (without namespace prefix if present)
+    const originalPath = agentPath.includes('--')
+      ? agentPath.replace(/^([^/]+)\/[^-]+--/, '$1/')
+      : agentPath;
+
+    const sourceInfo = componentSources.get(originalPath);
+    if (!sourceInfo) {
+      continue;
+    }
+
+    const sourcePath = path.join(sourceInfo.source, originalPath);
+    const destPath = path.join(targetDir, agentPath);
+
+    if (fs.existsSync(sourcePath)) {
+      fs.mkdirSync(path.dirname(destPath), { recursive: true });
+      fs.copyFileSync(sourcePath, destPath);
+    }
+  }
+
+  // Copy skills (directories)
+  for (const skillPath of mergedPlugin.skills) {
+    // Extract original path (without namespace prefix if present)
+    const originalPath = skillPath.includes('--')
+      ? skillPath.replace(/^([^/]+)\/[^-]+--/, '$1/')
+      : skillPath;
+
+    const sourceInfo = componentSources.get(originalPath);
+    if (!sourceInfo) {
+      continue;
+    }
+
+    const sourcePath = path.join(sourceInfo.source, originalPath);
+    const destPath = path.join(targetDir, skillPath);
+
+    if (fs.existsSync(sourcePath)) {
+      copyDirectoryRecursive(sourcePath, destPath);
+    }
+  }
+}
+
+/**
+ * Copy directory recursively
+ */
+function copyDirectoryRecursive(source: string, dest: string): void {
+  fs.mkdirSync(dest, { recursive: true });
+
+  const entries = fs.readdirSync(source, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const srcPath = path.join(source, entry.name);
+    const destPath = path.join(dest, entry.name);
+
+    if (entry.isDirectory()) {
+      copyDirectoryRecursive(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
 }
 
 /**

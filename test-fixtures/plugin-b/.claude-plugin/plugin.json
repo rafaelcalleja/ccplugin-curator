@@ -1,0 +1,5 @@
+{
+  "name": "test-plugin-b",
+  "version": "2.0.0",
+  "description": "Plugin B for conflict testing"
+}
