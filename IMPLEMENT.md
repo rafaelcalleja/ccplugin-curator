@@ -6,12 +6,10 @@
 
 ## 🎯 Success Criteria
 
-✅ **Convergence**: 2 consecutive iterations find NOTHING to implement
+✅ All pending items = 0 AND mandatory verification passes
 ✅ Application runs without errors
 
 **CRITICAL RULES**:
-- **Must re-read ALL docs/ every iteration** - No assumptions from previous iteration
-- **Only stop after 2 iterations with ZERO pending items** - One is not enough
 - **NO item can be marked as "optional"** - Everything in `docs/` is MANDATORY
 - **100% means 100%** - Not 90%, not "mostly done", not "core features complete"
 
@@ -38,7 +36,7 @@ RULE: If you can't verify the item with a SINGLE file check or test run, it's NO
 
 ---
 
-## The Loop (Run Until Convergence)
+## The Loop
 
 ### Iteration N:
 
@@ -82,13 +80,13 @@ Total: ___ pending items
 
 ---
 
-#### Step 3: Check convergence
+#### Step 3: Verify completeness
 
 **IF** pending items = 0:
 
-  **MANDATORY VERIFICATION BEFORE CONVERGENCE**
+  **MANDATORY VERIFICATION**
 
-  BEFORE declaring convergence, perform:
+  Perform random sampling:
 
   1. Re-scan docs/ directory
   2. Pick 3 random spec files
@@ -100,16 +98,9 @@ Total: ___ pending items
     → Return to Step 2 (recount more carefully)
 
   IF all verifications pass:
-    → Proceed with convergence check
-
-  - Increment convergence counter
-  - **IF** convergence counter = 2:
-    - **DONE** - Go to Final Verification
-  - **ELSE**:
-    - Continue to Step 1 (next iteration)
+    → **DONE** - Go to Final Verification
 
 **IF** pending items > 0:
-  - Reset convergence counter to 0
   - Continue to Step 4
 
 ---
@@ -128,7 +119,7 @@ Mark each item as done when complete.
 
 #### Step 5: Next iteration
 
-Return to Step 1 (re-read ALL docs/ from scratch)
+Return to Step 1
 
 ---
 
@@ -185,7 +176,7 @@ BUT 008 spec line 125 says "3 commands" → have 2 → NOT done
 
 ## Final Verification
 
-Only reached after 2 consecutive iterations found 0 pending items.
+Only reached after pending items = 0 AND mandatory verification passes.
 
 **EXECUTE**:
 - Run test suite (if exists)
@@ -193,7 +184,6 @@ Only reached after 2 consecutive iterations found 0 pending items.
 - Run application (if runnable)
 
 **IF** any verification fails:
-- Reset convergence counter to 0
 - Return to Step 1
 
 **IF** all verifications pass:
@@ -203,27 +193,21 @@ Only reached after 2 consecutive iterations found 0 pending items.
 
 ## 📊 Why This Works
 
-1. **Exhaustive re-reading**: Every iteration re-reads ALL docs/ from scratch
-2. **Convergence detection**: Stops only when 2 iterations find nothing
-3. **Self-correcting**: Can't skip items - will find them in next iteration
-4. **No memory assumptions**: Each iteration treats docs/ as new
-5. **Content-agnostic**: Works regardless of docs/ content
-6. **Line-by-line granularity**: Forces atomic items
-7. **Exact matching**: Prevents partial implementation acceptance
-8. **Numbers verification**: Catches count mismatches
-9. **Mandatory verification**: Random sampling before convergence
-10. **Anti-patterns**: Examples of what NOT to do
+1. **Line-by-line granularity**: Forces atomic items
+2. **Exact matching**: Prevents partial implementation acceptance
+3. **Numbers verification**: Catches count mismatches (3 ≠ 2)
+4. **Mandatory verification**: Random sampling prevents false positives
+5. **Anti-patterns**: Examples of what NOT to do
+6. **Content-agnostic**: Works regardless of docs/ content
 
 ---
 
 ## 🚀 START EXECUTION NOW
 
-**Iteration 1 - Step 1**: Read all documentation
+**Step 1**: Read all documentation
 
 ```bash
 ultrathink --seq @docs/spec @docs/decisions
 ```
 
-**Then**: Follow steps 2-5, loop until convergence (2x zero pending).
-
-**Convergence counter**: 0
+**Then**: Follow steps 2-5, loop until pending = 0 AND verification passes.
