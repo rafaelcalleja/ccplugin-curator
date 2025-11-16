@@ -9,21 +9,21 @@
 When you finish executing this protocol, you MUST have:
 
 ✅ All requirements from `docs/spec/*.md` extracted and documented
-✅ All decisions from `docs/decisions/*.md` verified and implemented
+✅ All decisions from `docs/decisions/*.md` extracted and applied
 ✅ Coverage matrix showing requirement → test → implementation mapping
 ✅ All tests passing (unit + integration)
 ✅ Every requirement status = ✅ (100% coverage)
 ✅ Zero gaps remaining
 ✅ **EVERY spec file has corresponding implementation** (verified in Phase 6.3)
-✅ **EVERY decision file has corresponding implementation** (verified in Phase 6.4)
+✅ **EVERY decision file has corresponding implementation** (verified in Phase 6.3)
 ✅ **TUI executable runs and displays correctly** (mandatory check for 003)
 
 **If any criterion is not met, continue implementing until all are ✅**
 
 **CRITICAL**: 100% coverage means:
-- ALL spec files (001-008) → implemented
-- ALL decision files → applied
-- TUI runs without errors
+- ALL spec files → implemented (verified in Phase 6.3)
+- ALL decision files → implemented (verified in Phase 6.3)
+- TUI runs without errors (verified in Check 4)
 
 ---
 
@@ -265,11 +265,60 @@ for spec in $(cat EXECUTION_ORDER.txt); do
     exit 1
   fi
 done
+
+# Check each decision file has requirements
+for decision in $(find docs/decisions -name "*.md" ! -name "README.md" -exec basename {} \;); do
+  count=$(grep -c "\"source\": \"docs/decisions/$decision" REQUIREMENTS.json)
+  if [ $count -eq 0 ]; then
+    echo "❌ ERROR: Decision $decision has ZERO requirements"
+    exit 1
+  fi
+done
 ```
 
 ---
 
-### 2.6 Consolidate requirements
+### 2.6 Extract decision requirements
+
+**ACTION**: Extract all requirements from `docs/decisions/*.md` files.
+
+**CRITICAL**: Decisions define HOW to implement features (e.g., "use json-schema-to-typescript"). They MUST be extracted and applied BEFORE implementation.
+
+For EACH decision file discovered in Phase 1:
+
+**Pattern**: Find decision headers and rationale sections
+
+```regex
+## Decision.*?\n(.+?)(?=\n##|\Z)
+```
+
+**Example match from `001-json-schema-to-typescript.md`**:
+```markdown
+## Decision
+Use `json-schema-to-typescript` to generate TypeScript types from JSON schemas.
+
+## Rationale
+- Ensures type safety between schemas and code
+- Auto-generates interfaces
+```
+
+**Generate requirement**:
+```json
+{
+  "id": "DEC001::Use::json-schema-to-typescript",
+  "type": "Decision",
+  "source": "docs/decisions/001-json-schema-to-typescript.md:5",
+  "description": "Use json-schema-to-typescript for type generation",
+  "content": "<full decision section>",
+  "priority": "critical"
+}
+```
+
+**Note**: Decisions with `priority: "critical"` MUST be implemented before any code that depends on them.
+
+---
+
+### 2.7 Consolidate requirements
 
 **Output**: `REQUIREMENTS.json`
 
@@ -288,8 +337,16 @@ done
     "source": "docs/spec/004-user-workflows.md:125",
     "description": "...",
     "content": "..."
+  },
+  {
+    "id": "DEC001::Use::json-schema-to-typescript",
+    "type": "Decision",
+    "source": "docs/decisions/001-json-schema-to-typescript.md:5",
+    "description": "...",
+    "content": "...",
+    "priority": "critical"
   }
-  // ... all requirements
+  // ... all requirements (specs + decisions)
 ]
 ```
 
@@ -449,80 +506,71 @@ ls -1 EXECUTION_ORDER.txt REQUIREMENTS.json COVERAGE_MATRIX.md GAPS.md
 
 ---
 
-### 6.3 EXECUTE: Verify implementation for EACH spec file
+### 6.3 EXECUTE: Verify 100% coverage for ALL discovered files
 
-**CRITICAL**: For EVERY spec file in EXECUTION_ORDER, verify implementation exists.
+**CRITICAL**: Every file discovered in Phase 1 MUST have 100% implementation coverage.
 
-#### Spec-by-Spec Verification:
+**Verification algorithm** (content-agnostic):
 
-**001-normalization-protocol.md**:
-- [ ] File exists: `src/normalize.ts` or equivalent
-- [ ] Exports normalization function
-- [ ] Tests exist: `tests/normalize.test.ts`
-
-**002-plugin-format-spec.md**:
-- [ ] External reference only (no implementation needed)
-
-**003-tui-visual-spec.md**:
-- [ ] File exists: `src/tui.ts` or `src/ui/` directory
-- [ ] Implements 3-panel layout
-- [ ] Implements keyboard navigation (←→↑↓ SPACE S Q)
-- [ ] Implements real-time preview panel
-- [ ] Entry point exists: `src/index.ts` or `src/cli.ts`
-- [ ] Can run: `node dist/index.js <path>` and TUI appears
-
-**004-user-workflows.md**:
-- [ ] All BDD scenarios have corresponding implementation
-- [ ] Save operation works (verified via tests)
-- [ ] Multi-plugin selection works (verified via tests)
-
-**005-transformation-rules.md**:
-- [ ] Implementation in `src/normalize.ts` (forward transform)
-- [ ] Tests exist: `tests/transform.test.ts`
-
-**006-reverse-transformation-rules.md**:
-- [ ] File exists: `src/reverse-transform.ts`
-- [ ] Tests exist: `tests/reverse-transform.test.ts`
-
-**007-save-operation-rules.md**:
-- [ ] File exists: `src/save.ts` or equivalent
-- [ ] Implements all edge cases (7.1-7.6)
-- [ ] Tests exist: `tests/save.test.ts`
-
-**008-integration-test-spec.md**:
-- [ ] File exists: `tests/integration.test.ts`
-- [ ] Both scenarios implemented (single-plugin + multi-plugin)
-- [ ] All verifications pass
-
-**MANDATORY**: Run executable to verify 003 (TUI):
 ```bash
-npm run build
-node dist/index.js ./test-fixtures
-# Should display TUI with 3 panels
-# Press Q to quit
+echo "=== Verifying ALL docs/ files are implemented ==="
+
+# Step 1: Get all files discovered in Phase 1
+all_spec_files=$(cat EXECUTION_ORDER.txt)
+all_decision_files=$(find docs/decisions -name "*.md" ! -name "README.md" -exec basename {} \;)
+
+# Step 2: Verify each spec file
+for spec in $all_spec_files; do
+  echo "Checking: docs/spec/$spec"
+
+  # Check: Has requirements extracted?
+  req_count=$(grep -c "\"source\": \"docs/spec/$spec" REQUIREMENTS.json 2>/dev/null || echo "0")
+  if [ "$req_count" -eq 0 ]; then
+    echo "❌ FAIL: $spec - NO requirements extracted (Phase 2 incomplete)"
+    exit 1
+  fi
+
+  # Check: All requirements are ✅ in coverage matrix?
+  incomplete=$(grep "docs/spec/$spec" COVERAGE_MATRIX.md 2>/dev/null | grep -c -E "❌|⚠️" || echo "0")
+  if [ "$incomplete" -gt 0 ]; then
+    echo "❌ FAIL: $spec - Has $incomplete incomplete requirements"
+    grep "docs/spec/$spec" COVERAGE_MATRIX.md | grep -E "❌|⚠️"
+    exit 1
+  fi
+
+  echo "✅ $spec - Complete"
+done
+
+# Step 3: Verify each decision file
+for decision in $all_decision_files; do
+  echo "Checking: docs/decisions/$decision"
+
+  # Check: Has requirements extracted?
+  req_count=$(grep -c "\"source\": \"docs/decisions/$decision" REQUIREMENTS.json 2>/dev/null || echo "0")
+  if [ "$req_count" -eq 0 ]; then
+    echo "❌ FAIL: $decision - NO requirements extracted (Phase 2.6 incomplete)"
+    exit 1
+  fi
+
+  # Check: All requirements are ✅ in coverage matrix?
+  incomplete=$(grep "docs/decisions/$decision" COVERAGE_MATRIX.md 2>/dev/null | grep -c -E "❌|⚠️" || echo "0")
+  if [ "$incomplete" -gt 0 ]; then
+    echo "❌ FAIL: $decision - Has $incomplete incomplete requirements"
+    grep "docs/decisions/$decision" COVERAGE_MATRIX.md | grep -E "❌|⚠️"
+    exit 1
+  fi
+
+  echo "✅ $decision - Complete"
+done
+
+echo "✅ All discovered files verified"
 ```
 
-**If ANY spec verification fails → INCOMPLETE, return to Phase 5**
+**This check is completely agnostic** - it doesn't care what's IN the files, only that:
+1. All files from Phase 1 are in REQUIREMENTS.json (extracted in Phase 2)
+2. All requirements from Phase 2 are ✅ in COVERAGE_MATRIX.md (implemented in Phase 5)
 
----
-
-### 6.4 EXECUTE: Verify implementation for EACH decision file
-
-**CRITICAL**: For EVERY file in `docs/decisions/*.md`, verify decision is implemented.
-
-#### Decision-by-Decision Verification:
-
-**001-json-schema-to-typescript.md**:
-- [ ] File exists: `package.json` with `json-schema-to-typescript` in devDependencies
-- [ ] Script exists: `package.json` has `generate-types` script
-- [ ] Type files exist: `src/types.ts` or equivalent generated from schemas
-- [ ] Can run: `npm run generate-types` (if schemas exist)
-
-**Additional decisions** (if added in future):
-- [ ] For each decision file, verify corresponding implementation exists
-- [ ] Check that decisions are applied in codebase
-
-**If ANY decision verification fails → INCOMPLETE, return to Phase 5**
+**If ANY file verification fails → INCOMPLETE, return to Phase 5**
 
 ---
 
@@ -553,19 +601,12 @@ npm run build 2>/dev/null && \
   echo "❌ TUI not implemented (003-tui-visual-spec.md incomplete)"
 ```
 
-### Check 5: Are ALL specs implemented?
+### Check 5: Are ALL specs and decisions implemented?
 ```bash
-# Verify each spec has implementation (from Phase 6.3)
-# Manual verification required for 003, 004, 008
-echo "⚠️  Manual verification required - see Phase 6.3"
-```
-
-### Check 6: Are ALL decisions applied?
-```bash
-# Verify each decision is implemented (from Phase 6.4)
-grep -q "json-schema-to-typescript" package.json && \
-  echo "✅ Decision 001 applied" || \
-  echo "❌ Decision 001 not applied"
+# Verify each spec and decision has implementation (from Phase 6.3)
+# This check runs the content-agnostic verification algorithm
+# See Phase 6.3 for details
+echo "⚠️  Run Phase 6.3 verification script"
 ```
 
 ### IF ANY CHECK FAILS:
