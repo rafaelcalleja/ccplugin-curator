@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ccplugin-curator.local/schemas/marketplace.json",
+  "title": "Marketplace Configuration",
+  "description": "Marketplace configuration file for curated plugin output",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Marketplace name"
+    },
+    "owner": {
+      "type": "object",
+      "description": "Marketplace owner information",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": false
+    },
+    "plugins": {
+      "type": "array",
+      "description": "List of plugins in this marketplace",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Plugin name"
+          },
+          "source": {
+            "type": "string",
+            "description": "Relative path to plugin directory",
+            "pattern": "^\\.\\/.*"
+          }
+        },
+        "required": ["name", "source"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["name", "owner", "plugins"],
+  "additionalProperties": false
+}

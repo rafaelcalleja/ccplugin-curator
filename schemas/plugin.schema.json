@@ -1,0 +1,199 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://code.claude.com/schemas/plugin.json",
+  "title": "Claude Code Plugin Format (Official)",
+  "description": "Official plugin.json format for Claude Code plugins",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Plugin name in kebab-case format. Defaults to directory basename if omitted.",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9.-]+)?(\\+[a-zA-Z0-9.-]+)?$"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief plugin description"
+    },
+    "author": {
+      "type": "object",
+      "description": "Plugin author information",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "additionalProperties": false
+    },
+    "homepage": {
+      "type": "string",
+      "description": "Documentation URL",
+      "format": "uri"
+    },
+    "repository": {
+      "type": "string",
+      "description": "Source code repository URL",
+      "format": "uri"
+    },
+    "license": {
+      "type": "string",
+      "description": "License identifier (e.g., MIT, Apache-2.0)"
+    },
+    "keywords": {
+      "type": "array",
+      "description": "Discovery tags",
+      "items": {
+        "type": "string"
+      }
+    },
+    "commands": {
+      "description": "Command files or directories. String for directory path, array for explicit files.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^\\.\\/.*"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^\\.\\/.*\\.md$"
+          }
+        }
+      ]
+    },
+    "agents": {
+      "description": "Agent files or directories. String for directory path, array for explicit files.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^\\.\\/.*"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^\\.\\/.*\\.md$"
+          }
+        }
+      ]
+    },
+    "skills": {
+      "description": "Skill directories. String for directory path, array for explicit directories.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^\\.\\/.*"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^\\.\\/.*"
+          }
+        }
+      ]
+    },
+    "hooks": {
+      "description": "Hooks configuration. String for file path, object for inline config.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^\\.\\/.*\\.json$"
+        },
+        {
+          "type": "object",
+          "patternProperties": {
+            "^(SessionStart|SessionEnd|UserPromptSubmit|PreToolUse|PostToolUse|Notification|Stop|SubagentStop|PreCompact)$": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "matcher": {
+                    "type": "string",
+                    "description": "Tool name pattern (regex)"
+                  },
+                  "hooks": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": ["command"]
+                        },
+                        "command": {
+                          "type": "string"
+                        },
+                        "timeout": {
+                          "type": "number",
+                          "description": "Timeout in seconds"
+                        }
+                      },
+                      "required": ["type", "command"],
+                      "additionalProperties": true
+                    }
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "mcpServers": {
+      "description": "MCP server configuration. String for file path, object for inline config.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^\\.\\/.*\\.json$"
+        },
+        {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z0-9_-]+$": {
+              "type": "object",
+              "properties": {
+                "command": {
+                  "type": "string"
+                },
+                "args": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "env": {
+                  "type": "object",
+                  "patternProperties": {
+                    "^[A-Z_][A-Z0-9_]*$": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "required": ["command"],
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

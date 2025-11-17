@@ -1,0 +1,48 @@
+{
+  "name": "ccplugin-curator",
+  "version": "0.0.13",
+  "description": "CLI tool for curating and combining Claude Code plugin components",
+  "main": "dist/index.js",
+  "bin": {
+    "ccplugin-curator": "./dist/index.js"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "generate-types": "npx json-schema-to-typescript schemas/plugin.schema.json -o src/types/plugin.ts && npx json-schema-to-typescript schemas/normalized-plugin.schema.json -o src/types/normalized.ts && npx json-schema-to-typescript schemas/marketplace.schema.json -o src/types/marketplace.ts",
+    "test": "vitest",
+    "test:integration": "vitest run tests/integration",
+    "test:coverage": "vitest run --coverage"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "plugin",
+    "curator",
+    "tui",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ink": "^4.4.1",
+    "react": "^18.2.0",
+    "commander": "^11.1.0",
+    "glob": "^10.3.10",
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "typescript": "^5.3.3",
+    "json-schema-to-typescript": "^13.1.1",
+    "vitest": "^1.0.4",
+    "@vitest/coverage-v8": "^1.0.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

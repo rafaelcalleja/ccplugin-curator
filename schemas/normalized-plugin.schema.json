@@ -1,0 +1,176 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ccplugin-curator.local/schemas/normalized-plugin.json",
+  "title": "Normalized Plugin Format (Internal)",
+  "description": "Internal normalized format used by ccplugin-curator TUI",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Plugin name (always present)"
+    },
+    "source": {
+      "type": "string",
+      "description": "Absolute path to plugin directory"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version (default: '0.0.0')"
+    },
+    "description": {
+      "type": "string",
+      "description": "Plugin description (default: '')"
+    },
+    "author": {
+      "type": "object",
+      "description": "Author information (all fields always present)",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "required": ["name", "email", "url"],
+      "additionalProperties": false
+    },
+    "homepage": {
+      "type": "string",
+      "description": "Documentation URL (default: '')"
+    },
+    "repository": {
+      "type": "string",
+      "description": "Repository URL (default: '')"
+    },
+    "license": {
+      "type": "string",
+      "description": "License identifier (default: '')"
+    },
+    "keywords": {
+      "type": "array",
+      "description": "Keywords (default: [])",
+      "items": {
+        "type": "string"
+      }
+    },
+    "commands": {
+      "type": "array",
+      "description": "Command file paths (always array, never undefined)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "agents": {
+      "type": "array",
+      "description": "Agent file paths (always array, never undefined)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "skills": {
+      "type": "array",
+      "description": "Skill directory paths (always array, never undefined)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "hooks": {
+      "type": "array",
+      "description": "Hooks (flat array, always present)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "description": "Event name (extracted from hooks.json key)",
+            "enum": [
+              "SessionStart",
+              "SessionEnd",
+              "UserPromptSubmit",
+              "PreToolUse",
+              "PostToolUse",
+              "Notification",
+              "Stop",
+              "SubagentStop",
+              "PreCompact"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": ["command"]
+          },
+          "command": {
+            "type": "string",
+            "description": "Command path"
+          },
+          "matcher": {
+            "type": "string",
+            "description": "Optional tool matcher pattern"
+          },
+          "timeout": {
+            "type": "number",
+            "description": "Optional timeout in seconds"
+          }
+        },
+        "required": ["event", "type", "command"],
+        "additionalProperties": true
+      }
+    },
+    "mcps": {
+      "type": "array",
+      "description": "MCP servers (flat array, always present)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Server name (extracted from mcpServers key)"
+          },
+          "command": {
+            "type": "string",
+            "description": "Executable command"
+          },
+          "args": {
+            "type": "array",
+            "description": "Command arguments",
+            "items": {
+              "type": "string"
+            }
+          },
+          "env": {
+            "type": "object",
+            "description": "Environment variables",
+            "patternProperties": {
+              "^[A-Z_][A-Z0-9_]*$": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": ["name", "command"],
+        "additionalProperties": true
+      }
+    }
+  },
+  "required": [
+    "name",
+    "source",
+    "version",
+    "description",
+    "author",
+    "homepage",
+    "repository",
+    "license",
+    "keywords",
+    "commands",
+    "agents",
+    "skills",
+    "hooks",
+    "mcps"
+  ],
+  "additionalProperties": false
+}
