@@ -15,7 +15,9 @@ The documentation follows a principle of single responsibility per document. Eac
 Follow these steps in order:
 
 **Step 1: Analysis Phase**
-- Read all documents in @docs/spec and @docs/decisions
+- Review all files in `@docs/spec` to understand the project specifications and requirements
+- Review all files in `@docs/decisions` to understand architectural and design decisions
+- Identify all features, components, and requirements defined in these documents
 - Identify the structure, dependencies, and architectural patterns
 - List all existing features that may interact with or be affected by [NEW FEATURE]
 - Document potential conflicts or synergies with existing functionality
