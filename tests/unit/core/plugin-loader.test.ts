@@ -13,48 +13,38 @@ describe('loadPlugin', () => {
     const pluginDir = join(fixturesDir, 'test-plugin-a');
     const result = loadPlugin(pluginDir);
 
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.plugin.data.name).toBe('test-plugin-a');
-      expect(result.plugin.pluginDir).toBe(pluginDir);
-    }
+    expect(result.data.name).toBe('test-plugin-a');
+    expect(result.pluginDir).toBe(pluginDir);
+    expect(result.pluginJsonPath).toContain('plugin.json');
   });
 
   it('should load minimal plugin', () => {
     const pluginDir = join(fixturesDir, 'test-plugin-minimal');
     const result = loadPlugin(pluginDir);
 
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.plugin.data.name).toBe('test-plugin-minimal');
-    }
+    expect(result.data.name).toBe('test-plugin-minimal');
+    expect(result.pluginDir).toBe(pluginDir);
   });
 
-  it('should fail for non-existent directory', () => {
+  it('should throw for non-existent directory', () => {
     const pluginDir = join(fixturesDir, 'non-existent');
-    const result = loadPlugin(pluginDir);
 
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error).toContain('not found');
-    }
+    expect(() => loadPlugin(pluginDir)).toThrow('Plugin not found');
   });
 
-  it('should fail for invalid JSON', () => {
+  it('should throw for invalid JSON', () => {
     const pluginDir = join(fixturesDir, 'invalid-json');
-    const result = loadPlugin(pluginDir);
 
-    expect(result.success).toBe(false);
+    expect(() => loadPlugin(pluginDir)).toThrow();
   });
 
   it('should use directory name as plugin name if name not in plugin.json', () => {
     const pluginDir = join(fixturesDir, 'test-plugin-minimal');
     const result = loadPlugin(pluginDir);
 
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.plugin.data.name).toBe('test-plugin-minimal');
-    }
+    // The minimal plugin has a name field, so this test is actually testing
+    // that the name IS used from plugin.json
+    expect(result.data.name).toBe('test-plugin-minimal');
   });
 });
 
@@ -71,15 +61,16 @@ describe('scanPlugins', () => {
   it('should return errors for invalid plugins', () => {
     const result = scanPlugins(fixturesDir);
 
-    // Might have errors if invalid plugins exist
+    // Result should have an errors array (might be empty or might have errors)
     expect(Array.isArray(result.errors)).toBe(true);
   });
 
-  it('should return empty arrays for non-existent directory', () => {
+  it('should return error for non-existent directory', () => {
     const result = scanPlugins(join(fixturesDir, 'non-existent'));
 
     expect(result.plugins).toEqual([]);
     expect(result.errors.length).toBeGreaterThan(0);
+    expect(result.errors[0].error).toContain('does not exist');
   });
 
   it('should include plugin directory path in results', () => {

@@ -85,7 +85,7 @@ describe('reverseTransform', () => {
       hooks: [
         {
           event: 'SessionStart',
-          type: 'shell',
+          type: 'command',
           command: 'echo "Hello"',
         },
       ],
@@ -100,7 +100,7 @@ describe('reverseTransform', () => {
           {
             hooks: [
               {
-                type: 'shell',
+                type: 'command',
                 command: 'echo "Hello"',
               },
             ],
@@ -149,7 +149,7 @@ describe('reverseTransform', () => {
       hooks: [
         {
           event: 'SessionStart',
-          type: 'shell',
+          type: 'command',
           command: 'npm install',
         },
       ],
@@ -177,7 +177,7 @@ describe('reverseTransform', () => {
           {
             hooks: [
               {
-                type: 'shell',
+                type: 'command',
                 command: 'npm install',
               },
             ],

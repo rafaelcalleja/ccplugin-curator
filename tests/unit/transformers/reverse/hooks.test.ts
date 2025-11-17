@@ -13,7 +13,7 @@ describe('transformHooks', () => {
     const hooks: NormalizedHook[] = [
       {
         event: 'SessionStart',
-        type: 'shell',
+        type: 'command',
         command: 'echo "Hello"',
       },
     ];
@@ -25,7 +25,7 @@ describe('transformHooks', () => {
         {
           hooks: [
             {
-              type: 'shell',
+              type: 'command',
               command: 'echo "Hello"',
             },
           ],
@@ -38,11 +38,9 @@ describe('transformHooks', () => {
     const hooks: NormalizedHook[] = [
       {
         event: 'PreToolUse',
-        type: 'shell',
+        type: 'command',
         command: 'echo "Before Bash"',
-        matcher: {
-          toolName: 'Bash',
-        },
+        matcher: 'Bash',
       },
     ];
 
@@ -51,12 +49,10 @@ describe('transformHooks', () => {
     expect(result).toEqual({
       PreToolUse: [
         {
-          matcher: {
-            toolName: 'Bash',
-          },
+          matcher: 'Bash',
           hooks: [
             {
-              type: 'shell',
+              type: 'command',
               command: 'echo "Before Bash"',
             },
           ],
@@ -69,17 +65,17 @@ describe('transformHooks', () => {
     const hooks: NormalizedHook[] = [
       {
         event: 'SessionStart',
-        type: 'shell',
+        type: 'command',
         command: 'echo "First"',
       },
       {
         event: 'SessionStart',
-        type: 'shell',
+        type: 'command',
         command: 'echo "Second"',
       },
       {
         event: 'SessionEnd',
-        type: 'shell',
+        type: 'command',
         command: 'echo "End"',
       },
     ];
@@ -91,11 +87,11 @@ describe('transformHooks', () => {
         {
           hooks: [
             {
-              type: 'shell',
+              type: 'command',
               command: 'echo "First"',
             },
             {
-              type: 'shell',
+              type: 'command',
               command: 'echo "Second"',
             },
           ],
@@ -105,7 +101,7 @@ describe('transformHooks', () => {
         {
           hooks: [
             {
-              type: 'shell',
+              type: 'command',
               command: 'echo "End"',
             },
           ],
@@ -118,19 +114,15 @@ describe('transformHooks', () => {
     const hooks: NormalizedHook[] = [
       {
         event: 'PreToolUse',
-        type: 'shell',
+        type: 'command',
         command: 'echo "Bash hook"',
-        matcher: {
-          toolName: 'Bash',
-        },
+        matcher: 'Bash',
       },
       {
         event: 'PreToolUse',
-        type: 'shell',
+        type: 'command',
         command: 'echo "Read hook"',
-        matcher: {
-          toolName: 'Read',
-        },
+        matcher: 'Read',
       },
     ];
 
@@ -139,23 +131,19 @@ describe('transformHooks', () => {
     expect(result).toEqual({
       PreToolUse: [
         {
-          matcher: {
-            toolName: 'Bash',
-          },
+          matcher: 'Bash',
           hooks: [
             {
-              type: 'shell',
+              type: 'command',
               command: 'echo "Bash hook"',
             },
           ],
         },
         {
-          matcher: {
-            toolName: 'Read',
-          },
+          matcher: 'Read',
           hooks: [
             {
-              type: 'shell',
+              type: 'command',
               command: 'echo "Read hook"',
             },
           ],
@@ -168,7 +156,7 @@ describe('transformHooks', () => {
     const hooks: NormalizedHook[] = [
       {
         event: 'SessionStart',
-        type: 'shell',
+        type: 'command',
         command: 'npm install',
         description: 'Install dependencies',
         continueOnError: true,
@@ -182,7 +170,7 @@ describe('transformHooks', () => {
         {
           hooks: [
             {
-              type: 'shell',
+              type: 'command',
               command: 'npm install',
               description: 'Install dependencies',
               continueOnError: true,
@@ -197,31 +185,31 @@ describe('transformHooks', () => {
     const hooks: NormalizedHook[] = [
       {
         event: 'SessionStart',
-        type: 'shell',
+        type: 'command',
         command: 'echo "Start 1"',
       },
       {
         event: 'SessionStart',
-        type: 'shell',
+        type: 'command',
         command: 'echo "Start 2"',
       },
       {
         event: 'PreToolUse',
-        type: 'shell',
+        type: 'command',
         command: 'echo "Bash"',
-        matcher: { toolName: 'Bash' },
+        matcher: 'Bash',
       },
       {
         event: 'PreToolUse',
-        type: 'shell',
+        type: 'command',
         command: 'echo "Bash 2"',
-        matcher: { toolName: 'Bash' },
+        matcher: 'Bash',
       },
       {
         event: 'PostToolUse',
-        type: 'shell',
+        type: 'command',
         command: 'echo "After"',
-        matcher: { toolName: 'Write' },
+        matcher: 'Write',
       },
     ];
 
@@ -231,24 +219,24 @@ describe('transformHooks', () => {
       SessionStart: [
         {
           hooks: [
-            { type: 'shell', command: 'echo "Start 1"' },
-            { type: 'shell', command: 'echo "Start 2"' },
+            { type: 'command', command: 'echo "Start 1"' },
+            { type: 'command', command: 'echo "Start 2"' },
           ],
         },
       ],
       PreToolUse: [
         {
-          matcher: { toolName: 'Bash' },
+          matcher: 'Bash',
           hooks: [
-            { type: 'shell', command: 'echo "Bash"' },
-            { type: 'shell', command: 'echo "Bash 2"' },
+            { type: 'command', command: 'echo "Bash"' },
+            { type: 'command', command: 'echo "Bash 2"' },
           ],
         },
       ],
       PostToolUse: [
         {
-          matcher: { toolName: 'Write' },
-          hooks: [{ type: 'shell', command: 'echo "After"' }],
+          matcher: 'Write',
+          hooks: [{ type: 'command', command: 'echo "After"' }],
         },
       ],
     });

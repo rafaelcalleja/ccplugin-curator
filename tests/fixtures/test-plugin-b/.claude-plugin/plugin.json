@@ -9,7 +9,7 @@
       {
         "hooks": [
           {
-            "type": "shell",
+            "type": "command",
             "command": "echo 'Plugin B started'"
           }
         ]

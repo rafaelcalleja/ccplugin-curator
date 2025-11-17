@@ -15,7 +15,7 @@
       {
         "hooks": [
           {
-            "type": "shell",
+            "type": "command",
             "command": "echo 'Session started'"
           }
         ]
@@ -23,12 +23,10 @@
     ],
     "PreToolUse": [
       {
-        "matcher": {
-          "toolName": "Bash"
-        },
+        "matcher": "Bash",
         "hooks": [
           {
-            "type": "shell",
+            "type": "command",
             "command": "echo 'Before bash'"
           }
         ]
