@@ -1,0 +1,13 @@
+{
+  "$schema": "./document-frontmatter.schema.json",
+
+  "gate_constraints": [
+    "single_responsibility",
+    "self_contained_content",
+    "no_cross_references",
+    "no_duplicate_definitions",
+    "no_duplicate_behavior"
+  ],
+
+  "document_covers": []
+}
