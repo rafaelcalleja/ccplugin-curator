@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * CLI Entry Point
  * Implements: docs/spec/004-user-workflows.md
