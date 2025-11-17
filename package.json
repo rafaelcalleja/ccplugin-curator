@@ -2,6 +2,7 @@
   "name": "ccplugin-curator",
   "version": "0.0.1",
   "description": "Claude Code Plugin Curator - TUI for selecting and curating plugin components",
+  "type": "module",
   "main": "dist/cli/index.js",
   "bin": {
     "ccplugin-curator": "./dist/cli/index.js"
@@ -28,17 +29,18 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/react": "^18.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
     "json-schema-to-typescript": "^13.0.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.0.0",
-    "vitest": "^1.0.0",
-    "@vitest/coverage-v8": "^1.0.0"
+    "vitest": "^1.0.0"
   },
   "dependencies": {
-    "ink": "^4.0.0",
-    "react": "^18.0.0",
-    "glob": "^10.0.0",
     "ajv": "^8.12.0",
-    "commander": "^11.0.0"
+    "commander": "^11.0.0",
+    "glob": "^10.0.0",
+    "ink": "^4.0.0",
+    "react": "^18.0.0"
   },
   "engines": {
     "node": ">=18.0.0"
