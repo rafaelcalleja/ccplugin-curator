@@ -167,11 +167,28 @@ Scenario: Merge de hooks del mismo evento
   Then plugin.json mergea automáticamente:
     "SessionStart": [
       { "hooks": [
-        { "command": "/setup-a.sh" },
-        { "command": "/setup-b.sh" }
+        { "command": "${CLAUDE_PLUGIN_ROOT}/setup-a.sh" },
+        { "command": "${CLAUDE_PLUGIN_ROOT}/setup-b.sh" }
       ] }
     ]
   And el orden preserva el orden de selección en TUI
+
+Scenario: Conflicto de nombres de hook scripts
+  Given plugin-a tiene hook SessionStart → hooks/setup.sh
+  And plugin-b tiene hook SessionStart → hooks/setup.sh
+  When selecciono ambos hooks
+  And presiono S (Save)
+  Then ambos scripts se copian con namespace prefix:
+    - hooks/plugin-a--setup.sh
+    - hooks/plugin-b--setup.sh
+  And plugin.json contiene paths con namespace:
+    "SessionStart": [
+      { "hooks": [
+        { "command": "${CLAUDE_PLUGIN_ROOT}/hooks/plugin-a--setup.sh" },
+        { "command": "${CLAUDE_PLUGIN_ROOT}/hooks/plugin-b--setup.sh" }
+      ] }
+    ]
+  And ambos scripts tienen permisos ejecutables (chmod +x)
 ```
 
 ### 6. Salir

@@ -29,7 +29,11 @@ test-plugin/
 │   └── skill-gamma/
 │       └── SKILL.md
 ├── hooks/
-│   └── hooks.json
+│   ├── hooks.json
+│   ├── setup-env.sh           ← Hook script (executable)
+│   ├── init-workspace.sh      ← Hook script (executable)
+│   ├── security-check.sh      ← Hook script (executable)
+│   └── cleanup.sh             ← Hook script (executable)
 └── .mcp.json
 ```
 
@@ -64,8 +68,8 @@ test-plugin/
   "SessionStart": [
     {
       "hooks": [
-        { "type": "command", "command": "/setup-env.sh" },
-        { "type": "command", "command": "/init-workspace.sh" }
+        { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/setup-env.sh" },
+        { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/init-workspace.sh" }
       ]
     }
   ],
@@ -73,13 +77,13 @@ test-plugin/
     {
       "matcher": "Bash",
       "hooks": [
-        { "type": "command", "command": "/security-check.sh" }
+        { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/security-check.sh" }
       ]
     },
     {
       "matcher": "Write",
       "hooks": [
-        { "type": "command", "command": "/cleanup.sh" }
+        { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/cleanup.sh" }
       ]
     }
   ]
@@ -177,6 +181,8 @@ Scenario: Full workflow - Load, select, save, verify
   And file "./output/curated-plugin/plugins/curated-plugin/agents/reviewer.md" exists
   And directory "./output/curated-plugin/plugins/curated-plugin/skills/skill-alpha" exists
   And file "./output/curated-plugin/plugins/curated-plugin/skills/skill-alpha/SKILL.md" exists
+  And file "./output/curated-plugin/plugins/curated-plugin/hooks/setup-env.sh" exists
+  And file "./output/curated-plugin/plugins/curated-plugin/hooks/setup-env.sh" is executable
 
   # VERIFY PLUGIN IS USABLE
   And can install with "/plugin marketplace add ./output/curated-plugin"
@@ -234,6 +240,12 @@ Scenario: Multi-plugin selection with conflict resolution
   And directory "./output/curated-plugin/plugins/curated-plugin/skills/test-plugin-b--chrome-devtools" exists
   And file "./output/curated-plugin/plugins/curated-plugin/skills/test-plugin-b--chrome-devtools/SKILL.md" exists
 
+  # VERIFY HOOK SCRIPTS - copied (no namespace needed, different names)
+  And file "./output/curated-plugin/plugins/curated-plugin/hooks/setup-a.sh" exists
+  And file "./output/curated-plugin/plugins/curated-plugin/hooks/setup-a.sh" is executable
+  And file "./output/curated-plugin/plugins/curated-plugin/hooks/setup-b.sh" exists
+  And file "./output/curated-plugin/plugins/curated-plugin/hooks/setup-b.sh" is executable
+
   # VERIFY OFFICIAL FORMAT (plugin.json)
   And plugin.json is valid JSON
   And plugin.json contains:
@@ -258,8 +270,8 @@ Scenario: Multi-plugin selection with conflict resolution
         "SessionStart": [
           {
             "hooks": [
-              { "type": "command", "command": "/setup-a.sh" },
-              { "type": "command", "command": "/setup-b.sh" }
+              { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/setup-a.sh" },
+              { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/setup-b.sh" }
             ]
           }
         ]
@@ -351,12 +363,19 @@ Scenario: Hooks transform correctly
     {
       "hooks": {
         "SessionStart": [
-          { "type": "command", "command": "/setup-env.sh" },
-          { "type": "command", "command": "/init-workspace.sh" }
+          {
+            "hooks": [
+              { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/setup-env.sh" },
+              { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/init-workspace.sh" }
+            ]
+          }
         ]
       }
     }
     ```
+  And hook script files are copied with executable permissions
+  And "./output/curated-plugin/plugins/curated-plugin/hooks/setup-env.sh" has permissions 0o755
+  And "./output/curated-plugin/plugins/curated-plugin/hooks/init-workspace.sh" has permissions 0o755
 
 Scenario: MCPs transform correctly
   Given plugin has 3 MCPs

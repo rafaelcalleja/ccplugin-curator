@@ -188,8 +188,28 @@ Este documento describe cómo transformar plugins desde el formato normalizado i
 **Transformation steps:**
 1. Group hooks by `event` field
 2. Within each event, group by `matcher` field (undefined matchers grouped together)
-3. Remove `event` and `matcher` fields from hook configs
-4. Create structure: `{ "EventName": [{ "matcher"?: string, "hooks": [...] }] }`
+3. Transform `command` paths to use `${CLAUDE_PLUGIN_ROOT}` for local script files
+4. Remove `event` and `matcher` fields from hook configs
+5. Create structure: `{ "EventName": [{ "matcher"?: string, "hooks": [...] }] }`
+
+**Hook Command Path Transformation:**
+
+Local script file paths are transformed to use `${CLAUDE_PLUGIN_ROOT}`:
+
+```typescript
+// Normalized input
+{ command: "hooks/setup.sh" }
+
+// Official output
+{ command: "${CLAUDE_PLUGIN_ROOT}/hooks/setup.sh" }
+```
+
+System commands (npx, node, etc.) remain unchanged:
+
+```typescript
+// No transformation needed
+{ command: "npx tsx hooks/script.ts" }
+```
 
 ```typescript
 // Normalized input
