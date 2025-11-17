@@ -3,7 +3,7 @@
  * Based on 005-transformation-rules.md
  */
 
-import { glob } from 'fast-glob';
+import glob from 'fast-glob';
 import { readFile } from 'fs/promises';
 import { join, dirname, basename } from 'path';
 import type { NormalizedPluginFormat } from '../types/normalized.js';

@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { Box, useInput, useApp } from 'ink';
+import { Box, Text, useInput, useApp } from 'ink';
 import type { NormalizedPluginFormat } from '../types/normalized.js';
 import { PluginsPanel } from './PluginsPanel.js';
 import { ComponentsPanel } from './ComponentsPanel.js';
@@ -211,7 +211,7 @@ export function App({ plugins }: AppProps) {
     <Box flexDirection="column" height="100%">
       {/* Header */}
       <Box borderStyle="single" paddingX={1}>
-        PLUGIN: {currentPlugin.name}
+        <Text>PLUGIN: {currentPlugin.name}</Text>
       </Box>
 
       {/* Main 3-panel layout */}
