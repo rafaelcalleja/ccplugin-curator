@@ -1,0 +1,29 @@
+{
+  "name": "test-plugin-b",
+  "version": "2.0.0",
+  "description": "Test plugin B for conflict resolution tests",
+  "commands": ["./commands/build.md", "./commands/deploy.md"],
+  "agents": ["./agents/reviewer.md"],
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "shell",
+            "command": "echo 'Plugin B started'"
+          }
+        ]
+      }
+    ]
+  },
+  "mcpServers": {
+    "test-server": {
+      "command": "node",
+      "args": ["server-b.js"]
+    },
+    "unique-server": {
+      "command": "node",
+      "args": ["unique.js"]
+    }
+  }
+}

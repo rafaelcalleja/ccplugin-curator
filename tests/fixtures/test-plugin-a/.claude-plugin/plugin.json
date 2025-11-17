@@ -1,0 +1,47 @@
+{
+  "name": "test-plugin-a",
+  "version": "1.0.0",
+  "description": "Test plugin A for unit tests",
+  "author": {
+    "name": "Test Author",
+    "email": "test@example.com",
+    "url": "https://example.com"
+  },
+  "commands": ["./commands/build.md", "./commands/test.md"],
+  "agents": ["./agents/coder.md"],
+  "skills": ["./skills/hello-skill"],
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "shell",
+            "command": "echo 'Session started'"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": {
+          "toolName": "Bash"
+        },
+        "hooks": [
+          {
+            "type": "shell",
+            "command": "echo 'Before bash'"
+          }
+        ]
+      }
+    ]
+  },
+  "mcpServers": {
+    "test-server": {
+      "command": "node",
+      "args": ["server.js"],
+      "env": {
+        "PORT": "3000"
+      }
+    }
+  }
+}
