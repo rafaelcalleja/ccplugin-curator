@@ -105,7 +105,9 @@ export async function saveSelection(
 }
 
 /**
- * Build normalized plugin from selection
+ * Build normalized plugin from selection with conflict resolution
+ * Implements namespace prefix for conflicting names (007 spec lines 186-206)
+ * Implements hooks merging for same event (007 spec lines 231-255)
  */
 function buildNormalizedFromSelection(
   plugins: NormalizedPluginFormat[],
@@ -128,20 +130,61 @@ function buildNormalizedFromSelection(
     mcps: [],
   };
 
+  // Track conflicts for namespace prefix
+  const commandCounts = new Map<string, number>();
+  const agentCounts = new Map<string, number>();
+  const skillCounts = new Map<string, number>();
+  const mcpCounts = new Map<string, number>();
+
+  // First pass: count duplicates
   for (const plugin of plugins) {
     const sel = selection[plugin.name];
     if (!sel) continue;
 
-    // Add selected commands
-    result.commands.push(...Array.from(sel.commands));
+    for (const cmd of sel.commands) {
+      commandCounts.set(cmd, (commandCounts.get(cmd) || 0) + 1);
+    }
+    for (const agent of sel.agents) {
+      agentCounts.set(agent, (agentCounts.get(agent) || 0) + 1);
+    }
+    for (const skill of sel.skills) {
+      skillCounts.set(skill, (skillCounts.get(skill) || 0) + 1);
+    }
+    for (const mcpIndex of sel.mcps) {
+      const mcp = plugin.mcps[mcpIndex];
+      if (mcp) {
+        mcpCounts.set(mcp.name, (mcpCounts.get(mcp.name) || 0) + 1);
+      }
+    }
+  }
 
-    // Add selected agents
-    result.agents.push(...Array.from(sel.agents));
+  // Second pass: add with namespace prefix if conflict
+  for (const plugin of plugins) {
+    const sel = selection[plugin.name];
+    if (!sel) continue;
 
-    // Add selected skills
-    result.skills.push(...Array.from(sel.skills));
+    // Commands with conflict resolution
+    for (const cmd of sel.commands) {
+      const hasConflict = commandCounts.get(cmd)! > 1;
+      const finalPath = hasConflict ? `${plugin.name}--${cmd}` : cmd;
+      result.commands.push(finalPath);
+    }
 
-    // Add selected hooks
+    // Agents with conflict resolution
+    for (const agent of sel.agents) {
+      const hasConflict = agentCounts.get(agent)! > 1;
+      const finalPath = hasConflict ? `${plugin.name}--${agent}` : agent;
+      result.agents.push(finalPath);
+    }
+
+    // Skills with conflict resolution
+    for (const skill of sel.skills) {
+      const hasConflict = skillCounts.get(skill)! > 1;
+      const finalPath = hasConflict ? `${plugin.name}--${skill}` : skill;
+      result.skills.push(finalPath);
+    }
+
+    // Hooks - merge by event (no conflicts, they merge automatically)
     for (const hookIndex of sel.hooks) {
       const hook = plugin.hooks[hookIndex];
       if (hook) {
@@ -149,11 +192,13 @@ function buildNormalizedFromSelection(
       }
     }
 
-    // Add selected MCPs
+    // MCPs with conflict resolution
     for (const mcpIndex of sel.mcps) {
       const mcp = plugin.mcps[mcpIndex];
       if (mcp) {
-        result.mcps.push(mcp);
+        const hasConflict = mcpCounts.get(mcp.name)! > 1;
+        const finalName = hasConflict ? `${plugin.name}--${mcp.name}` : mcp.name;
+        result.mcps.push({ ...mcp, name: finalName });
       }
     }
   }
@@ -162,37 +207,65 @@ function buildNormalizedFromSelection(
 }
 
 /**
- * Copy component files to output directory
+ * Copy component files to output directory with conflict resolution
  */
 async function copyComponentFiles(
   plugins: NormalizedPluginFormat[],
   selection: Selection,
   outputDir: string
 ): Promise<void> {
+  // Track conflicts for namespace prefix
+  const commandCounts = new Map<string, number>();
+  const agentCounts = new Map<string, number>();
+  const skillCounts = new Map<string, number>();
+
+  // First pass: count duplicates
+  for (const plugin of plugins) {
+    const sel = selection[plugin.name];
+    if (!sel) continue;
+
+    for (const cmd of sel.commands) {
+      commandCounts.set(cmd, (commandCounts.get(cmd) || 0) + 1);
+    }
+    for (const agent of sel.agents) {
+      agentCounts.set(agent, (agentCounts.get(agent) || 0) + 1);
+    }
+    for (const skill of sel.skills) {
+      skillCounts.set(skill, (skillCounts.get(skill) || 0) + 1);
+    }
+  }
+
+  // Second pass: copy with namespace prefix if conflict
   for (const plugin of plugins) {
     const sel = selection[plugin.name];
     if (!sel) continue;
 
     // Copy commands
     for (const cmd of sel.commands) {
+      const hasConflict = commandCounts.get(cmd)! > 1;
+      const finalPath = hasConflict ? `${plugin.name}--${cmd}` : cmd;
       const srcPath = join(plugin.source, cmd);
-      const destPath = join(outputDir, cmd);
+      const destPath = join(outputDir, finalPath);
       await mkdir(dirname(destPath), { recursive: true });
       await copyFile(srcPath, destPath);
     }
 
     // Copy agents
     for (const agent of sel.agents) {
+      const hasConflict = agentCounts.get(agent)! > 1;
+      const finalPath = hasConflict ? `${plugin.name}--${agent}` : agent;
       const srcPath = join(plugin.source, agent);
-      const destPath = join(outputDir, agent);
+      const destPath = join(outputDir, finalPath);
       await mkdir(dirname(destPath), { recursive: true });
       await copyFile(srcPath, destPath);
     }
 
     // Copy skills (directories)
     for (const skill of sel.skills) {
+      const hasConflict = skillCounts.get(skill)! > 1;
+      const finalPath = hasConflict ? `${plugin.name}--${skill}` : skill;
       const srcPath = join(plugin.source, skill);
-      const destPath = join(outputDir, skill);
+      const destPath = join(outputDir, finalPath);
       await cp(srcPath, destPath, { recursive: true });
     }
   }

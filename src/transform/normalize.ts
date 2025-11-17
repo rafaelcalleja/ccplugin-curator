@@ -93,30 +93,31 @@ async function normalizeCommands(
   pluginPath: string,
   commands?: string | string[]
 ): Promise<string[]> {
-  const result: string[] = [];
+  const resultSet = new Set<string>();
 
   // Auto-discovery: commands/**/*.md (ALWAYS runs if directory exists)
   const autoDiscovered = await glob('commands/**/*.md', {
     cwd: pluginPath,
     onlyFiles: true,
   });
-  result.push(...autoDiscovered);
+  autoDiscovered.forEach(p => resultSet.add(normalizePath(p)));
 
   // Custom paths (COMPLEMENT auto-discovery, don't replace)
   if (typeof commands === 'string') {
     // String path: glob it
-    const custom = await glob(`${commands}/**/*.md`, {
+    const customPath = normalizePath(commands);
+    const custom = await glob(`${customPath}/**/*.md`, {
       cwd: pluginPath,
       onlyFiles: true,
     });
-    result.push(...custom);
+    custom.forEach(p => resultSet.add(normalizePath(p)));
   } else if (Array.isArray(commands)) {
     // Array: already explicit paths
-    result.push(...commands.map(normalizePath));
+    commands.forEach(p => resultSet.add(normalizePath(p)));
   }
 
-  // Remove duplicates and remove leading './'
-  return [...new Set(result)].map(normalizePath);
+  // Return unique values
+  return Array.from(resultSet);
 }
 
 /**
@@ -126,30 +127,31 @@ async function normalizeAgents(
   pluginPath: string,
   agents?: string | string[]
 ): Promise<string[]> {
-  const result: string[] = [];
+  const resultSet = new Set<string>();
 
   // Auto-discovery: agents/**/*.md (ALWAYS runs if directory exists)
   const autoDiscovered = await glob('agents/**/*.md', {
     cwd: pluginPath,
     onlyFiles: true,
   });
-  result.push(...autoDiscovered);
+  autoDiscovered.forEach(p => resultSet.add(normalizePath(p)));
 
   // Custom paths (COMPLEMENT auto-discovery, don't replace)
   if (typeof agents === 'string') {
     // String path: glob it
-    const custom = await glob(`${agents}/**/*.md`, {
+    const customPath = normalizePath(agents);
+    const custom = await glob(`${customPath}/**/*.md`, {
       cwd: pluginPath,
       onlyFiles: true,
     });
-    result.push(...custom);
+    custom.forEach(p => resultSet.add(normalizePath(p)));
   } else if (Array.isArray(agents)) {
     // Array: already explicit paths
-    result.push(...agents.map(normalizePath));
+    agents.forEach(p => resultSet.add(normalizePath(p)));
   }
 
-  // Remove duplicates and remove leading './'
-  return [...new Set(result)].map(normalizePath);
+  // Return unique values
+  return Array.from(resultSet);
 }
 
 /**
@@ -159,28 +161,29 @@ async function normalizeSkills(
   pluginPath: string,
   skills?: string | string[]
 ): Promise<string[]> {
-  const result: string[] = [];
+  const resultSet = new Set<string>();
 
   // Auto-discovery: skills/*/SKILL.md (return parent directories)
   const autoDiscovered = await glob('skills/*/SKILL.md', {
     cwd: pluginPath,
     onlyFiles: true,
   });
-  result.push(...autoDiscovered.map((p) => dirname(p)));
+  autoDiscovered.forEach(p => resultSet.add(normalizePath(dirname(p))));
 
   // Custom paths (COMPLEMENT auto-discovery)
   if (typeof skills === 'string') {
-    const custom = await glob(`${skills}/*/SKILL.md`, {
+    const customPath = normalizePath(skills);
+    const custom = await glob(`${customPath}/*/SKILL.md`, {
       cwd: pluginPath,
       onlyFiles: true,
     });
-    result.push(...custom.map((p) => dirname(p)));
+    custom.forEach(p => resultSet.add(normalizePath(dirname(p))));
   } else if (Array.isArray(skills)) {
-    result.push(...skills.map(normalizePath));
+    skills.forEach(p => resultSet.add(normalizePath(p)));
   }
 
-  // Remove duplicates and remove leading './'
-  return [...new Set(result)].map(normalizePath);
+  // Return unique values
+  return Array.from(resultSet);
 }
 
 /**
