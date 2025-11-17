@@ -23,7 +23,7 @@ import {
   resolveMcpConflicts,
   type ResolvedItem,
 } from './conflicts.js';
-import { copyComponentFiles, copySkillDirectories } from './copier.js';
+import { copyComponentFiles, copySkillDirectories, copyHookScripts } from './copier.js';
 import { generateMarketplace, writeMarketplaceJson } from './marketplace.js';
 import {
   generatePluginJson,
@@ -78,6 +78,7 @@ function buildAggregatedPlugin(
 ): {
   normalized: NormalizedPluginFormatInternal;
   sourceRoots: Map<string, string>;
+  hooksByPlugin: Map<NormalizedHook, string>;
 } {
   // Collect all selected items across plugins
   const allCommands: Array<{ pluginName: string; path: string }> = [];
@@ -87,6 +88,7 @@ function buildAggregatedPlugin(
   const allMcps: Array<{ pluginName: string; mcpName: string; mcp: NormalizedMcp }> = [];
 
   const sourceRoots = new Map<string, string>();
+  const hooksByPlugin = new Map<NormalizedHook, string>();
 
   for (const plugin of state.plugins) {
     const selection = getSelection(state, plugin.name);
@@ -112,6 +114,7 @@ function buildAggregatedPlugin(
       const hook = plugin.hooks[hookIndex];
       if (hook) {
         allHooks.push(hook);
+        hooksByPlugin.set(hook, plugin.name);
       }
     });
 
@@ -158,7 +161,7 @@ function buildAggregatedPlugin(
     }),
   };
 
-  return { normalized, sourceRoots };
+  return { normalized, sourceRoots, hooksByPlugin };
 }
 
 /**
@@ -208,7 +211,7 @@ export async function save(
 
   try {
     // 3. Build aggregated plugin
-    const { normalized, sourceRoots } = buildAggregatedPlugin(state, pluginName);
+    const { normalized, sourceRoots, hooksByPlugin } = buildAggregatedPlugin(state, pluginName);
 
     // 4. Get output paths
     const paths: OutputPaths = getOutputPaths(outputDir, pluginName);
@@ -259,8 +262,22 @@ export async function save(
       copySkillDirectories(skillItems, sourceRoots, paths.pluginDir);
     }
 
+    // 7.5. Copy hook scripts with executable permissions and update paths
+    const updatedHooks = copyHookScripts(
+      normalized.hooks,
+      sourceRoots,
+      paths.pluginDir,
+      hooksByPlugin
+    );
+
+    // Update normalized plugin with resolved hook paths
+    const finalNormalized: NormalizedPluginFormatInternal = {
+      ...normalized,
+      hooks: updatedHooks,
+    };
+
     // 8. Generate and write plugin.json
-    const pluginJson = generatePluginJson(normalized);
+    const pluginJson = generatePluginJson(finalNormalized);
     writePluginJson(paths.claudePluginDir, pluginJson);
 
     // 9. Generate and write marketplace.json
@@ -271,7 +288,7 @@ export async function save(
     writeMarketplaceJson(paths.marketplaceDir, marketplace);
 
     // 10. Write normalized-plugin.json (for debugging)
-    writeNormalizedJson(paths.root, normalized);
+    writeNormalizedJson(paths.root, finalNormalized);
 
     // Success!
     return {
@@ -279,11 +296,11 @@ export async function save(
       outputDir,
       errors: [],
       stats: {
-        commands: normalized.commands.length,
-        agents: normalized.agents.length,
-        skills: normalized.skills.length,
-        hooks: normalized.hooks.length,
-        mcps: normalized.mcps.length,
+        commands: finalNormalized.commands.length,
+        agents: finalNormalized.agents.length,
+        skills: finalNormalized.skills.length,
+        hooks: finalNormalized.hooks.length,
+        mcps: finalNormalized.mcps.length,
       },
     };
   } catch (error: any) {

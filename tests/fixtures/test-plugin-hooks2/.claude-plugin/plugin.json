@@ -1,0 +1,18 @@
+{
+  "name": "test-plugin-hooks2",
+  "version": "1.0.0",
+  "description": "Second test plugin with hook scripts (for conflict testing)",
+  "commands": ["./commands/build.md"],
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./hooks/session-start.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
