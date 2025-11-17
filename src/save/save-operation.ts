@@ -3,8 +3,9 @@
  * Based on 007-save-operation-rules.md
  */
 
-import { mkdir, writeFile, copyFile, cp } from 'fs/promises';
+import { mkdir, writeFile, copyFile, cp, rm, access } from 'fs/promises';
 import { join, dirname, basename } from 'path';
+import { confirm } from '@inquirer/prompts';
 import type { NormalizedPluginFormat } from '../types/normalized.js';
 import { officialize } from '../transform/officialize.js';
 
@@ -41,6 +42,26 @@ export async function saveSelection(
   if (isEmpty) {
     console.log('⚠ No hay componentes seleccionados');
     return;
+  }
+
+  // Check if output directory exists (spec 007 lines 176-183)
+  try {
+    await access(outputDir);
+    // Directory exists, ask for confirmation
+    const shouldOverwrite = await confirm({
+      message: 'Output directory exists. Overwrite?',
+      default: true,
+    });
+
+    if (!shouldOverwrite) {
+      console.log('Operation cancelled');
+      return;
+    }
+
+    // Delete existing directory
+    await rm(outputDir, { recursive: true, force: true });
+  } catch {
+    // Directory doesn't exist, continue
   }
 
   // Create output directories
@@ -89,13 +110,20 @@ export async function saveSelection(
     join(outputDir, 'plugins/curated-plugin')
   );
 
-  // 5. Show success message
+  // 5. Show success message (spec 007 lines 283-303)
   console.log('✓ Plugin guardado exitosamente');
   console.log();
   console.log('Archivos generados:');
-  console.log('  • .claude-plugin/marketplace.json');
-  console.log('  • plugins/curated-plugin/');
-  console.log('  • normalized-plugin.json');
+  console.log('  • .claude-plugin/marketplace.json     (marketplace oficial - usar en Claude Code)');
+  console.log('  • plugins/curated-plugin/             (plugin con componentes - oficial - usar en Claude Code)');
+  console.log('  • normalized-plugin.json              (normalizado - para testing)');
+  console.log();
+  console.log('Componentes incluidos:');
+  console.log(`  • ${normalizedPlugin.commands.length} commands`);
+  console.log(`  • ${normalizedPlugin.agents.length} agents`);
+  console.log(`  • ${normalizedPlugin.skills.length} skills`);
+  console.log(`  • ${normalizedPlugin.hooks.length} hooks`);
+  console.log(`  • ${normalizedPlugin.mcps.length} MCPs`);
   console.log();
   console.log('Ubicación:', outputDir);
   console.log();

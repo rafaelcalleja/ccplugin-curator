@@ -200,8 +200,8 @@ export function App({ plugins }: AppProps) {
   const handleSave = async () => {
     try {
       await saveSelection(plugins, selection);
-      // Show success message (implement later)
-      exit();
+      // TUI remains open after save (per spec 004 line 113)
+      // User can continue selecting or press Q to quit
     } catch (error) {
       console.error('Save failed:', error);
     }
