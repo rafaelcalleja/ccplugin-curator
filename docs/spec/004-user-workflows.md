@@ -4,7 +4,17 @@ Flujos de usuario definidos con Behavior-Driven Development.
 
 ---
 
-## Comando
+## Comandos
+
+### Modo Interactivo (Recomendado)
+
+```bash
+app
+```
+
+Lanza la aplicación en modo interactivo mostrando el menú principal y formulario de configuración.
+
+### Modo Directo
 
 ```bash
 app select <plugin-folder>
@@ -15,6 +25,73 @@ app select <plugin-folder>
 app select ~/.claude/plugins
 ```
 
+Salta directamente al TUI de selección de componentes (usa configuración por defecto).
+
+---
+
+## Workflow de Setup Inicial
+
+```gherkin
+Feature: Configurar plugin curado desde menú principal
+  As a user
+  I want to configure my curated plugin metadata
+  So that I can proceed to component selection
+
+Scenario: Setup completo desde menú principal
+  Given el usuario ejecuta "app" sin argumentos
+  When la aplicación inicia
+  Then muestra Main Menu con opciones:
+    - Create New Curated Plugin
+    - Exit
+
+  When el usuario selecciona "Create New Curated Plugin"
+  Then muestra Configuration Form con campos:
+    | Campo                    | Tipo      | Default               |
+    | Marketplace Name         | Required  | my-marketplace        |
+    | Plugin Name              | Required  | My Awesome Plugin     |
+    | Source Plugin Directory  | Required  | ~/.claude/plugins     |
+    | Output Directory         | Optional  | ./output              |
+    | Author Email             | Optional  | you@example.com       |
+
+  When el usuario completa los campos requeridos
+  And presiona ENTER
+  Then la aplicación:
+    - Valida campos (marketplace name: lowercase+hyphens, email: format válido)
+    - Escanea Source Plugin Directory buscando plugins
+    - Muestra "→ Scanning... Found X plugins"
+    - Auto-completa Output Directory basándose en Marketplace Name
+  And transforma a TUI de selección de componentes (3 paneles)
+
+Scenario: Validación de campos en Configuration Form
+  Given el usuario está en Configuration Form
+  When el usuario escribe en "Marketplace Name" con caracteres inválidos
+  Then muestra error: "✗ Only lowercase, numbers, hyphens allowed (3-50 chars)"
+  And no permite continuar hasta corregir
+
+  When el usuario escribe email inválido en "Author Email"
+  Then muestra error: "✗ Invalid email format"
+
+  When el usuario escribe directorio que no existe en "Source Plugin Directory"
+  Then muestra error: "✗ Directory does not exist"
+  And no permite continuar
+
+Scenario: Cancelar desde Configuration Form
+  Given el usuario está en Configuration Form
+  When presiona ESC
+  Then retorna a Main Menu
+
+  When el usuario está en Main Menu
+  And presiona ESC o selecciona "Exit"
+  Then la aplicación cierra
+
+Scenario: Source directory sin plugins
+  Given el usuario completa Configuration Form
+  But el Source Plugin Directory no contiene plugins
+  When presiona ENTER
+  Then muestra error: "✗ No plugins found in directory"
+  And retorna al formulario para corregir path
+```
+
 ---
 
 ## Workflow Principal
@@ -22,13 +99,12 @@ app select ~/.claude/plugins
 ```gherkin
 Feature: Seleccionar componentes de plugins
 
-Scenario: Usuario selecciona componentes
-  Given el usuario tiene plugins en "./plugins"
-  When ejecuta "app select ./plugins"
-  Then la aplicación escanea el folder
-  And normaliza los plugins al formato interno
-  And muestra TUI con 3 paneles:
-    - Panel izquierdo: lista de plugins
+Scenario: Usuario selecciona componentes (desde setup)
+  Given el usuario completó Configuration Form
+  And la aplicación escaneó Source Plugin Directory
+  When el usuario presiona ENTER en Configuration Form
+  Then la aplicación muestra TUI con 3 paneles:
+    - Panel izquierdo: lista de plugins encontrados
     - Panel central: componentes del plugin seleccionado
     - Panel derecho: preview JSON de la selección
 
@@ -37,10 +113,19 @@ Scenario: Usuario selecciona componentes
   Then el panel derecho actualiza el preview en tiempo real
 
   When el usuario presiona S (Save)
-  Then la aplicación guarda la selección como plugin.json
+  Then la aplicación guarda la selección usando configuración del setup
 
   When el usuario presiona Q (Quit)
   Then la aplicación cierra
+
+Scenario: Usuario usa modo directo
+  Given el usuario tiene plugins en "./plugins"
+  When ejecuta "app select ./plugins"
+  Then la aplicación:
+    - Salta setup screens
+    - Usa configuración por defecto (marketplace name: "my-marketplace", output: "./output")
+    - Escanea "./plugins"
+    - Muestra TUI directamente con plugins encontrados
 ```
 
 ---
@@ -50,15 +135,22 @@ Scenario: Usuario selecciona componentes
 ### 1. Inicio
 
 ```gherkin
-Given el usuario ejecuta "app select ./plugins"
-When la app inicia
-Then:
-  - Escanea "./plugins" buscando directorios con ".claude-plugin/plugin.json"
-  - Para cada plugin encontrado:
-    - Lee plugin.json
-    - Ejecuta auto-discovery (commands/, agents/, skills/, hooks/, .mcp.json)
-    - Transforma a formato normalizado (según 001-normalization-protocol.md)
-  - Muestra TUI con primer plugin auto-seleccionado
+Scenario: Inicio desde modo interactivo
+  Given el usuario ejecuta "app" sin argumentos
+  When la app inicia
+  Then muestra Main Menu → Configuration Form → TUI
+  (Ver "Workflow de Setup Inicial" para detalles)
+
+Scenario: Inicio desde modo directo
+  Given el usuario ejecuta "app select ./plugins"
+  When la app inicia
+  Then:
+    - Escanea "./plugins" buscando directorios con ".claude-plugin/plugin.json"
+    - Para cada plugin encontrado:
+      - Lee plugin.json
+      - Ejecuta auto-discovery (commands/, agents/, skills/, hooks/, .mcp.json)
+      - Transforma a formato normalizado (según 001-normalization-protocol.md)
+    - Muestra TUI directamente con primer plugin auto-seleccionado
 ```
 
 ### 2. Navegación
