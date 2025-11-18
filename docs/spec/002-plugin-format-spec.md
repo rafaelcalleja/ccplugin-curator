@@ -83,7 +83,16 @@ interface PluginJson {
 - **`command`**: Script/command path
 - **`timeout`**: Execution limit in seconds (default: 60)
 
-### 2.3 Events
+### 2.3 Hook Script Requirements
+
+Hook commands reference executable script files that must meet these requirements:
+
+- **Executable permissions**: Scripts must have execute permission (`chmod +x script.sh`)
+- **Directory structure**: Script files typically reside in `hooks/` directory at plugin root
+- **Path resolution**: Use `${CLAUDE_PLUGIN_ROOT}` variable for portable plugin paths
+- **Environment**: `CLAUDE_PLUGIN_ROOT` environment variable provides absolute path to plugin directory
+
+### 2.4 Events
 
 - `PreToolUse` (matcher: tool name)
 - `PostToolUse` (matcher: tool name)
@@ -95,7 +104,7 @@ interface PluginJson {
 - `SessionStart` (matcher: `startup`|`resume`|`clear`|`compact`)
 - `SessionEnd`
 
-### 2.4 Examples
+### 2.5 Examples
 
 **With matcher:**
 ```json

@@ -97,7 +97,7 @@ glob(`${pluginRoot}/skills/*/SKILL.md`)
 2. Extract event name from top-level key
 3. Extract matcher from matcher field (if present)
 4. Add event and matcher fields to each hook
-5. Preserve all original hook fields
+5. Preserve all original hook fields (including `command` paths exactly as they appear)
 
 ```json
 // Output
@@ -106,12 +106,12 @@ glob(`${pluginRoot}/skills/*/SKILL.md`)
     {
       "event": "SessionStart",
       "type": "command",
-      "command": "/setup.sh"
+      "command": "${CLAUDE_PLUGIN_ROOT}/hooks/setup.sh"
     },
     {
       "event": "PostToolUse",
       "type": "command",
-      "command": "/format.sh",
+      "command": "${CLAUDE_PLUGIN_ROOT}/hooks/format.sh",
       "matcher": "Write|Edit"
     }
   ]

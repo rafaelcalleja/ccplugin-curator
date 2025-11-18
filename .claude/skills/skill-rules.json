@@ -1,0 +1,27 @@
+{
+  "skills": [
+    {
+      "name": "frontmatter-validator",
+      "triggers": {
+        "filePatterns": [
+          "**/*.md"
+        ],
+        "keywords": [
+          "markdown",
+          "frontmatter",
+          "gate_constraints",
+          "document_covers",
+          "escribir",
+          "editar",
+          "crear documento",
+          "añadir contenido"
+        ],
+        "toolPatterns": [
+          "Write.*\\.md",
+          "Edit.*\\.md"
+        ]
+      },
+      "activationMessage": "⚠️ Detecté que estás trabajando con archivos markdown. La skill 'frontmatter-validator' debería estar activa para validar las restricciones del frontmatter antes de escribir."
+    }
+  ]
+}

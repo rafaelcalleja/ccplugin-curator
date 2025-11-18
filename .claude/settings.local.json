@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__superflag__get_directives",
+      "mcp__tavily-remote__tavily_search",
+      "mcp__tavily-remote__tavily_extract",
+      "Bash(chmod:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
