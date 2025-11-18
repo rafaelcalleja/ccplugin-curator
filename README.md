@@ -20,12 +20,24 @@ npm install
 npm run build
 ```
 
+## Quick Start
+
+```bash
+# Run interactive TUI
+npm start
+
+# Or use the CLI directly
+npm run cli -- curate
+```
+
 ## Usage
 
 ### Interactive TUI Mode (Recommended)
 
 ```bash
 npm start
+# or
+npm run cli -- curate
 # or
 node dist/cli/index.js curate
 ```
