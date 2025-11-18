@@ -19,17 +19,47 @@ npm run build
 
 ## Usage
 
-### Basic Usage
+### Interactive Mode (Recommended)
 
 ```bash
-# Select from plugins in a directory
+# Launch interactive setup
+ccplugin-curator
+```
+
+This will guide you through:
+1. **Main Menu**: Choose to create a new curated plugin or exit
+2. **Configuration Form**: Enter plugin metadata
+   - Marketplace Name (lowercase, numbers, hyphens)
+   - Plugin Name (display name)
+   - Source Plugin Directory (where your plugins are)
+   - Output Directory (where to save)
+   - Author Email (optional)
+3. **Component Selection**: 3-panel TUI for selecting components
+
+### Direct Mode
+
+```bash
+# Skip setup and go directly to component selection
 ccplugin-curator select ./plugins
 
 # Specify output directory
 ccplugin-curator select ./plugins -o ./my-output
 ```
 
-### TUI Navigation
+### Setup Screen Navigation
+
+**Main Menu:**
+- **↑/↓**: Navigate options
+- **ENTER**: Select option
+- **Q/ESC**: Quit
+
+**Configuration Form:**
+- **↑/↓/TAB**: Navigate fields
+- **Type**: Edit field (placeholder disappears)
+- **ENTER**: Submit form (when all required fields valid)
+- **ESC**: Cancel and return to Main Menu
+
+### Component Selection Navigation
 
 - **←/→**: Switch between panels (Plugins | Components | Preview)
 - **↑/↓**: Navigate items in Components panel
@@ -112,6 +142,7 @@ See `docs/` for detailed specifications:
 - [006 - Reverse Transformation Rules](./docs/spec/006-reverse-transformation-rules.md)
 - [007 - Save Operation Rules](./docs/spec/007-save-operation-rules.md)
 - [008 - Integration Test Spec](./docs/spec/008-integration-test-spec.md)
+- [009 - TUI Setup Screens](./docs/spec/009-tui-setup-screens.md)
 
 ## License
 
