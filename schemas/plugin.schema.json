@@ -84,11 +84,20 @@
       "description": "Agent files. Default: './agents/**/*.md' glob"
     },
     "skills": {
-      "type": "array",
-      "description": "Skill directory paths. Default: './skills/*/SKILL.md' parent dirs",
-      "items": {
-        "type": "string"
-      }
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Glob pattern or directory for skill directories"
+        },
+        {
+          "type": "array",
+          "description": "Explicit array of skill directory paths",
+          "items": {
+            "type": "string"
+          }
+        }
+      ],
+      "description": "Skill directory paths. Default: './skills/*/SKILL.md' parent dirs"
     },
     "hooks": {
       "oneOf": [

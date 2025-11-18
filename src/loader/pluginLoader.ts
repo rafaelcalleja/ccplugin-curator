@@ -7,7 +7,8 @@ import {
   discoverSkills,
   discoverHooks,
   discoverMcpServers,
-  expandGlob
+  expandGlob,
+  expandSkillsGlob
 } from './autoDiscover';
 
 /**
@@ -122,6 +123,9 @@ async function applyAutoDiscovery(
     if (discovered.length > 0) {
       resolved.skills = discovered;
     }
+  } else if (typeof resolved.skills === 'string') {
+    // String: treat as glob pattern for skill directories
+    resolved.skills = await expandSkillsGlob(pluginDir, resolved.skills);
   }
 
   // Hooks: auto-discover if undefined

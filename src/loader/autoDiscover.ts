@@ -111,14 +111,64 @@ export async function discoverMcpServers(pluginDir: string): Promise<string | un
  * Expand a glob pattern to file paths
  *
  * @param pluginDir - Absolute path to plugin directory
- * @param pattern - Glob pattern (may include **\/ wildcards)
+ * @param pattern - Glob pattern (may include **\/ wildcards) or directory path
  * @returns Array of file paths relative to plugin directory
  */
 export async function expandGlob(pluginDir: string, pattern: string): Promise<string[]> {
   // Remove leading ./ if present
-  const cleanPattern = pattern.startsWith('./') ? pattern.slice(2) : pattern;
+  let cleanPattern = pattern.startsWith('./') ? pattern.slice(2) : pattern;
+
+  // If pattern is a directory (no wildcards and ends with / or no extension), add /**/*.md
+  const hasWildcard = cleanPattern.includes('*');
+  const endsWithSlash = cleanPattern.endsWith('/');
+  const hasExtension = /\.\w+$/.test(cleanPattern);
+
+  if (!hasWildcard && (endsWithSlash || !hasExtension)) {
+    // Remove trailing slash if present
+    cleanPattern = cleanPattern.replace(/\/$/, '');
+    // Add /**/*.md to discover all markdown files in directory
+    cleanPattern = `${cleanPattern}/**/*.md`;
+  }
+
   const fullPattern = path.join(pluginDir, cleanPattern);
 
   const files = await glob(fullPattern, { nodir: true });
   return files.map(f => path.relative(pluginDir, f));
+}
+
+/**
+ * Expand a skills pattern to skill directory paths
+ *
+ * Skills are discovered by finding SKILL.md files and returning their parent directories.
+ *
+ * @param pluginDir - Absolute path to plugin directory
+ * @param pattern - Glob pattern or directory path for skills
+ * @returns Array of skill directory paths relative to plugin directory
+ */
+export async function expandSkillsGlob(pluginDir: string, pattern: string): Promise<string[]> {
+  // Remove leading ./ if present
+  let cleanPattern = pattern.startsWith('./') ? pattern.slice(2) : pattern;
+
+  // If pattern is a directory (no wildcards), add /*/SKILL.md to find skill directories
+  const hasWildcard = cleanPattern.includes('*');
+  const endsWithSlash = cleanPattern.endsWith('/');
+
+  if (!hasWildcard) {
+    // Remove trailing slash if present
+    cleanPattern = cleanPattern.replace(/\/$/, '');
+    // Add /*/SKILL.md to discover skill directories
+    cleanPattern = `${cleanPattern}/*/SKILL.md`;
+  } else if (!cleanPattern.includes('SKILL.md')) {
+    // If has wildcard but doesn't specify SKILL.md, add it
+    cleanPattern = cleanPattern.replace(/\*\.md$/, 'SKILL.md');
+  }
+
+  const fullPattern = path.join(pluginDir, cleanPattern);
+  const files = await glob(fullPattern, { nodir: true });
+
+  // Return parent directories (the skill dirs, not SKILL.md files)
+  return files.map(f => {
+    const skillFile = path.relative(pluginDir, f);
+    return path.dirname(skillFile); // e.g., "skills/my-skill" from "skills/my-skill/SKILL.md"
+  });
 }

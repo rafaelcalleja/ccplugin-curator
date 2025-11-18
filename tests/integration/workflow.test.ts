@@ -9,7 +9,7 @@ import { SelectionState } from '../../src/tui/state/SelectionState';
 describe('Full Workflow Integration Test', () => {
   const fixturesDir = path.join(__dirname, '../fixtures');
   const testPluginDir = path.join(fixturesDir, 'test-plugin');
-  const outputDir = path.join(__dirname, '../output');
+  const outputDir = path.join(__dirname, '../output/workflow-test');
 
   beforeEach(async () => {
     // Clean output directory

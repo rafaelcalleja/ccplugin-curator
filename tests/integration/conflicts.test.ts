@@ -9,7 +9,7 @@ describe('Multi-Plugin Conflict Resolution', () => {
   const fixturesDir = path.join(__dirname, '../fixtures');
   const pluginADir = path.join(fixturesDir, 'test-plugin-a');
   const pluginBDir = path.join(fixturesDir, 'test-plugin-b');
-  const outputDir = path.join(__dirname, '../output');
+  const outputDir = path.join(__dirname, '../output/conflicts-test');
 
   beforeEach(async () => {
     // Clean output directory

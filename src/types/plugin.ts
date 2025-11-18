@@ -57,7 +57,7 @@ export interface ClaudeCodePluginConfiguration {
   /**
    * Skill directory paths. Default: './skills/* /SKILL.md' parent dirs
    */
-  skills?: string[];
+  skills?: string | string[];
   /**
    * Hooks configuration. Default: './hooks/hooks.json' or './settings.json'
    */
