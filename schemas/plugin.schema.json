@@ -1,0 +1,189 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://code.claude.com/schemas/plugin.json",
+  "title": "Claude Code Plugin Configuration",
+  "description": "Official Claude Code plugin.json format",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Plugin name (required, kebab-case format)",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief explanation of plugin purpose"
+    },
+    "author": {
+      "type": "object",
+      "description": "Author information",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "homepage": {
+      "type": "string",
+      "format": "uri",
+      "description": "Documentation URL"
+    },
+    "repository": {
+      "type": "string",
+      "format": "uri",
+      "description": "Source code URL"
+    },
+    "license": {
+      "type": "string",
+      "description": "License identifier"
+    },
+    "keywords": {
+      "type": "array",
+      "description": "Discovery tags",
+      "items": {
+        "type": "string"
+      }
+    },
+    "commands": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Custom directory path"
+        },
+        {
+          "type": "array",
+          "description": "Explicit file paths",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "agents": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Custom directory path"
+        },
+        {
+          "type": "array",
+          "description": "Explicit file paths",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "skills": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Custom directory path"
+        },
+        {
+          "type": "array",
+          "description": "Explicit directory paths",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "hooks": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Path to hooks.json configuration file"
+        },
+        {
+          "type": "object",
+          "description": "Inline hook configuration",
+          "patternProperties": {
+            "^(PreToolUse|PostToolUse|UserPromptSubmit|Notification|Stop|SubagentStop|PreCompact|SessionStart|SessionEnd)$": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "matcher": {
+                    "type": "string",
+                    "description": "Tool pattern matcher"
+                  },
+                  "hooks": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": ["command"]
+                        },
+                        "command": {
+                          "type": "string"
+                        },
+                        "timeout": {
+                          "type": "number",
+                          "minimum": 1
+                        }
+                      },
+                      "required": ["type", "command"]
+                    }
+                  }
+                },
+                "required": ["hooks"]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "mcpServers": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Path to .mcp.json configuration file"
+        },
+        {
+          "type": "object",
+          "description": "Inline MCP server configuration",
+          "patternProperties": {
+            ".*": {
+              "type": "object",
+              "properties": {
+                "command": {
+                  "type": "string"
+                },
+                "args": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "env": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": ["command"]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "required": ["name"]
+}

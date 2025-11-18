@@ -1,5 +1,43 @@
 {
+  "name": "ccplugin-curator",
+  "version": "0.1.0",
+  "description": "Curate and combine Claude Code plugin components",
+  "main": "dist/cli/index.js",
+  "bin": {
+    "ccplugin-curator": "./bin/app"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "generate-types": "json-schema-to-typescript schemas/plugin.schema.json -o src/types/plugin.ts && json-schema-to-typescript schemas/normalized-plugin.schema.json -o src/types/normalized.ts",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "test:integration": "vitest run test/integration"
+  },
+  "dependencies": {
+    "ajv": "^8.12.0",
+    "ajv-formats": "^3.0.1",
+    "blessed": "^0.1.81",
+    "commander": "^11.0.0",
+    "glob": "^10.3.0"
+  },
   "devDependencies": {
-    "@anthropic-ai/claude-code": "^2.0.44"
-  }
+    "@anthropic-ai/claude-code": "^2.0.44",
+    "@types/blessed": "^0.1.25",
+    "@types/node": "^20.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "json-schema-to-typescript": "^13.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "plugin",
+    "curator",
+    "tui"
+  ],
+  "author": "",
+  "license": "MIT"
 }
