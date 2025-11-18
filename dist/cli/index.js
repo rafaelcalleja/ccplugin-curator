@@ -38,6 +38,9 @@ const commander_1 = require("commander");
 const normalizer_1 = require("../lib/normalizer");
 const save_controller_1 = require("../lib/save-controller");
 const validator_1 = require("../lib/validator");
+const main_menu_1 = require("../tui/screens/main-menu");
+const config_form_1 = require("../tui/screens/config-form");
+const component_selection_1 = require("../tui/screens/component-selection");
 const path = __importStar(require("path"));
 const program = new commander_1.Command();
 program
@@ -91,9 +94,77 @@ program
 program
     .command('curate')
     .description('Interactive TUI for selecting and combining plugin components')
-    .action(() => {
-    console.log('TUI not yet implemented. Please use the normalize and combine commands for now.');
-    process.exit(1);
+    .action(async () => {
+    try {
+        // Show main menu
+        const menuResult = await (0, main_menu_1.showMainMenu)();
+        if (menuResult.action === 'exit') {
+            console.log('Goodbye!');
+            return;
+        }
+        // Show configuration form
+        const configResult = await (0, config_form_1.showConfigForm)();
+        if (configResult.action === 'cancel') {
+            console.log('Cancelled.');
+            return;
+        }
+        // Load plugins from source directory
+        console.log('Loading plugins...');
+        const pluginPaths = (0, validator_1.listPluginDirectories)(configResult.sourceDirectory);
+        if (pluginPaths.length === 0) {
+            console.error('No plugins found in source directory');
+            process.exit(1);
+        }
+        const plugins = [];
+        for (const pluginPath of pluginPaths) {
+            const normalized = await (0, normalizer_1.normalizePlugin)(pluginPath);
+            plugins.push(normalized);
+        }
+        // Show component selection
+        const selectionResult = await (0, component_selection_1.showComponentSelection)(plugins);
+        if (selectionResult.action === 'quit') {
+            console.log('Cancelled.');
+            return;
+        }
+        // Save the curated plugin
+        console.log('\nSaving curated plugin...\n');
+        const saveConfig = {
+            marketplaceName: configResult.marketplaceName,
+            pluginName: configResult.pluginName,
+            outputDirectory: configResult.outputDirectory,
+            authorEmail: configResult.authorEmail
+        };
+        const result = await (0, save_controller_1.save)(selectionResult.selection, saveConfig);
+        if (!result.success) {
+            console.error('Failed to save plugin:');
+            if (result.errors) {
+                for (const error of result.errors) {
+                    console.error(`  - ${error}`);
+                }
+            }
+            process.exit(1);
+        }
+        console.log('✓ Plugin saved successfully\n');
+        console.log('Files generated:');
+        console.log(`  • ${result.outputPath}/.claude-plugin/marketplace.json`);
+        console.log(`  • ${result.outputPath}/plugins/${saveConfig.pluginName}/`);
+        console.log(`  • ${result.outputPath}/normalized-plugin.json\n`);
+        console.log('Components included:');
+        if (result.stats) {
+            console.log(`  • ${result.stats.commands} commands`);
+            console.log(`  • ${result.stats.agents} agents`);
+            console.log(`  • ${result.stats.skills} skills`);
+            console.log(`  • ${result.stats.hooks} hooks`);
+            console.log(`  • ${result.stats.mcps} MCPs\n`);
+        }
+        console.log('Installation:');
+        console.log(`  /plugin marketplace add ${result.outputPath}`);
+        console.log(`  /plugin install ${saveConfig.pluginName}`);
+    }
+    catch (error) {
+        console.error('Error:', error instanceof Error ? error.message : String(error));
+        process.exit(1);
+    }
 });
 program
     .command('combine <source-dir>')
