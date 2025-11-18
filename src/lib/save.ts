@@ -130,12 +130,10 @@ export async function savePlugin(
 
   // 8. Write output files
   try {
-    // Write marketplace.json
-    await fs.writeFile(
-      path.join(outputPath, '.claude-plugin', 'marketplace.json'),
-      JSON.stringify(marketplace, null, 2)
-    );
+    // Create .claude-plugin directory first
     await fs.mkdir(path.join(outputPath, '.claude-plugin'), { recursive: true });
+    
+    // Write marketplace.json
     await fs.writeFile(
       path.join(outputPath, '.claude-plugin', 'marketplace.json'),
       JSON.stringify(marketplace, null, 2)
