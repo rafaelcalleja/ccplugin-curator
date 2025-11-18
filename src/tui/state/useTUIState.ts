@@ -8,6 +8,26 @@ import type { NormalizedPlugin } from '../../types/normalized';
 import type { TUIState, TUIAction, ComponentTreeNode } from './types';
 import { denormalizePlugin } from '../../core/denormalize';
 
+/**
+ * Fuzzy matching: returns true if all characters in query appear in text in order
+ * Example: "bld" matches "build", "bold", "build-tool"
+ */
+function fuzzyMatch(text: string, query: string): boolean {
+  if (query === '') return true;
+
+  const textLower = text.toLowerCase();
+  const queryLower = query.toLowerCase();
+
+  let queryIndex = 0;
+  for (let i = 0; i < textLower.length && queryIndex < queryLower.length; i++) {
+    if (textLower[i] === queryLower[queryIndex]) {
+      queryIndex++;
+    }
+  }
+
+  return queryIndex === queryLower.length;
+}
+
 export function useTUIState(initialPlugins: NormalizedPlugin[]) {
   const [state, setState] = useState<TUIState>({
     plugins: initialPlugins,
@@ -21,6 +41,7 @@ export function useTUIState(initialPlugins: NormalizedPlugin[]) {
     },
     expandedCategories: new Set(['commands', 'agents', 'skills', 'hooks', 'mcps']),
     outputDir: './output/curated-plugin',
+    searchQuery: '',
   });
 
   const dispatch = useCallback((action: TUIAction) => {
@@ -88,6 +109,9 @@ export function useTUIState(initialPlugins: NormalizedPlugin[]) {
 
         case 'SET_OUTPUT_DIR':
           return { ...prev, outputDir: action.dir };
+
+        case 'SET_SEARCH_QUERY':
+          return { ...prev, searchQuery: action.query, cursorPositions: { ...prev.cursorPositions, components: 0 } };
 
         default:
           return prev;
@@ -200,8 +224,30 @@ export function useTUIState(initialPlugins: NormalizedPlugin[]) {
       });
     }
 
+    // Apply search filter if query exists
+    if (state.searchQuery) {
+      return tree.map(category => {
+        if (category.type === 'category' && category.children) {
+          const filteredChildren = category.children.filter(child =>
+            fuzzyMatch(child.label, state.searchQuery)
+          );
+
+          if (filteredChildren.length === 0) {
+            return null;
+          }
+
+          return {
+            ...category,
+            label: category.label.replace(/\(\d+\)/, `(${filteredChildren.length})`),
+            children: filteredChildren,
+          };
+        }
+        return category;
+      }).filter(Boolean) as ComponentTreeNode[];
+    }
+
     return tree;
-  }, [state.plugins, state.selectedPluginIndex]);
+  }, [state.plugins, state.selectedPluginIndex, state.searchQuery]);
 
   // Compute live preview JSON
   const previewJSON = useMemo(() => {
@@ -294,11 +340,35 @@ export function useTUIState(initialPlugins: NormalizedPlugin[]) {
     return { commands, agents, skills, hooks, mcps, total: commands + agents + skills + hooks + mcps };
   }, [state.plugins, state.selection]);
 
+  // Calculate total components and matches for search
+  const totalComponentCount = useMemo(() => {
+    return state.plugins[state.selectedPluginIndex]
+      ? state.plugins[state.selectedPluginIndex].commands.length +
+          state.plugins[state.selectedPluginIndex].agents.length +
+          state.plugins[state.selectedPluginIndex].skills.length +
+          state.plugins[state.selectedPluginIndex].hooks.length +
+          state.plugins[state.selectedPluginIndex].mcps.length
+      : 0;
+  }, [state.plugins, state.selectedPluginIndex]);
+
+  const matchCount = useMemo(() => {
+    let count = 0;
+    componentsTree.forEach(category => {
+      if (category.type === 'category' && category.children) {
+        count += category.children.length;
+      }
+    });
+    return count;
+  }, [componentsTree]);
+
   return {
     state,
     dispatch,
     componentsTree,
     previewJSON,
     selectionCounts,
+    searchQuery: state.searchQuery,
+    matchCount,
+    totalComponentCount,
   };
 }

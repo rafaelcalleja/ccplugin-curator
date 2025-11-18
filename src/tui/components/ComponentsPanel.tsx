@@ -60,9 +60,14 @@ export function ComponentsPanel({
         {flatItems.length === 0 ? (
           <Text dimColor>No components</Text>
         ) : (
-          flatItems.map((item, index) => {
-            const isCurrent = index === cursorPosition;
-            const { node, depth } = item;
+          <>
+            {/* Show indicator if there are items above visible range */}
+            {visibleRange.start > 0 && (
+              <Text dimColor>... {visibleRange.start} more above ...</Text>
+            )}
+            {visibleItems.map((item) => {
+              const isCurrent = item.absoluteIndex === cursorPosition;
+              const { node, depth } = item;
 
             if (node.type === 'category') {
               const isExpanded = node.category ? expandedCategories.has(node.category) : false;
@@ -99,7 +104,12 @@ export function ComponentsPanel({
                 </Box>
               );
             }
-          })
+          })}
+            {/* Show indicator if there are items below visible range */}
+            {visibleRange.end < flatItems.length && (
+              <Text dimColor>... {flatItems.length - visibleRange.end} more below ...</Text>
+            )}
+          </>
         )}
       </Box>
     </Box>

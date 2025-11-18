@@ -30,6 +30,9 @@ export interface TUIState {
 
   // Output directory for save operation
   outputDir: string;
+
+  // Search/filter query
+  searchQuery: string;
 }
 
 export interface ComponentTreeNode {
@@ -52,4 +55,5 @@ export type TUIAction =
   | { type: 'MOVE_CURSOR'; panel: 'plugins' | 'components' | 'preview'; delta: number }
   | { type: 'SELECT_ALL' }
   | { type: 'DESELECT_ALL' }
-  | { type: 'SET_OUTPUT_DIR'; dir: string };
+  | { type: 'SET_OUTPUT_DIR'; dir: string }
+  | { type: 'SET_SEARCH_QUERY'; query: string };

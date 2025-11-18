@@ -13,6 +13,7 @@ import { useKeyboard } from './hooks/useKeyboard';
 import { useSave } from './hooks/useSave';
 import { PluginsPanel } from './components/PluginsPanel';
 import { ComponentsPanel } from './components/ComponentsPanel';
+import { SearchBox } from './components/SearchBox';
 import { PreviewPanel } from './components/PreviewPanel';
 import { MainMenu } from './screens/MainMenu';
 import { ConfigurationForm, type FormData } from './screens/ConfigurationForm';
@@ -23,7 +24,7 @@ interface TUIAppProps {
 }
 
 function TUIApp({ plugins }: TUIAppProps) {
-  const { state, dispatch, componentsTree, previewJSON, selectionCounts } = useTUIState(plugins);
+  const { state, dispatch, componentsTree, previewJSON, selectionCounts, searchQuery, matchCount, totalComponentCount } = useTUIState(plugins);
   const [shouldExit, setShouldExit] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
@@ -40,13 +41,14 @@ function TUIApp({ plugins }: TUIAppProps) {
     outputDir: state.outputDir,
   });
 
-  // Keyboard navigation
-  useKeyboard({
+  // Keyboard navigation with search support
+  const { isSearchMode } = useKeyboard({
     activePanelIndex: state.activePanelIndex,
     cursorPositions: state.cursorPositions,
     pluginsCount: state.plugins.length,
     componentsTree,
     expandedCategories: state.expandedCategories,
+    searchQuery,
     dispatch,
     onSave: handleSave,
     onQuit: () => setShouldExit(true),
@@ -107,11 +109,20 @@ function TUIApp({ plugins }: TUIAppProps) {
   return (
     <Box flexDirection="column" height="100%">
       {/* Header */}
+      {/* Header */}
       <Box marginBottom={1}>
         <Text bold color="cyan">
           Claude Plugin Curator
         </Text>
       </Box>
+
+      {/* Search Box */}
+      <SearchBox
+        searchQuery={searchQuery}
+        matchCount={matchCount}
+        totalCount={totalComponentCount}
+        isActive={isSearchMode}
+      />
 
       {/* Three-panel layout */}
       <Box flexGrow={1}>

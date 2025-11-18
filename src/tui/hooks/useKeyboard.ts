@@ -1,10 +1,11 @@
 /**
  * Keyboard Navigation Hook
  * Implements: docs/spec/003-tui-visual-spec.md (Keyboard Navigation section)
+ * Extended with search functionality
  */
 
 import { useInput } from 'ink';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { TUIAction, ComponentTreeNode } from '../state/types';
 
 interface UseKeyboardProps {
@@ -13,6 +14,7 @@ interface UseKeyboardProps {
   pluginsCount: number;
   componentsTree: ComponentTreeNode[];
   expandedCategories: Set<string>;
+  searchQuery: string;
   dispatch: (action: TUIAction) => void;
   onSave: () => void;
   onQuit: () => void;
@@ -24,10 +26,13 @@ export function useKeyboard({
   pluginsCount,
   componentsTree,
   expandedCategories,
+  searchQuery,
   dispatch,
   onSave,
   onQuit,
 }: UseKeyboardProps) {
+  const [isSearchMode, setIsSearchMode] = useState(false);
+
   // Flatten components tree for cursor navigation
   const flatComponents = useMemo(() => {
     const items: ComponentTreeNode[] = [];
@@ -46,9 +51,56 @@ export function useKeyboard({
   }, [componentsTree, expandedCategories]);
 
   useInput((input, key) => {
+    // Search mode handling
+    if (isSearchMode) {
+      if (key.escape) {
+        // Clear search and exit search mode
+        dispatch({ type: 'SET_SEARCH_QUERY', query: '' });
+        setIsSearchMode(false);
+        return;
+      }
+
+      if (key.return) {
+        // Exit search mode but keep query
+        setIsSearchMode(false);
+        return;
+      }
+
+      if (key.backspace || key.delete) {
+        // Remove last character
+        const newQuery = searchQuery.slice(0, -1);
+        dispatch({ type: 'SET_SEARCH_QUERY', query: newQuery });
+        return;
+      }
+
+      // Add character to search query
+      if (input && !key.ctrl && !key.meta) {
+        const newQuery = searchQuery + input;
+        dispatch({ type: 'SET_SEARCH_QUERY', query: newQuery });
+        return;
+      }
+
+      return;
+    }
+
+    // Normal mode handling
+    // Activate search mode with "/"
+    if (input === '/') {
+      setIsSearchMode(true);
+      return;
+    }
+
+    // Clear search with ESC (when not in search mode)
+    if (key.escape && searchQuery) {
+      dispatch({ type: 'SET_SEARCH_QUERY', query: '' });
+      return;
+    }
+
     // Quit keys
-    if (input === 'q' || input === 'Q' || key.escape) {
-      onQuit();
+    if (input === 'q' || input === 'Q') {
+      if (!searchQuery) {
+        onQuit();
+      }
       return;
     }
 
@@ -136,4 +188,6 @@ export function useKeyboard({
       }
     }
   });
+
+  return { isSearchMode };
 }

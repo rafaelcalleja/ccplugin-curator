@@ -28,6 +28,7 @@ interface FieldState {
   isValid: boolean;
   error?: string;
   helpText: string;
+  errorMessage?: string;
 }
 
 export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({
@@ -82,27 +83,80 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({
 
   const requiredFields = [0, 1, 2]; // Indices of required fields
 
-  // Validation functions
-  const validateMarketplaceName = (value: string): boolean => {
-    return /^[a-z0-9-]{3,50}$/.test(value);
+  // Validation functions with detailed error messages
+  const validateMarketplaceName = (value: string): { isValid: boolean; errorMessage?: string } => {
+    if (value.length === 0) {
+      return { isValid: false };
+    }
+    if (value.length < 3) {
+      return { isValid: false, errorMessage: '✗ Too short (minimum 3 characters). Try: personal-tools' };
+    }
+    if (value.length > 50) {
+      return { isValid: false, errorMessage: '✗ Too long (maximum 50 characters)' };
+    }
+    if (!/^[a-z0-9-]+$/.test(value)) {
+      const hasUppercase = /[A-Z]/.test(value);
+      const hasSpaces = /\s/.test(value);
+      const hasSpecial = /[^a-z0-9-]/.test(value);
+
+      if (hasUppercase) {
+        return { isValid: false, errorMessage: '✗ No uppercase letters allowed. Try: ' + value.toLowerCase() };
+      }
+      if (hasSpaces) {
+        return { isValid: false, errorMessage: '✗ No spaces allowed. Try: ' + value.replace(/\s+/g, '-') };
+      }
+      if (hasSpecial) {
+        return { isValid: false, errorMessage: '✗ Only lowercase, numbers, and hyphens allowed. Try: my-plugin' };
+      }
+    }
+    return { isValid: true };
   };
 
-  const validatePluginName = (value: string): boolean => {
-    return value.length >= 3 && value.length <= 100;
+  const validatePluginName = (value: string): { isValid: boolean; errorMessage?: string } => {
+    if (value.length === 0) {
+      return { isValid: false };
+    }
+    if (value.length < 3) {
+      return { isValid: false, errorMessage: '✗ Too short (minimum 3 characters). Try: My Awesome Plugin' };
+    }
+    if (value.length > 100) {
+      return { isValid: false, errorMessage: '✗ Too long (maximum 100 characters)' };
+    }
+    return { isValid: true };
   };
 
-  const validateDirectory = (value: string): boolean => {
+  const validateDirectory = (value: string): { isValid: boolean; errorMessage?: string } => {
+    if (value.length === 0) {
+      return { isValid: false };
+    }
     try {
       const expandedPath = value.replace(/^~/, process.env.HOME || '~');
-      return fs.existsSync(expandedPath);
-    } catch {
-      return false;
+      if (!fs.existsSync(expandedPath)) {
+        return { isValid: false, errorMessage: '✗ Directory does not exist. Check the path and try again' };
+      }
+      const stats = fs.statSync(expandedPath);
+      if (!stats.isDirectory()) {
+        return { isValid: false, errorMessage: '✗ Path exists but is not a directory' };
+      }
+      return { isValid: true };
+    } catch (error) {
+      return { isValid: false, errorMessage: '✗ Cannot access directory. Check permissions' };
     }
   };
 
-  const validateEmail = (value: string): boolean => {
-    if (value === '') return true; // Optional field
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  const validateEmail = (value: string): { isValid: boolean; errorMessage?: string } => {
+    if (value === '') return { isValid: true }; // Optional field
+
+    if (!value.includes('@')) {
+      return { isValid: false, errorMessage: '✗ Missing @ symbol. Try: you@example.com' };
+    }
+    if (!value.includes('.')) {
+      return { isValid: false, errorMessage: '✗ Missing domain. Try: you@example.com' };
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      return { isValid: false, errorMessage: '✗ Invalid email format. Try: you@example.com' };
+    }
+    return { isValid: true };
   };
 
   // Scan plugins in directory
@@ -134,19 +188,27 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({
 
     // Validate based on field type
     switch (index) {
-      case 0: // Marketplace Name
-        newFields[index].isValid = validateMarketplaceName(value);
+      case 0: { // Marketplace Name
+        const result = validateMarketplaceName(value);
+        newFields[index].isValid = result.isValid;
+        newFields[index].errorMessage = result.errorMessage;
         // Auto-fill output directory
         if (newFields[index].isValid && newFields[3].value === '') {
           newFields[3].value = `./output/${value}`;
           newFields[3].isValid = true;
         }
         break;
-      case 1: // Plugin Name
-        newFields[index].isValid = validatePluginName(value);
+      }
+      case 1: { // Plugin Name
+        const result = validatePluginName(value);
+        newFields[index].isValid = result.isValid;
+        newFields[index].errorMessage = result.errorMessage;
         break;
-      case 2: // Source Directory
-        newFields[index].isValid = validateDirectory(value);
+      }
+      case 2: { // Source Directory
+        const result = validateDirectory(value);
+        newFields[index].isValid = result.isValid;
+        newFields[index].errorMessage = result.errorMessage;
         if (newFields[index].isValid) {
           scanPlugins(value);
         } else {
@@ -154,12 +216,17 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({
           setPluginNames([]);
         }
         break;
+      }
       case 3: // Output Directory (optional)
         newFields[index].isValid = true;
+        newFields[index].errorMessage = undefined;
         break;
-      case 4: // Author Email (optional)
-        newFields[index].isValid = validateEmail(value);
+      case 4: { // Author Email (optional)
+        const result = validateEmail(value);
+        newFields[index].isValid = result.isValid;
+        newFields[index].errorMessage = result.errorMessage;
         break;
+      }
     }
 
     setFields(newFields);
@@ -260,15 +327,25 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({
                 </Text>
               )}
             </Box>
-            <Text dimColor>{fields[fieldIndex].helpText}</Text>
+            {/* Show error message or help text */}
+            {fields[fieldIndex].value && !fields[fieldIndex].isValid && fields[fieldIndex].errorMessage ? (
+              <Text color="red">{fields[fieldIndex].errorMessage}</Text>
+            ) : (
+              <Text dimColor>{fields[fieldIndex].helpText}</Text>
+            )}
 
             {/* Show plugin scan results for source directory */}
-            {fieldIndex === 2 && pluginCount !== null && (
+            {fieldIndex === 2 && pluginCount !== null && fields[fieldIndex].isValid && (
               <Text color="cyan">
                 → Scanning... Found {pluginCount} plugin
                 {pluginCount !== 1 ? 's' : ''}{' '}
                 {pluginNames.length > 0 && `(${pluginNames.join(', ')})`}
               </Text>
+            )}
+
+            {/* Show error if no plugins found */}
+            {fieldIndex === 2 && pluginCount === 0 && fields[fieldIndex].isValid && (
+              <Text color="red">✗ No plugins found in directory</Text>
             )}
           </Box>
         ))}
@@ -312,13 +389,18 @@ export const ConfigurationForm: React.FC<ConfigurationFormProps> = ({
                 </Text>
               )}
             </Box>
-            <Text dimColor>
-              {fieldIndex === 3 &&
-              fields[0].isValid &&
-              fields[3].value.includes(fields[0].value)
-                ? 'Where to save the curated plugin (auto-filled from marketplace name)'
-                : fields[fieldIndex].helpText}
-            </Text>
+            {/* Show error message or help text for optional fields */}
+            {fields[fieldIndex].value && !fields[fieldIndex].isValid && fields[fieldIndex].errorMessage ? (
+              <Text color="red">{fields[fieldIndex].errorMessage}</Text>
+            ) : (
+              <Text dimColor>
+                {fieldIndex === 3 &&
+                fields[0].isValid &&
+                fields[3].value.includes(fields[0].value)
+                  ? 'Where to save the curated plugin (auto-filled from marketplace name)'
+                  : fields[fieldIndex].helpText}
+              </Text>
+            )}
           </Box>
         ))}
       </Box>

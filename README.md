@@ -16,6 +16,9 @@ Claude Code Plugin Curator helps you create custom plugin combinations by select
 - ✅ **Multi-Plugin Support**: Merge components from multiple plugins
 - ✅ **Dual Output**: Generates both official and normalized plugin formats
 - ✅ **Full Validation**: Ensures output conforms to Claude Code plugin spec
+- ✅ **Search/Filter**: Fuzzy search to quickly find components
+- ✅ **Performance Optimized**: Efficient rendering for large plugin collections
+- ✅ **Enhanced Validation**: Detailed error messages with examples
 
 ## Installation
 
@@ -66,14 +69,21 @@ node dist/cli/index.js select ./my-plugins
 - `←` `→` / `TAB` - Switch panels
 - `ENTER` - Expand/collapse categories
 
+**Search/Filter:**
+- `/` - Activate search mode (fuzzy matching)
+- Type to filter components
+- `ESC` - Clear search / Exit search mode
+- `ENTER` - Exit search mode (keep filter)
+
 **Selection:**
 - `SPACE` - Toggle component selection
-- `A` - Select all components
+- `A` - Select all components (visible or all)
 - `N` - Deselect all components
 
 **Actions:**
 - `S` - Save selection
-- `Q` / `ESC` - Quit
+- `Q` - Quit (only when search is empty)
+- `ESC` - Quit (when not in search mode)
 - `Y` / `N` - Confirm overwrite prompt
 
 ### TUI Panels
