@@ -142,8 +142,6 @@ program
     }
   });
 
-program.parse();
-
 // Interactive mode - launch setup flow when no command provided
 if (process.argv.length === 2) {
   // No arguments provided, launch interactive mode
@@ -163,4 +161,7 @@ if (process.argv.length === 2) {
       process.exit(1);
     }
   })();
+} else {
+  // Parse commands if arguments provided
+  program.parse();
 }
