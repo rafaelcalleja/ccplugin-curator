@@ -2,7 +2,7 @@
 
 > 🎨 Interactive TUI for curating and combining Claude Code plugin components
 
-[![Tests](https://img.shields.io/badge/tests-161%20passing-brightgreen)](tests/)
+[![Tests](https://img.shields.io/badge/tests-165%20passing-brightgreen)](tests/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -94,13 +94,33 @@ npm link
 ccplugin-curator select <plugin-folder> [options]
 ```
 
-### Options
+### Interactive Mode
+
+Run without arguments to launch the interactive setup wizard:
+
+```bash
+ccplugin-curator
+```
+
+The wizard will guide you through:
+1. **Main Menu** - Choose to create a new curated plugin or exit
+2. **Configuration Form** - Configure your plugin with validation:
+   - Marketplace Name (required, lowercase letters/numbers/hyphens)
+   - Plugin Name (required)
+   - Source Directory (required, automatically scans for plugins)
+   - Output Directory (optional, auto-fills from marketplace name)
+   - Author Email (optional)
+3. **Component Selection** - Interactive TUI for selecting components
+
+### Direct Mode Options
 
 | Option | Alias | Description | Default |
 |--------|-------|-------------|---------|
 | `--output <dir>` | `-o` | Output directory | `./output/curated-plugin` |
 | `--name <name>` | `-n` | Plugin name | `curated-plugin` |
 | `--overwrite` | - | Overwrite if exists | `false` |
+| `--owner-name <name>` | - | Owner name for marketplace.json | - |
+| `--owner-email <email>` | - | Owner email for marketplace.json | - |
 
 ### Examples
 
@@ -351,6 +371,44 @@ ccplugin-curator select ./my-plugins -n my-tools
 
 # ✅ Your curated plugin is now active!
 ```
+
+## 🔧 Troubleshooting
+
+### Interactive Mode Issues
+
+**Problem**: "Directory does not exist" error in configuration form
+- **Solution**: Verify the path is correct and the directory exists on your system
+- Use absolute paths if relative paths aren't working
+- Check file permissions
+
+**Problem**: "No valid plugins found" after entering directory
+- **Solution**: Ensure each plugin has a `.claude-plugin/plugin.json` file
+- Check that the directory structure is correct
+- Verify plugin.json files are valid JSON
+
+**Problem**: Field validation fails unexpectedly
+- **Solution**: Check field requirements:
+  - Marketplace Name: lowercase letters, numbers, hyphens only (3-50 chars)
+  - Plugin Name: lowercase letters, numbers, hyphens only (3-50 chars)
+  - Email: valid email format (optional)
+
+### General Issues
+
+**Problem**: "Output directory already exists" error
+- **Solution**: Use `--overwrite` flag or choose a different output directory
+
+**Problem**: Curated plugin won't install in Claude Code
+- **Solution**:
+  - Verify marketplace.json exists in output directory
+  - Check that plugin.json is valid
+  - Ensure all referenced files exist
+  - Try validating with JSON schema
+
+**Problem**: Hook scripts not executing
+- **Solution**:
+  - Verify hook scripts have executable permissions (755)
+  - Check that paths use `${CLAUDE_PLUGIN_ROOT}` variable
+  - Ensure scripts are in the hooks/ directory
 
 ## 🛠️ Development
 

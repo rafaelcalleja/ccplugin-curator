@@ -1,0 +1,24 @@
+{
+  "SessionStart": [
+    {
+      "hooks": [
+        { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/setup-env.sh" },
+        { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/init-workspace.sh" }
+      ]
+    }
+  ],
+  "PostToolUse": [
+    {
+      "matcher": "Bash",
+      "hooks": [
+        { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/security-check.sh" }
+      ]
+    },
+    {
+      "matcher": "Write",
+      "hooks": [
+        { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/cleanup.sh" }
+      ]
+    }
+  ]
+}

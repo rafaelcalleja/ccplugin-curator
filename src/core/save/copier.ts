@@ -151,13 +151,17 @@ export function isLocalScriptPath(command: string): boolean {
  *
  * For simple paths, returns the whole command.
  * For commands with arguments, extracts just the script path.
+ * Handles ${CLAUDE_PLUGIN_ROOT} variable.
  *
  * @param command - Hook command string
  * @returns Extracted script path (relative)
  */
 export function extractScriptPath(command: string): string {
+  // Remove ${CLAUDE_PLUGIN_ROOT}/ prefix
+  let normalized = command.replace(/^\$\{CLAUDE_PLUGIN_ROOT\}\//, '');
+
   // Remove leading "./"
-  const normalized = command.replace(/^\.\//, '');
+  normalized = normalized.replace(/^\.\//, '');
 
   // Extract just the script path (before any arguments)
   const match = normalized.match(/^([^\s]+)/);
