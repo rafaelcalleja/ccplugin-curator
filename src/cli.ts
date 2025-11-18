@@ -4,7 +4,7 @@ import { render } from 'ink';
 import React from 'react';
 import fs from 'fs/promises';
 import path from 'path';
-import { App } from './components/App.js';
+import { Setup } from './components/Setup.js';
 import { normalizePlugin } from './lib/normalize.js';
 import type { NormalizedPluginInternalFormat } from './types/normalized.js';
 import type { ClaudeCodePluginOfficialFormat } from './types/plugin.js';
@@ -29,8 +29,8 @@ program
         process.exit(1);
       }
 
-      // Render TUI
-      render(React.createElement(App, {
+      // Render TUI in direct mode (skip setup screens)
+      render(React.createElement(Setup, {
         plugins,
         outputDir: options.output,
       }));
@@ -40,7 +40,18 @@ program
     }
   });
 
+// Interactive mode: no command provided
+program.action(() => {
+  // Render Setup component (shows Main Menu first)
+  render(React.createElement(Setup, {}));
+});
+
 program.parse(process.argv);
+
+// If no arguments provided, run interactive mode
+if (process.argv.length === 2) {
+  render(React.createElement(Setup, {}));
+}
 
 /**
  * Load all plugins from directory
