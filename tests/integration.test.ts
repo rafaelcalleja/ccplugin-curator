@@ -22,11 +22,11 @@ describe('Integration Tests', () => {
     expect(normalized.name).toBe('test-plugin');
     expect(normalized.version).toBe('1.2.3');
     expect(normalized.description).toBe('Comprehensive test plugin');
-    expect(normalized.commands.length).toBeGreaterThan(0);
-    expect(normalized.agents.length).toBeGreaterThan(0);
-    expect(normalized.skills.length).toBeGreaterThan(0);
-    expect(normalized.hooks.length).toBeGreaterThan(0);
-    expect(normalized.mcps.length).toBeGreaterThan(0);
+    expect(normalized.commands.length).toBe(3);
+    expect(normalized.agents.length).toBe(2);
+    expect(normalized.skills.length).toBe(3);
+    expect(normalized.hooks.length).toBe(4);
+    expect(normalized.mcps.length).toBe(3);
   });
 
   test('should validate normalized format', async () => {
@@ -58,11 +58,16 @@ describe('Integration Tests', () => {
     const normalized = await normalizePlugin(pluginJson, fixtureDir);
 
     const sessionStartHooks = normalized.hooks.filter(h => h.event === 'SessionStart');
-    expect(sessionStartHooks.length).toBeGreaterThan(0);
+    expect(sessionStartHooks.length).toBe(2);
 
     const postToolUseHooks = normalized.hooks.filter(h => h.event === 'PostToolUse');
-    expect(postToolUseHooks.length).toBeGreaterThan(0);
-    expect(postToolUseHooks[0].matcher).toBe('Write|Edit');
+    expect(postToolUseHooks.length).toBe(2);
+
+    // Verify specific matchers
+    const bashMatcher = postToolUseHooks.find(h => h.matcher === 'Bash');
+    const writeMatcher = postToolUseHooks.find(h => h.matcher === 'Write');
+    expect(bashMatcher).toBeDefined();
+    expect(writeMatcher).toBeDefined();
   });
 
   test('should normalize MCPs correctly', async () => {

@@ -5,18 +5,31 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/setup-env.sh"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/setup-env.sh"
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/init-workspace.sh"
           }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "/format.sh"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/security-check.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/cleanup.sh"
           }
         ]
       }
