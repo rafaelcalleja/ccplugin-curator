@@ -2,6 +2,7 @@
  * Main TUI Application
  * Implements: docs/spec/003-tui-visual-spec.md
  * Implements: docs/spec/004-user-workflows.md
+ * Implements: docs/spec/009-tui-setup-screens.md
  */
 
 import React, { useState, useEffect } from 'react';
@@ -13,6 +14,9 @@ import { useSave } from './hooks/useSave';
 import { PluginsPanel } from './components/PluginsPanel';
 import { ComponentsPanel } from './components/ComponentsPanel';
 import { PreviewPanel } from './components/PreviewPanel';
+import { MainMenu } from './screens/MainMenu';
+import { ConfigurationForm, type FormData } from './screens/ConfigurationForm';
+import { useSetupState } from './state/useSetupState';
 
 interface TUIAppProps {
   plugins: NormalizedPlugin[];
@@ -154,8 +158,76 @@ function TUIApp({ plugins }: TUIAppProps) {
 }
 
 /**
- * Launch TUI with plugins
+ * TUI App with Setup Flow
+ * Handles Main Menu → Configuration Form → Component Selection
+ */
+interface TUIAppWithSetupProps {
+  initialPlugins?: NormalizedPlugin[];
+  initialFormData?: FormData;
+  skipSetup?: boolean;
+}
+
+function TUIAppWithSetup({ initialPlugins, initialFormData, skipSetup = false }: TUIAppWithSetupProps) {
+  const { state: setupState, showMainMenu, showConfigurationForm, showComponentSelection, goBack } = useSetupState(
+    skipSetup ? 'component-selection' : 'main-menu'
+  );
+
+  const [plugins, setPlugins] = useState<NormalizedPlugin[]>(initialPlugins || []);
+  const [formData, setFormData] = useState<FormData | null>(initialFormData || null);
+
+  // Handle screen transitions
+  const handleCreatePlugin = () => {
+    showConfigurationForm();
+  };
+
+  const handleExit = () => {
+    process.exit(0);
+  };
+
+  const handleFormSubmit = async (data: FormData) => {
+    setFormData(data);
+    // Scan plugins from source directory
+    const { scanPlugins } = await import('../cli/index');
+    const scannedPlugins = await scanPlugins(data.sourceDirectory);
+    setPlugins(scannedPlugins);
+    showComponentSelection(data);
+  };
+
+  const handleFormCancel = () => {
+    goBack();
+  };
+
+  // Render current screen
+  if (setupState.currentScreen === 'main-menu') {
+    return <MainMenu onCreatePlugin={handleCreatePlugin} onExit={handleExit} />;
+  }
+
+  if (setupState.currentScreen === 'configuration-form') {
+    return <ConfigurationForm onSubmit={handleFormSubmit} onCancel={handleFormCancel} />;
+  }
+
+  if (setupState.currentScreen === 'component-selection' && plugins.length > 0) {
+    return <TUIApp plugins={plugins} />;
+  }
+
+  // Fallback
+  return (
+    <Box flexDirection="column" justifyContent="center" alignItems="center" height="100%">
+      <Text>Loading...</Text>
+    </Box>
+  );
+}
+
+/**
+ * Launch TUI with plugins (direct mode - skips setup)
  */
 export async function launchTUI(plugins: NormalizedPlugin[]): Promise<void> {
-  render(<TUIApp plugins={plugins} />);
+  render(<TUIAppWithSetup initialPlugins={plugins} skipSetup={true} />);
+}
+
+/**
+ * Launch TUI in interactive mode (with setup screens)
+ */
+export async function launchInteractiveTUI(): Promise<void> {
+  render(<TUIAppWithSetup />);
 }

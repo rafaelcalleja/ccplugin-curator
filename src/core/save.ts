@@ -163,6 +163,9 @@ async function copyComponents(
     );
     copyDirectory(srcPath, destPath);
   }
+
+  // Copy hook scripts with executable permissions
+  await copyHookScripts(selection, outputDir, sourceMappings);
 }
 
 /**
@@ -257,6 +260,69 @@ function copyDirectory(src: string, dest: string): void {
       fs.copyFileSync(srcPath, destPath);
     }
   }
+}
+
+/**
+ * Copy hook scripts with executable permissions
+ * Implements: docs/spec/007-save-operation-rules.md section 5.1
+ */
+async function copyHookScripts(
+  selection: NormalizedPlugin,
+  outputDir: string,
+  sourceMappings?: Array<{ pluginName: string; sourceDir: string }>
+): Promise<void> {
+  const hooksDir = path.join(outputDir, 'hooks');
+
+  for (const hook of selection.hooks) {
+    // Extract script path from command
+    // Formats: "/script.sh", "${CLAUDE_PLUGIN_ROOT}/hooks/script.sh", "hooks/script.sh"
+    const scriptPath = extractScriptPath(hook.command);
+    if (!scriptPath) continue;
+
+    // Resolve source and destination
+    const { srcPath, destPath } = resolveComponentPaths(
+      selection.source,
+      scriptPath,
+      outputDir,
+      sourceMappings
+    );
+
+    // Copy script file
+    if (fs.existsSync(srcPath)) {
+      copyFile(srcPath, destPath);
+
+      // Set executable permissions (0o755 = rwxr-xr-x)
+      try {
+        fs.chmodSync(destPath, 0o755);
+      } catch (error) {
+        console.warn(`Warning: Could not set executable permission on ${destPath}`);
+      }
+    } else {
+      console.warn(`Warning: Hook script not found: ${srcPath}`);
+    }
+  }
+}
+
+/**
+ * Extract script file path from hook command
+ * Handles various formats:
+ * - "${CLAUDE_PLUGIN_ROOT}/hooks/script.sh" → "hooks/script.sh"
+ * - "/hooks/script.sh" → "hooks/script.sh"
+ * - "hooks/script.sh" → "hooks/script.sh"
+ */
+function extractScriptPath(command: string): string | null {
+  // Remove ${CLAUDE_PLUGIN_ROOT} if present
+  let scriptPath = command.replace(/\$\{CLAUDE_PLUGIN_ROOT\}[\\/]?/, '');
+
+  // Remove leading slash
+  scriptPath = scriptPath.replace(/^\/+/, '');
+
+  // Check if it's a valid script path (has extension)
+  if (scriptPath && /\.(sh|bash|js|ts|py)$/i.test(scriptPath)) {
+    return scriptPath;
+  }
+
+  return null;
 }
 
 /**

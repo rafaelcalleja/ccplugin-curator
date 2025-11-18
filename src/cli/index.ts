@@ -16,9 +16,10 @@ import type { NormalizedPlugin } from '../types/normalized';
 async function main() {
   const args = process.argv.slice(2);
 
+  // Interactive mode (no arguments) - Show setup screens
   if (args.length === 0) {
-    console.log('Usage: ccplugin-curator select <plugin-folder>');
-    process.exit(1);
+    await interactiveMode();
+    return;
   }
 
   const command = args[0];
@@ -28,6 +29,7 @@ async function main() {
     if (!pluginFolder) {
       console.error('Error: Plugin folder required');
       console.log('Usage: ccplugin-curator select <plugin-folder>');
+      console.log('Or run without arguments for interactive mode');
       process.exit(1);
     }
 
@@ -35,8 +37,19 @@ async function main() {
   } else {
     console.error(`Unknown command: ${command}`);
     console.log('Available commands: select');
+    console.log('Or run without arguments for interactive mode');
     process.exit(1);
   }
+}
+
+/**
+ * Interactive mode: Launch TUI with setup screens
+ */
+async function interactiveMode() {
+  console.log('Starting Claude Plugin Curator in interactive mode...\n');
+
+  const { launchInteractiveTUI } = await import('../tui/app');
+  await launchInteractiveTUI();
 }
 
 /**
@@ -74,8 +87,9 @@ async function selectCommand(pluginFolder: string) {
 
 /**
  * Scan for plugins in a directory
+ * Exported for use in TUI setup flow
  */
-async function scanPlugins(dir: string): Promise<NormalizedPlugin[]> {
+export async function scanPlugins(dir: string): Promise<NormalizedPlugin[]> {
   const plugins: NormalizedPlugin[] = [];
 
   // Check if dir itself is a plugin
