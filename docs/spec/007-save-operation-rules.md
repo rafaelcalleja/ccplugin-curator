@@ -131,6 +131,12 @@ fs.copyFile(sourceFile, destFile);
 
 // Skills: copy directories
 fs.cp(sourceDir, destDir, { recursive: true });
+
+// Hook scripts: copy script files + set executable permissions
+for (const scriptPath of hookScriptFiles) {
+  fs.copyFile(scriptPath, destScriptPath);
+  fs.chmod(destScriptPath, 0o755); // Required by Claude Code
+}
 ```
 
 ### 5.2 Write Output Files
@@ -235,7 +241,7 @@ IF plugin-a has Hook(event: "SessionStart", command: "/setup-a.sh")
 AND plugin-b has Hook(event: "SessionStart", command: "/setup-b.sh")
 AND both selected
 
-THEN merge into same event array (already supported by 006-reverse-transformation-rules.md):
+THEN merge into same event array:
   "hooks": {
     "SessionStart": [
       {
@@ -251,6 +257,30 @@ THEN merge into same event array (already supported by 006-reverse-transformatio
 **Order**: Preserve selection order from TUI.
 
 **No conflicts** - this is valid Claude Code behavior (multiple hooks per event).
+
+**Hook Script Files**: Must be copied and namespaced if from different plugins:
+
+```
+IF plugin-a has Hook(command: "/hooks/setup.sh")
+AND plugin-b has Hook(command: "/hooks/setup.sh")
+AND both selected
+
+THEN copy with namespace prefix:
+  - Copy plugin-a/hooks/setup.sh → curated-plugin/hooks/plugin-a--setup.sh
+  - Copy plugin-b/hooks/setup.sh → curated-plugin/hooks/plugin-b--setup.sh
+
+AND in plugin.json:
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/plugin-a--setup.sh" },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/plugin-b--setup.sh" }
+        ]
+      }
+    ]
+  }
+```
 
 ---
 
