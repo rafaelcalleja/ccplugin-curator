@@ -88,7 +88,7 @@ The curator converts all plugins to this consistent format:
 interface Hook {
   event: string;           // Extracted from hooks.json event key
   type: "command";         // Only "command" is supported
-  command: string;         // command path
+  command: string;         // Command path (may reference script files via ${CLAUDE_PLUGIN_ROOT})
   matcher?: string;        // Optional tool matcher
   timeout?: number;        // Optional timeout in seconds
   [key: string]: any;      // Preserve additional fields
@@ -124,7 +124,8 @@ my-plugin/
 │   └── skill-b/
 │       └── SKILL.md
 ├── hooks/
-│   └── hooks.json           ← Hook configurations
+│   ├── hooks.json           ← Hook configurations
+│   └── setup.sh             ← Hook script file (executable)
 └── .mcp.json                ← MCP server definitions
 ```
 

@@ -1,128 +1,75 @@
-# EXECUTE: Spec-Driven Implementation Protocol
+# Project Implementation Review and Task Management
 
-**INSTRUCTION**: Implement 100% of `docs/spec/` and `docs/decisions/`
+You are a technical project manager reviewing implementation progress against specifications and design decisions.
 
----
+## Your Task
 
-## 🎯 Success Criteria
+Perform a comprehensive review of the project changes and create a detailed implementation checklist.
 
-✅ Checklist generated from `docs/` is 100% complete
-✅ All items marked as done
-✅ Application runs without errors
+## Step-by-Step Instructions
 
----
+**Step 1: Analyze Documentation**
+- Review all files in `@docs/spec` to understand the project specifications and requirements
+- Review all files in `@docs/decisions` to understand architectural and design decisions
+- Identify all features, components, and requirements defined in these documents
 
-## Phase 1: Generate Checklist
+**Step 2: Compare Current Implementation**
+- Examine the current codebase and recent changes
+- Compare the actual implementation against the specifications and decisions
+- Note any discrepancies, missing features, or incomplete implementations
 
-**EXECUTE**:
+**Step 3: Create Implementation Checklist**
 
-```bash
-ultrathink --seq @docs/spec @docs/decisions
+Generate a structured checklist in the following format:
+
+```markdown
+## ✅ Completed Items
+- [x] [Feature/Component Name]: Brief description of what was implemented
+  - Implementation details or location in codebase
+  - Relevant spec reference
+
+## ⏳ Pending Items
+- [ ] [Feature/Component Name]: Brief description of what needs to be implemented
+  - Reason for pending status (if known)
+  - Relevant spec reference
+  - Priority level (High/Medium/Low)
+
+## 🔄 Partially Implemented
+- [~] [Feature/Component Name]: Description of current state
+  - What's completed
+  - What's remaining
+  - Relevant spec reference
 ```
 
-**This command**:
-- Reads all files in `docs/spec/` and `docs/decisions/`
-- Generates a checklist of completed vs pending items
-- Shows what is already done
-- Shows what needs to be implemented
+**Step 4: Identify All Differences**
 
-**Output**: A checklist with items marked as ✅ (done) or ❌ (pending)
+Create a comprehensive list of differences between the specification and current implementation:
+- Missing features not yet implemented
+- Features implemented differently than specified
+- Additional features implemented beyond the spec
+- Design decisions not yet applied
 
----
+**Step 5: Generate Implementation Plan**
 
-## Phase 2: Review Checklist
+For each pending or partially implemented item:
+1. Describe what needs to be added or modified
+2. Specify which files or components need changes
+3. Note any dependencies or prerequisites
+4. Suggest implementation approach aligned with existing design decisions
 
-**CHECK**: Look at the checklist generated in Phase 1.
+## Output Format
 
-**Questions**:
-- Are ALL items marked as ✅ (done)?
-- Are there any ❌ (pending) items?
-- Are there any ⚠️ (incomplete) items?
+Provide your response in the following sections:
 
-**If YES (there are pending/incomplete items) → Go to Phase 3**
+1. **Executive Summary**: Brief overview of implementation status (% complete, major gaps)
+2. **Detailed Checklist**: Complete checklist as specified in Step 3
+3. **Differences Analysis**: Comprehensive list from Step 4
+4. **Implementation Plan**: Actionable next steps from Step 5
 
-**If NO (all items are ✅) → Go to Phase 4**
+## Important Notes
 
----
-
-## Phase 3: Complete Pending Items
-
-**EXECUTE**: For each pending item in the checklist:
-
-1. Read the spec/decision file that corresponds to that item
-2. Understand what needs to be implemented
-3. Implement it (write code, tests, config, etc.)
-4. Verify it works (run tests, build, etc.)
-5. Mark item as ✅ in the checklist
-
-**Continue until**: All items in checklist are ✅
-
-**Then**: Return to Phase 1 (regenerate checklist to verify)
-
----
-
-## Phase 4: Final Verification
-
-**EXECUTE**: Verify the application works end-to-end.
-
-Run whatever verification the project defines:
-- Test suite (if exists)
-- Build process (if exists)
-- Run application (if runnable)
-- Any other project-specific verification
-
-**CHECK**: Do all verifications pass?
-
-**If NO → Return to Phase 3**
-
-**If YES → DONE - Implementation complete**
-
----
-
-## 🔁 EXECUTION LOOP
-
-```
-START
-  ↓
-Phase 1: Generate checklist
-  ↓
-Phase 2: Review checklist
-  ↓
-All ✅? ──NO──→ Phase 3: Complete pending items ──→ Back to Phase 1
-  ↓
- YES
-  ↓
-Phase 4: Final verification
-  ↓
-Pass? ──NO──→ Phase 3: Fix failures ──→ Back to Phase 1
-  ↓
-YES
-  ↓
-DONE - 100% complete
-```
-
-**DO NOT STOP** until checklist is 100% ✅ and all verifications pass.
-
----
-
-## 📊 Why This Works
-
-1. **Checklist-driven**: Explicit tracking of what's done vs pending
-2. **Self-verifying**: Regenerate checklist after changes to confirm completion
-3. **Content-agnostic**: Works regardless of docs/ content or project structure
-4. **Immutable**: Protocol never changes, only checklist content changes
-5. **Exhaustive**: Loops until 100% of checklist is complete
-
----
-
-## 🚀 START EXECUTION NOW
-
-**BEGIN Phase 1**:
-
-```bash
-ultrathink --seq @docs/spec @docs/decisions
-```
-
-**THEN**: Review the checklist, complete pending items, verify, loop.
-
-**DO NOT STOP** until checklist shows 100% ✅ and all verifications pass.
+- Be thorough and systematic in your review
+- Reference specific files, sections, or line numbers when possible
+- Highlight any conflicts between specifications and design decisions
+- Prioritize items based on dependencies and project impact
+- Use clear, actionable language for pending items

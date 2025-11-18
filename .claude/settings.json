@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/skill-activation.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Before writing or editing any .md file, you MUST activate and use the frontmatter-validator skill to validate gate constraints. Read the file's frontmatter first, then validate your content against all gate_constraints before proceeding."
+          }
+        ]
+      }
+    ]
+  }
+}
