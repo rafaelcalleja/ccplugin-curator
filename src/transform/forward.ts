@@ -45,17 +45,17 @@ export async function transformToNormalized(
   const normalized: NormalizedPluginConfiguration = {
     name: official.name || 'unnamed-plugin',
     source: pluginDir,
-    version: '0.0.0',
-    description: '',
+    version: official.version || '0.0.0',
+    description: official.description || '',
     author: {
-      name: '',
-      email: '',
-      url: ''
+      name: official.author?.name || '',
+      email: official.author?.email || '',
+      url: official.author?.url || ''
     },
-    homepage: '',
-    repository: '',
-    license: '',
-    keywords: [],
+    homepage: official.homepage || '',
+    repository: official.repository || '',
+    license: official.license || '',
+    keywords: official.keywords || [],
     commands,
     agents,
     skills,

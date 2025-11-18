@@ -36,6 +36,7 @@ export const App: React.FC<AppProps> = ({ plugins, outputName, onSave }) => {
   const [cursorIndex, setCursorIndex] = useState(0);
   const [selectionState] = useState(() => new SelectionState(plugins));
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [, forceUpdate] = useState({});
 
   const activePlugin = plugins[activePluginIndex];
@@ -143,16 +144,21 @@ export const App: React.FC<AppProps> = ({ plugins, outputName, onSave }) => {
     },
     onSave: async () => {
       if (selectionState.getCount() === 0) {
-        return; // Nothing to save
+        setError('No components selected. Select at least one component to save.');
+        setTimeout(() => setError(null), 3000);
+        return;
       }
 
       setSaving(true);
+      setError(null);
       try {
         await onSave(selectionState);
         exit();
-      } catch (error) {
-        console.error('Save failed:', error);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error occurred';
+        setError(`Save failed: ${message}`);
         setSaving(false);
+        setTimeout(() => setError(null), 5000);
       }
     },
     onQuit: () => {
@@ -168,6 +174,20 @@ export const App: React.FC<AppProps> = ({ plugins, outputName, onSave }) => {
     );
   }
 
+  // Handle empty plugin list
+  if (plugins.length === 0) {
+    return (
+      <Box flexDirection="column" padding={1}>
+        <Text bold color="red">
+          Error: No plugins loaded
+        </Text>
+        <Text dimColor>Please provide valid plugin directories</Text>
+        <Text> </Text>
+        <Text dimColor>Press Q to quit</Text>
+      </Box>
+    );
+  }
+
   return (
     <Box flexDirection="column" padding={1}>
       <Text bold color="cyan">
@@ -175,6 +195,16 @@ export const App: React.FC<AppProps> = ({ plugins, outputName, onSave }) => {
       </Text>
       <Text dimColor>Select components from multiple plugins to create a curated plugin</Text>
       <Text> </Text>
+
+      {/* Error Message */}
+      {error && (
+        <>
+          <Box borderStyle="round" borderColor="red" padding={1}>
+            <Text color="red" bold>⚠ {error}</Text>
+          </Box>
+          <Text> </Text>
+        </>
+      )}
 
       <Box flexDirection="row" height={30}>
         {/* Left: Plugins Panel */}
@@ -198,7 +228,13 @@ export const App: React.FC<AppProps> = ({ plugins, outputName, onSave }) => {
       </Box>
 
       <Text> </Text>
-      <Text dimColor>Tab: Switch Plugin | ↑/↓: Navigate | Space: Select | S: Save | Q: Quit</Text>
+      {/* Status Bar */}
+      <Box flexDirection="row" justifyContent="space-between">
+        <Text dimColor>Tab: Switch Plugin | ↑/↓: Navigate | Space: Select | S: Save | Q: Quit</Text>
+        <Text color="cyan">
+          {selectionState.getCount()} component{selectionState.getCount() !== 1 ? 's' : ''} selected
+        </Text>
+      </Box>
     </Box>
   );
 };

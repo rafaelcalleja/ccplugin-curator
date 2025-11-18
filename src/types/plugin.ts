@@ -14,6 +14,39 @@ export interface ClaudeCodePluginConfiguration {
    */
   name?: string;
   /**
+   * Plugin version (semver format)
+   */
+  version?: string;
+  /**
+   * Plugin description
+   */
+  description?: string;
+  /**
+   * Plugin author information
+   */
+  author?: {
+    name?: string;
+    email?: string;
+    url?: string;
+    [k: string]: unknown;
+  };
+  /**
+   * Plugin homepage URL
+   */
+  homepage?: string;
+  /**
+   * Plugin repository URL
+   */
+  repository?: string;
+  /**
+   * Plugin license (SPDX identifier)
+   */
+  license?: string;
+  /**
+   * Plugin keywords for search/discovery
+   */
+  keywords?: string[];
+  /**
    * Command files. Default: './commands/** /*.md' glob
    */
   commands?: string | string[];

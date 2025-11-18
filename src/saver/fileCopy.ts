@@ -68,11 +68,15 @@ async function copySingleFile(
   sourcePlugins: Map<string, NormalizedPluginConfiguration>,
   targetDir: string
 ): Promise<void> {
+  // Strip namespace prefix if present (format: pluginname--filename)
+  // Example: commands/test-plugin-a--build.md → commands/build.md
+  const originalPath = stripNamespacePrefix(relativePath);
+
   // Find source plugin that contains this file
   let sourcePath: string | null = null;
 
   for (const plugin of sourcePlugins.values()) {
-    const possiblePath = path.join(plugin.source, relativePath);
+    const possiblePath = path.join(plugin.source, originalPath);
     try {
       await fs.access(possiblePath);
       sourcePath = possiblePath;
@@ -83,11 +87,11 @@ async function copySingleFile(
   }
 
   if (!sourcePath) {
-    console.warn(`Warning: Could not find source file for ${relativePath}`);
+    console.warn(`Warning: Could not find source file for ${originalPath} (resolved from ${relativePath})`);
     return;
   }
 
-  // Copy to target
+  // Copy to target with potentially namespaced filename
   const targetPath = path.join(targetDir, relativePath);
   await fs.mkdir(path.dirname(targetPath), { recursive: true });
   await fs.copyFile(sourcePath, targetPath);
@@ -101,11 +105,14 @@ async function copySkillDirectory(
   sourcePlugins: Map<string, NormalizedPluginConfiguration>,
   targetDir: string
 ): Promise<void> {
+  // Strip namespace prefix if present
+  const originalSkillDir = stripNamespacePrefix(skillDir);
+
   // Find source plugin that contains this skill
   let sourceSkillPath: string | null = null;
 
   for (const plugin of sourcePlugins.values()) {
-    const possiblePath = path.join(plugin.source, skillDir);
+    const possiblePath = path.join(plugin.source, originalSkillDir);
     try {
       const stat = await fs.stat(possiblePath);
       if (stat.isDirectory()) {
@@ -118,11 +125,11 @@ async function copySkillDirectory(
   }
 
   if (!sourceSkillPath) {
-    console.warn(`Warning: Could not find source directory for skill ${skillDir}`);
+    console.warn(`Warning: Could not find source directory for skill ${originalSkillDir} (resolved from ${skillDir})`);
     return;
   }
 
-  // Copy directory recursively
+  // Copy directory recursively with potentially namespaced dirname
   const targetPath = path.join(targetDir, skillDir);
   await fs.mkdir(targetPath, { recursive: true });
   await copyDirectoryRecursive(sourceSkillPath, targetPath);
@@ -162,6 +169,36 @@ async function copyHookScript(
 
   // Set executable permissions (chmod +x) per Spec 007 line 138
   await fs.chmod(targetPath, 0o755);
+}
+
+/**
+ * Strip namespace prefix from path
+ *
+ * Examples:
+ * - commands/test-plugin-a--build.md → commands/build.md
+ * - skills/test-plugin-b--chrome-devtools → skills/chrome-devtools
+ * - commands/test.md → commands/test.md (no prefix)
+ *
+ * @param filePath - Path with potential namespace prefix
+ * @returns Path with namespace prefix removed
+ */
+function stripNamespacePrefix(filePath: string): string {
+  const parts = filePath.split('/');
+  const fileName = parts[parts.length - 1];
+  const directory = parts.slice(0, -1);
+
+  // Check if filename has namespace prefix (pluginname--filename)
+  const namespacePrefixMatch = fileName.match(/^[a-z0-9-]+--(.+)$/);
+  if (namespacePrefixMatch) {
+    const originalFileName = namespacePrefixMatch[1];
+    if (directory.length > 0) {
+      return [...directory, originalFileName].join('/');
+    }
+    return originalFileName;
+  }
+
+  // No prefix found, return original
+  return filePath;
 }
 
 /**

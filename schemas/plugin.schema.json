@@ -9,6 +9,48 @@
       "type": "string",
       "description": "Plugin name. Default: directory basename"
     },
+    "version": {
+      "type": "string",
+      "description": "Plugin version (semver format)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Plugin description"
+    },
+    "author": {
+      "type": "object",
+      "description": "Plugin author information",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "homepage": {
+      "type": "string",
+      "description": "Plugin homepage URL"
+    },
+    "repository": {
+      "type": "string",
+      "description": "Plugin repository URL"
+    },
+    "license": {
+      "type": "string",
+      "description": "Plugin license (SPDX identifier)"
+    },
+    "keywords": {
+      "type": "array",
+      "description": "Plugin keywords for search/discovery",
+      "items": {
+        "type": "string"
+      }
+    },
     "commands": {
       "oneOf": [
         {

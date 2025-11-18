@@ -78,13 +78,22 @@ export async function resolveConflicts(
   }
 
   // Resolve command conflicts
+  const commandOccurrences = new Map<string, number>(); // Track which occurrence of each path
   resolved.commands = merged.commands.map(cmd => {
     const source = commandSources.get(cmd);
     if (source === 'CONFLICT') {
+      // Track occurrence index for this path
+      const currentOccurrence = commandOccurrences.get(cmd) || 0;
+      commandOccurrences.set(cmd, currentOccurrence + 1);
+
       // Find which plugin this specific instance came from
+      let occurrenceIndex = 0;
       for (const [pluginName, plugin] of sourcePlugins) {
         if (plugin.commands.includes(cmd)) {
-          return applyNamespacePrefix(cmd, pluginName);
+          if (occurrenceIndex === currentOccurrence) {
+            return applyNamespacePrefix(cmd, pluginName);
+          }
+          occurrenceIndex++;
         }
       }
     }
@@ -92,12 +101,20 @@ export async function resolveConflicts(
   });
 
   // Resolve agent conflicts
+  const agentOccurrences = new Map<string, number>();
   resolved.agents = merged.agents.map(agent => {
     const source = agentSources.get(agent);
     if (source === 'CONFLICT') {
+      const currentOccurrence = agentOccurrences.get(agent) || 0;
+      agentOccurrences.set(agent, currentOccurrence + 1);
+
+      let occurrenceIndex = 0;
       for (const [pluginName, plugin] of sourcePlugins) {
         if (plugin.agents.includes(agent)) {
-          return applyNamespacePrefix(agent, pluginName);
+          if (occurrenceIndex === currentOccurrence) {
+            return applyNamespacePrefix(agent, pluginName);
+          }
+          occurrenceIndex++;
         }
       }
     }
@@ -105,12 +122,20 @@ export async function resolveConflicts(
   });
 
   // Resolve skill conflicts
+  const skillOccurrences = new Map<string, number>();
   resolved.skills = merged.skills.map(skill => {
     const source = skillSources.get(skill);
     if (source === 'CONFLICT') {
+      const currentOccurrence = skillOccurrences.get(skill) || 0;
+      skillOccurrences.set(skill, currentOccurrence + 1);
+
+      let occurrenceIndex = 0;
       for (const [pluginName, plugin] of sourcePlugins) {
         if (plugin.skills.includes(skill)) {
-          return applyNamespacePrefix(skill, pluginName);
+          if (occurrenceIndex === currentOccurrence) {
+            return applyNamespacePrefix(skill, pluginName);
+          }
+          occurrenceIndex++;
         }
       }
     }
@@ -118,15 +143,23 @@ export async function resolveConflicts(
   });
 
   // Resolve MCP conflicts (apply prefix to name field)
+  const mcpOccurrences = new Map<string, number>();
   resolved.mcps = merged.mcps.map(mcp => {
     const source = mcpSources.get(mcp.name);
     if (source === 'CONFLICT') {
+      const currentOccurrence = mcpOccurrences.get(mcp.name) || 0;
+      mcpOccurrences.set(mcp.name, currentOccurrence + 1);
+
+      let occurrenceIndex = 0;
       for (const [pluginName, plugin] of sourcePlugins) {
         if (plugin.mcps.some(m => m.name === mcp.name)) {
-          return {
-            ...mcp,
-            name: `${pluginName}--${mcp.name}`
-          };
+          if (occurrenceIndex === currentOccurrence) {
+            return {
+              ...mcp,
+              name: `${pluginName}--${mcp.name}`
+            };
+          }
+          occurrenceIndex++;
         }
       }
     }
