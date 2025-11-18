@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mkcurator.io/schemas/document-frontmatter.schema.json",
+  "title": "Document Frontmatter Schema",
+  "description": "Gate constraints that determine if content belongs in this document.",
+
+  "type": "object",
+
+  "properties": {
+    "extends": {
+      "type": "string",
+      "description": "Path to base JSON file to inherit from.",
+      "examples": ["../../schemas/base.json"]
+    },
+
+    "document_covers": {
+      "type": "array",
+      "description": "Topics this document covers. If your content is NOT about these topics, DO NOT write here.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "concepts_and_definitions",
+          "data_structures",
+          "algorithms_and_logic",
+          "validation_and_constraints",
+          "workflows_and_processes",
+          "user_interactions",
+          "api_specifications",
+          "configuration_and_setup",
+          "testing_strategies",
+          "visual_design",
+          "implementation_details",
+          "architectural_decisions"
+        ]
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+
+    "gate_constraints": {
+      "type": "array",
+      "description": "Gate rules that determine if you can write in this document. Check ALL constraints before writing.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "single_responsibility",
+          "no_cross_references",
+          "no_duplicate_definitions",
+          "no_duplicate_behavior",
+          "self_contained_content",
+          "index_document"
+        ]
+      },
+      "uniqueItems": true
+    }
+  },
+
+  "anyOf": [
+    {
+      "required": ["extends"]
+    },
+    {
+      "required": ["gate_constraints"]
+    }
+  ],
+
+  "additionalProperties": false,
+
+  "definitions": {
+    "constraint_definitions": {
+      "description": "Gate constraint definitions. Check these BEFORE writing.",
+
+      "single_responsibility": {
+        "description": "This document covers exactly ONE topic. Before writing, verify your content is about the ONE topic defined in document_covers.",
+        "gate_question": "Is my content about the SINGLE topic this document covers?",
+        "if_no": "Find another document or create a new one"
+      },
+
+      "no_cross_references": {
+        "description": "This document cannot reference other internal documents by ID or filename.",
+        "gate_question": "Does my content need to link to other internal documents?",
+        "if_yes": "Either inline the content OR don't write here"
+      },
+
+      "no_duplicate_definitions": {
+        "description": "This document does not duplicate definitions that exist in schema files or type definitions.",
+        "gate_question": "Am I defining a structure that already exists in a schema/type file?",
+        "if_yes": "Don't write here. Reference the schema instead"
+      },
+
+      "no_duplicate_behavior": {
+        "description": "This document does not duplicate behavior already documented elsewhere.",
+        "gate_question": "Is this behavior/algorithm already documented in another file?",
+        "if_yes": "Don't write here. Content belongs in the original document"
+      },
+
+      "self_contained_content": {
+        "description": "This document must be understandable without reading other documents.",
+        "gate_question": "Can my content be understood without reading other docs?",
+        "if_no": "Either add context inline OR don't write here"
+      },
+
+      "index_document": {
+        "description": "Override: This is an index/README that catalogs other documents. Cross-references allowed.",
+        "replaces": "no_cross_references"
+      }
+    }
+  }
+}

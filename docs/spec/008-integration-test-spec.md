@@ -114,7 +114,146 @@ test-plugin/
 
 ---
 
-## 2. Integration Test (BDD)
+## 2. Setup Screens Tests (BDD)
+
+```gherkin
+Feature: Setup screens workflow
+  As a user
+  I want to configure my curated plugin through interactive screens
+  So that I can proceed to component selection with correct metadata
+
+Scenario: Complete setup flow - Main Menu to Component Selection
+  When I execute "app" without arguments
+  Then Main Menu is displayed with options:
+    | Option                     |
+    | Create New Curated Plugin  |
+    | Exit                       |
+  And cursor is on "Create New Curated Plugin"
+
+  When I press ENTER on "Create New Curated Plugin"
+  Then Configuration Form is displayed with fields:
+    | Field                    | Type     | Placeholder           |
+    | Marketplace Name         | Required | my-marketplace        |
+    | Plugin Name              | Required | My Awesome Plugin     |
+    | Source Plugin Directory  | Required | ~/.claude/plugins     |
+    | Output Directory         | Optional | ./output              |
+    | Author Email             | Optional | you@example.com       |
+  And cursor is on "Marketplace Name"
+  And all fields show placeholders in gray
+
+  When I type "personal-ai-tools" in "Marketplace Name"
+  Then placeholder disappears
+  And field shows checkmark: "✓"
+  And field is validated against pattern: ^[a-z0-9-]+$
+
+  When I navigate to "Plugin Name"
+  And type "My Personal AI Tools"
+  Then field shows checkmark: "✓"
+
+  When I navigate to "Source Plugin Directory"
+  Then default value "~/.claude/plugins" is present
+  And system scans directory
+  And shows: "→ Scanning... Found X plugins"
+
+  When I navigate to "Output Directory"
+  Then value is auto-filled to "./output/personal-ai-tools"
+
+  When I press ENTER
+  Then Configuration Form closes
+  And TUI opens with 3 panels showing scanned plugins
+  And configuration is applied (marketplace name, output directory, etc.)
+
+Scenario: Field validation - Invalid marketplace name
+  Given Configuration Form is displayed
+  When I type "MyPlugin" in "Marketplace Name" (uppercase)
+  Then field shows error: "✗"
+  And help text shows: "Only lowercase, numbers, hyphens allowed (3-50 chars)"
+  And ENTER is disabled
+
+  When I clear field and type "my-plugin"
+  Then error clears
+  And checkmark appears: "✓"
+  And ENTER is enabled
+
+Scenario: Field validation - Invalid email
+  Given Configuration Form is displayed
+  When I type "invalid-email" in "Author Email"
+  Then field shows error: "✗"
+  And help text shows: "Invalid email format"
+
+  When I clear field and type "user@example.com"
+  Then error clears
+  And checkmark appears: "✓"
+
+Scenario: Field validation - Directory does not exist
+  Given Configuration Form is displayed
+  When I type "/nonexistent/path" in "Source Plugin Directory"
+  And navigate to next field
+  Then field shows error: "✗"
+  And help text shows: "Directory does not exist"
+  And ENTER is disabled
+
+Scenario: Field validation - Directory with no plugins
+  Given Configuration Form is displayed
+  When I type "/tmp/empty" in "Source Plugin Directory"
+  And "/tmp/empty" exists but contains no plugins
+  And I press ENTER
+  Then error message appears: "✗ No plugins found in directory"
+  And form remains open for correction
+
+Scenario: Cancel from Configuration Form
+  Given Configuration Form is displayed
+  When I press ESC
+  Then Configuration Form closes
+  And Main Menu is displayed again
+
+Scenario: Exit from Main Menu
+  Given Main Menu is displayed
+  When I select "Exit"
+  And press ENTER
+  Then application closes with exit code 0
+
+  Given Main Menu is displayed
+  When I press Q
+  Then application closes with exit code 0
+
+Scenario: Keyboard navigation in Configuration Form
+  Given Configuration Form is displayed
+  When I press TAB
+  Then cursor moves to next field
+
+  When I press SHIFT+TAB
+  Then cursor moves to previous field
+
+  When I press ↑
+  Then cursor moves to previous field
+
+  When I press ↓
+  Then cursor moves to next field
+
+Scenario: Placeholder behavior
+  Given Configuration Form is displayed
+  And "Marketplace Name" shows placeholder "my-marketplace" in gray
+  When I start typing
+  Then placeholder disappears immediately
+  And cursor is visible
+
+  When I clear all text
+  Then placeholder reappears in gray
+
+Scenario: Auto-fill Output Directory from Marketplace Name
+  Given Configuration Form is displayed
+  When I type "custom-plugin" in "Marketplace Name"
+  And navigate to "Output Directory"
+  Then "Output Directory" shows "./output/custom-plugin"
+
+  When I manually change "Output Directory" to "/custom/path"
+  Then manual value is preserved (no auto-fill override)
+```
+
+---
+
+## 3. Integration Test (BDD)
 
 ```gherkin
 Feature: Complete plugin curation workflow
@@ -444,7 +583,18 @@ describe('Integration Test Suite', () => {
 
 ## 6. Success Criteria
 
-### Must Pass
+### Must Pass - Setup Screens
+- ✅ Main Menu displays correctly with all options
+- ✅ Configuration Form shows all required/optional fields
+- ✅ Field validation works (marketplace name, email format, directory existence)
+- ✅ Placeholders display and disappear correctly
+- ✅ Auto-fill works (Output Directory from Marketplace Name)
+- ✅ Directory scanning works and displays plugin count
+- ✅ Transition from Configuration Form to TUI works seamlessly
+- ✅ ESC cancels and returns to previous screen
+- ✅ Invalid input prevents ENTER (form submission)
+
+### Must Pass - Component Selection
 - ✅ Can load test-plugin without errors
 - ✅ All 15 components visible in TUI
 - ✅ Selection works correctly
@@ -452,11 +602,14 @@ describe('Integration Test Suite', () => {
 - ✅ Official plugin.json is valid
 - ✅ All selected files copied to output
 - ✅ Output plugin can be loaded by Claude Code
+- ✅ Configuration from setup screens is applied correctly
 
 ### Quality Gates
 - ✅ No crashes or unhandled errors
 - ✅ Clear error messages for invalid states
 - ✅ All edge cases handled gracefully
+- ✅ Keyboard navigation is consistent across all screens
+- ✅ Visual consistency (terminal requirements, colors, borders)
 
 ---
 
@@ -466,7 +619,8 @@ describe('Integration Test Suite', () => {
 |---------------|---------------|
 | 001-normalization-protocol.md | Path resolution, auto-discovery, defaults |
 | 002-plugin-format-spec.md | Output validation |
-| 004-user-workflows.md | Load → Select → Save flow |
+| 004-user-workflows.md | Setup flow, component selection, save flow |
 | 005-transformation-rules.md | Input normalization |
 | 006-reverse-transformation-rules.md | Output transformation |
 | 007-save-operation-rules.md | Dual output, file copying |
+| 009-tui-setup-screens.md | Main menu navigation, form validation, field behavior, transitions |
