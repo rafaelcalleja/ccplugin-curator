@@ -116,10 +116,10 @@ function flattenHooks(config: HooksConfig): NormalizedHook[] {
 
       for (const hook of hooksList) {
         const normalized: NormalizedHook = {
+          ...hook, // Preserve additional fields
           event: eventName,
           type: hook.type,
-          command: hook.command,
-          ...hook // Preserve additional fields
+          command: hook.command
         };
 
         // Add matcher if present

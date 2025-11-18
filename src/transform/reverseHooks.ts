@@ -25,12 +25,14 @@ interface HookEntry {
     timeout?: number;
     [key: string]: unknown;
   }>;
+  [key: string]: unknown;
 }
 
 interface GroupedHooks {
   hooks: {
     [event: string]: HookEntry[];
   };
+  [key: string]: unknown;
 }
 
 /**

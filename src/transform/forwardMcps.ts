@@ -107,9 +107,9 @@ function objectToArray(config: McpServersConfig): NormalizedMcp[] {
 
   for (const [name, serverConfig] of Object.entries(servers)) {
     const normalized: NormalizedMcp = {
+      ...serverConfig, // Preserve additional fields
       name,
-      command: serverConfig.command,
-      ...serverConfig // Preserve additional fields
+      command: serverConfig.command
     };
 
     // Ensure env exists (default to empty object)
