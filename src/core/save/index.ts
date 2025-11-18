@@ -32,6 +32,10 @@ import {
 } from './outputs.js';
 import type { NormalizedHook } from '../hooks-loader.js';
 import type { NormalizedMcp } from '../mcp-loader.js';
+import {
+  validatePluginJson,
+  validateMarketplaceJson,
+} from '../validator.js';
 
 /**
  * Save options
@@ -300,6 +304,21 @@ export async function save(
 
     // 8. Generate and write plugin.json
     const pluginJson = generatePluginJson(finalNormalized);
+
+    // 8.1. Validate plugin.json (spec 007 §6)
+    const pluginValidation = validatePluginJson(pluginJson);
+    if (!pluginValidation.valid) {
+      return {
+        success: false,
+        outputDir,
+        errors: [
+          'Generated plugin.json is invalid:',
+          ...(pluginValidation.errors || []),
+        ],
+        stats: { commands: 0, agents: 0, skills: 0, hooks: 0, mcps: 0 },
+      };
+    }
+
     writePluginJson(paths.claudePluginDir, pluginJson);
 
     // 9. Generate and write marketplace.json
@@ -307,6 +326,21 @@ export async function save(
       ownerName: options.ownerName,
       ownerEmail: options.ownerEmail,
     });
+
+    // 9.1. Validate marketplace.json (spec 007 §6)
+    const marketplaceValidation = validateMarketplaceJson(marketplace);
+    if (!marketplaceValidation.valid) {
+      return {
+        success: false,
+        outputDir,
+        errors: [
+          'Generated marketplace.json is invalid:',
+          ...(marketplaceValidation.errors || []),
+        ],
+        stats: { commands: 0, agents: 0, skills: 0, hooks: 0, mcps: 0 },
+      };
+    }
+
     writeMarketplaceJson(paths.marketplaceDir, marketplace);
 
     // 10. Write normalized-plugin.json (for debugging)
