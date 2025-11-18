@@ -1,6 +1,6 @@
 ---
 name: frontmatter-validator
-description: Validate and enforce frontmatter schema constraints when writing or editing markdown files. Ensures content respects gate_constraints and document_covers defined in schemas.
+description: Use this skill when writing or editing markdown files with YAML frontmatter. Validates gate_constraints (single_responsibility, no_cross_references, etc.) and document_covers before writing. Helps decide which file to write to or if a new file should be created based on constraint violations. Always activate before Write or Edit operations on .md files.
 ---
 
 # Frontmatter Validator
