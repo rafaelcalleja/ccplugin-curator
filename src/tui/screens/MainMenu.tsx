@@ -40,7 +40,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({ onSelect }) => {
       </Box>
 
       {/* Spacer */}
-      <Box height={2} />
+      <Box marginTop={1} />
 
       {/* Options */}
       <Box flexDirection="column" alignItems="center">
@@ -57,7 +57,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({ onSelect }) => {
       </Box>
 
       {/* Spacer */}
-      <Box height={2} />
+      <Box marginTop={1} />
 
       {/* Status bar */}
       <Box borderStyle="single" borderColor="gray">
