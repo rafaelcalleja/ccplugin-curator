@@ -158,3 +158,65 @@ export async function loadPlugins(pluginDirs: string[]): Promise<LoadedPlugin[]>
   const promises = pluginDirs.map(dir => loadPlugin(dir));
   return Promise.all(promises);
 }
+
+/**
+ * Scan a directory and load all plugins found within it
+ *
+ * This function scans a directory for subdirectories that contain .claude-plugin/plugin.json
+ * files and loads each one as a plugin. It also handles the case where the directory itself
+ * is a plugin directory.
+ *
+ * @param directory - Absolute path to directory containing plugins
+ * @returns Array of loaded and normalized plugins
+ * @throws Error if directory doesn't exist or no plugins found
+ */
+export async function loadPluginsFromDirectory(directory: string): Promise<import('../types/normalized').NormalizedPluginConfiguration[]> {
+  const { transformToNormalized } = await import('../transform/forward');
+
+  // Check if directory exists
+  try {
+    const stat = await fs.stat(directory);
+    if (!stat.isDirectory()) {
+      throw new Error(`${directory} is not a directory`);
+    }
+  } catch (error) {
+    throw new Error(`Directory ${directory} does not exist`);
+  }
+
+  let plugins: import('../types/normalized').NormalizedPluginConfiguration[] = [];
+
+  // Check if this directory itself is a plugin
+  const pluginJsonPath = path.join(directory, '.claude-plugin', 'plugin.json');
+  try {
+    await fs.access(pluginJsonPath);
+    // This is a plugin directory
+    const loaded = await loadPlugin(directory);
+    const normalized = await transformToNormalized(loaded.config, loaded.pluginDir);
+    plugins.push(normalized);
+    return plugins;
+  } catch {
+    // Not a plugin directory, scan for subdirectories
+  }
+
+  // Scan directory for plugin subdirectories
+  const entries = await fs.readdir(directory, { withFileTypes: true });
+  const pluginDirs = entries
+    .filter(e => e.isDirectory())
+    .map(e => path.join(directory, e.name));
+
+  for (const dir of pluginDirs) {
+    try {
+      const loaded = await loadPlugin(dir);
+      const normalized = await transformToNormalized(loaded.config, loaded.pluginDir);
+      plugins.push(normalized);
+    } catch {
+      // Skip directories that aren't plugins
+    }
+  }
+
+  if (plugins.length === 0) {
+    throw new Error(`No plugins found in ${directory}`);
+  }
+
+  return plugins;
+}

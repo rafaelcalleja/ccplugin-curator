@@ -10,7 +10,9 @@ import { useKeyboard } from './hooks/useKeyboard';
 interface AppProps {
   plugins: NormalizedPluginConfiguration[];
   outputName: string;
-  onSave: (selectionState: SelectionState) => Promise<void>;
+  outputDir?: string;
+  authorEmail?: string;
+  onSave: (selectionState: SelectionState, outputDir?: string) => Promise<void>;
 }
 
 /**
@@ -28,12 +30,13 @@ interface AppProps {
  * - S: Save
  * - Q: Quit
  */
-export const App: React.FC<AppProps> = ({ plugins, outputName, onSave }) => {
+export const App: React.FC<AppProps> = ({ plugins, outputName, outputDir, authorEmail, onSave }) => {
   const { exit } = useApp();
 
   // State
   const [activePluginIndex, setActivePluginIndex] = useState(0);
   const [cursorIndex, setCursorIndex] = useState(0);
+  const [focusedPanel, setFocusedPanel] = useState<'plugins' | 'components' | 'preview'>('components');
   const [selectionState] = useState(() => new SelectionState(plugins));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -142,6 +145,37 @@ export const App: React.FC<AppProps> = ({ plugins, outputName, onSave }) => {
         return;
       }
     },
+    onShiftTab: () => {
+      // Switch to previous plugin
+      setActivePluginIndex(prev => prev === 0 ? plugins.length - 1 : prev - 1);
+      setCursorIndex(0); // Reset cursor when switching plugins
+    },
+    onLeft: () => {
+      // Navigate to previous panel
+      setFocusedPanel(prev => {
+        if (prev === 'preview') return 'components';
+        if (prev === 'components') return 'plugins';
+        return 'plugins';
+      });
+    },
+    onRight: () => {
+      // Navigate to next panel
+      setFocusedPanel(prev => {
+        if (prev === 'plugins') return 'components';
+        if (prev === 'components') return 'preview';
+        return 'preview';
+      });
+    },
+    onSelectAll: () => {
+      // Select all components in current plugin
+      selectionState.selectAll(activePlugin.name);
+      forceUpdate({});
+    },
+    onSelectNone: () => {
+      // Deselect all components in current plugin
+      selectionState.deselectAll(activePlugin.name);
+      forceUpdate({});
+    },
     onSave: async () => {
       if (selectionState.getCount() === 0) {
         setError('No components selected. Select at least one component to save.');
@@ -152,7 +186,7 @@ export const App: React.FC<AppProps> = ({ plugins, outputName, onSave }) => {
       setSaving(true);
       setError(null);
       try {
-        await onSave(selectionState);
+        await onSave(selectionState, outputDir);
         exit();
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Unknown error occurred';
@@ -230,7 +264,7 @@ export const App: React.FC<AppProps> = ({ plugins, outputName, onSave }) => {
       <Text> </Text>
       {/* Status Bar */}
       <Box flexDirection="row" justifyContent="space-between">
-        <Text dimColor>Tab: Switch Plugin | ↑/↓: Navigate | Space: Select | S: Save | Q: Quit</Text>
+        <Text dimColor>Tab/Shift+Tab: Switch Plugin | ←/→: Panel | ↑/↓: Navigate | Space: Select | A: All | N: None | S: Save | Q: Quit</Text>
         <Text color="cyan">
           {selectionState.getCount()} component{selectionState.getCount() !== 1 ? 's' : ''} selected
         </Text>

@@ -18,6 +18,9 @@ export interface KeyboardHandlers {
   onRight?: () => void;
   onSpace?: () => void;
   onTab?: () => void;
+  onShiftTab?: () => void;
+  onSelectAll?: () => void;
+  onSelectNone?: () => void;
   onSave?: () => void;
   onQuit?: () => void;
 }
@@ -34,8 +37,14 @@ export function useKeyboard(handlers: KeyboardHandlers) {
       handlers.onRight();
     } else if (input === ' ' && handlers.onSpace) {
       handlers.onSpace();
+    } else if (key.tab && key.shift && handlers.onShiftTab) {
+      handlers.onShiftTab();
     } else if (key.tab && handlers.onTab) {
       handlers.onTab();
+    } else if ((input === 'a' || input === 'A') && handlers.onSelectAll) {
+      handlers.onSelectAll();
+    } else if ((input === 'n' || input === 'N') && handlers.onSelectNone) {
+      handlers.onSelectNone();
     } else if ((input === 's' || input === 'S') && handlers.onSave) {
       handlers.onSave();
     } else if ((input === 'q' || input === 'Q') && handlers.onQuit) {

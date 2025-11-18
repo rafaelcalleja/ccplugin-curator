@@ -8,6 +8,7 @@ import * as fs from 'fs/promises';
 import { loadPlugin } from './loader/pluginLoader';
 import { transformToNormalized } from './transform/forward';
 import { App } from './tui/App';
+import { SetupFlow } from './tui/screens/SetupFlow';
 import { SelectionState } from './tui/state/SelectionState';
 import { savePlugin } from './saver/save';
 import { NormalizedPluginConfiguration } from './types/normalized';
@@ -102,24 +103,34 @@ program
         React.createElement(App, {
           plugins,
           outputName: options.name,
-          onSave: async (selectionState: SelectionState) => {
+          outputDir: options.output,
+          onSave: async (selectionState: SelectionState, outputDirOverride?: string) => {
             // Build merged plugin
             const merged = selectionState.buildMergedPlugin(options.name);
 
+            // Use override output dir if provided, otherwise use options
+            const finalOutputDir = outputDirOverride || options.output;
+
             // Save to disk
             const result = await savePlugin(merged, sourcePluginsMap, {
-              outputDir: path.resolve(options.output),
+              outputDir: path.resolve(finalOutputDir),
               pluginName: options.name
             });
 
-            console.log('\nCurated plugin saved successfully!');
-            console.log(`  Marketplace JSON: ${result.marketplaceJson}`);
-            console.log(`  Plugin JSON: ${result.pluginJson}`);
-            console.log(`  Normalized JSON: ${result.normalizedJson}`);
-            console.log(`  Files: ${result.filesDir}`);
-            console.log('\nTo use this plugin:');
-            console.log(`  1. Copy ${path.dirname(result.pluginJson)} to your Claude Code plugins directory`);
-            console.log(`  2. Or publish ${result.marketplaceJson} to the Claude Code marketplace`);
+            console.log('\n✓ Plugin saved successfully!\n');
+            console.log('Files generated:');
+            console.log(`  • ${result.marketplaceJson}`);
+            console.log(`  • ${result.pluginJson}`);
+            console.log(`  • ${result.normalizedJson}\n`);
+            console.log('Components included:');
+            console.log(`  • ${merged.commands.length} commands`);
+            console.log(`  • ${merged.agents.length} agents`);
+            console.log(`  • ${merged.skills.length} skills`);
+            console.log(`  • ${merged.hooks.length} hooks`);
+            console.log(`  • ${merged.mcps.length} MCPs\n`);
+            console.log('Installation:');
+            console.log(`  /plugin marketplace add ${result.marketplaceJson}`);
+            console.log(`  /plugin install ${options.name}`);
           }
         })
       );
@@ -132,3 +143,24 @@ program
   });
 
 program.parse();
+
+// Interactive mode - launch setup flow when no command provided
+if (process.argv.length === 2) {
+  // No arguments provided, launch interactive mode
+  (async () => {
+    try {
+      const { waitUntilExit } = render(
+        React.createElement(SetupFlow, {
+          onSave: async (outputDir: string) => {
+            console.log(`\n✓ Plugin saved to ${outputDir}`);
+          }
+        })
+      );
+
+      await waitUntilExit();
+    } catch (error) {
+      console.error('Error:', (error as Error).message);
+      process.exit(1);
+    }
+  })();
+}

@@ -168,4 +168,80 @@ export class SelectionState {
   getCount(): number {
     return this.selections.size;
   }
+
+  /**
+   * Select all components in a specific plugin
+   */
+  selectAll(pluginName: string): void {
+    const plugin = this.plugins.find(p => p.name === pluginName);
+    if (!plugin) return;
+
+    // Select all commands
+    plugin.commands.forEach((cmd, idx) => {
+      const key = this.getKey({ pluginName, type: 'command', path: cmd, index: idx });
+      this.selections.add(key);
+    });
+
+    // Select all agents
+    plugin.agents.forEach((agent, idx) => {
+      const key = this.getKey({ pluginName, type: 'agent', path: agent, index: idx });
+      this.selections.add(key);
+    });
+
+    // Select all skills
+    plugin.skills.forEach((skill, idx) => {
+      const key = this.getKey({ pluginName, type: 'skill', path: skill, index: idx });
+      this.selections.add(key);
+    });
+
+    // Select all hooks
+    plugin.hooks.forEach((hook, idx) => {
+      const key = this.getKey({ pluginName, type: 'hook', path: hook.command, index: idx });
+      this.selections.add(key);
+    });
+
+    // Select all MCPs
+    plugin.mcps.forEach((mcp, idx) => {
+      const key = this.getKey({ pluginName, type: 'mcp', path: mcp.name, index: idx });
+      this.selections.add(key);
+    });
+  }
+
+  /**
+   * Deselect all components in a specific plugin
+   */
+  deselectAll(pluginName: string): void {
+    const plugin = this.plugins.find(p => p.name === pluginName);
+    if (!plugin) return;
+
+    // Deselect all commands
+    plugin.commands.forEach((cmd, idx) => {
+      const key = this.getKey({ pluginName, type: 'command', path: cmd, index: idx });
+      this.selections.delete(key);
+    });
+
+    // Deselect all agents
+    plugin.agents.forEach((agent, idx) => {
+      const key = this.getKey({ pluginName, type: 'agent', path: agent, index: idx });
+      this.selections.delete(key);
+    });
+
+    // Deselect all skills
+    plugin.skills.forEach((skill, idx) => {
+      const key = this.getKey({ pluginName, type: 'skill', path: skill, index: idx });
+      this.selections.delete(key);
+    });
+
+    // Deselect all hooks
+    plugin.hooks.forEach((hook, idx) => {
+      const key = this.getKey({ pluginName, type: 'hook', path: hook.command, index: idx });
+      this.selections.delete(key);
+    });
+
+    // Deselect all MCPs
+    plugin.mcps.forEach((mcp, idx) => {
+      const key = this.getKey({ pluginName, type: 'mcp', path: mcp.name, index: idx });
+      this.selections.delete(key);
+    });
+  }
 }
