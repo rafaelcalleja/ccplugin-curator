@@ -1,3 +1,9 @@
+---
+extends: ../../schemas/base.json
+document_covers:
+  - testing_strategies
+---
+
 # Integration Test Specification
 
 **Version**: 1.0.0
@@ -129,6 +135,11 @@ Scenario: Complete setup flow - Main Menu to Component Selection
     | Create New Curated Plugin  |
     | Exit                       |
   And cursor is on "Create New Curated Plugin"
+  And Main Menu matches visual format:
+    - Title box uses double-line borders (╔═╗║╚═╝)
+    - Menu items are centered
+    - Cursor indicator "►" appears before focused item
+    - Status bar shows keyboard shortcuts (↑↓: Navigate | ENTER: Select | Q: Quit)
 
   When I press ENTER on "Create New Curated Plugin"
   Then Configuration Form is displayed with fields:
@@ -140,6 +151,14 @@ Scenario: Complete setup flow - Main Menu to Component Selection
     | Author Email             | Optional | you@example.com       |
   And cursor is on "Marketplace Name"
   And all fields show placeholders in gray
+  And Configuration Form visual components are present:
+    - Section headers "REQUIRED FIELDS" and "OPTIONAL FIELDS" visible with box borders (┌─┐│└┘)
+    - ALL input boxes have single-line borders
+    - Cursor indicator "►" visible before "Marketplace Name"
+    - Help text present below EVERY field in gray
+    - Field labels present above EVERY input box
+    - Placeholders visible in ALL empty fields
+    - Layout is aligned (no descuadre between fields)
 
   When I type "personal-ai-tools" in "Marketplace Name"
   Then placeholder disappears
@@ -169,6 +188,10 @@ Scenario: Field validation - Invalid marketplace name
   Then field shows error: "✗"
   And help text shows: "Only lowercase, numbers, hyphens allowed (3-50 chars)"
   And ENTER is disabled
+  And error elements are visible:
+    - Error indicator "✗" is present
+    - Error message is displayed below field
+    - Field layout remains stable
 
   When I clear field and type "my-plugin"
   Then error clears
@@ -180,6 +203,10 @@ Scenario: Field validation - Invalid email
   When I type "invalid-email" in "Author Email"
   Then field shows error: "✗"
   And help text shows: "Invalid email format"
+  And error elements are visible:
+    - Error indicator "✗" is present
+    - Error message is displayed below field
+    - Field layout remains stable
 
   When I clear field and type "user@example.com"
   Then error clears
@@ -192,6 +219,10 @@ Scenario: Field validation - Directory does not exist
   Then field shows error: "✗"
   And help text shows: "Directory does not exist"
   And ENTER is disabled
+  And error elements are visible:
+    - Error indicator "✗" is present
+    - Error message is displayed below field
+    - Field layout remains stable
 
 Scenario: Field validation - Directory with no plugins
   Given Configuration Form is displayed
@@ -231,15 +262,46 @@ Scenario: Keyboard navigation in Configuration Form
   When I press ↓
   Then cursor moves to next field
 
-Scenario: Placeholder behavior
+Scenario: Placeholder behavior - Empty field
   Given Configuration Form is displayed
-  And "Marketplace Name" shows placeholder "my-marketplace" in gray
+  And "Marketplace Name" field is empty
+  And placeholder "my-marketplace" shows in gray
   When I start typing
   Then placeholder disappears immediately
   And cursor is visible
+  And my text is entered
 
   When I clear all text
   Then placeholder reappears in gray
+
+Scenario: Default value behavior - Pre-filled fields
+  Given Configuration Form is displayed
+  When I navigate to "Source Plugin Directory"
+  Then field has default value "~/.claude/plugins"
+  And value appears selected (highlighted)
+  And field validates successfully with default value
+
+  When I press TAB without typing
+  Then default value is accepted
+  And cursor moves to next field
+  And "Source Plugin Directory" keeps value "~/.claude/plugins"
+
+  When I navigate back to "Source Plugin Directory"
+  And I type one character "/"
+  Then entire default value is replaced
+  And field now contains only "/"
+  And previous value "~/.claude/plugins" is completely cleared
+
+Scenario: Default value behavior - Output Directory auto-fill
+  Given Configuration Form is displayed
+  And I have typed "personal-tools" in "Marketplace Name"
+  When I navigate to "Output Directory"
+  Then field shows auto-filled value "./output/personal-tools"
+  And value appears selected (highlighted)
+
+  When I type one character "."
+  Then entire auto-filled value is replaced
+  And field now contains only "."
 
 Scenario: Auto-fill Output Directory from Marketplace Name
   Given Configuration Form is displayed
@@ -277,6 +339,12 @@ Scenario: Full workflow - Load, select, save, verify
   And PLUGINS panel shows "test-plugin"
   And COMPONENTS panel shows 15 items total
   And PREVIEW panel is empty
+  And TUI visual format is correct:
+    - Three panels use single-line box borders (┌─┬┐│├┼┤└─┴┘)
+    - Panel headers show clear labels (PLUGINS, COMPONENTS, PREVIEW)
+    - Status bar shows keyboard shortcuts at bottom
+    - Components use checkboxes [ ] and [✓]
+    - Cursor indicator "►" shows focused item
 
   When I navigate to COMPONENTS panel
   And I select:
@@ -624,3 +692,4 @@ describe('Integration Test Suite', () => {
 | 006-reverse-transformation-rules.md | Output transformation |
 | 007-save-operation-rules.md | Dual output, file copying |
 | 009-tui-setup-screens.md | Main menu navigation, form validation, field behavior, transitions |
+| 003-tui-visual-spec.md | Visual format validation (borders, colors, indicators) |
