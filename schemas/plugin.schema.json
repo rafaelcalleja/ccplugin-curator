@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://code.claude.com/schemas/plugin.json",
+  "title": "Claude Code Plugin Configuration",
+  "description": "Schema for Claude Code's official plugin.json format",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Plugin name. Default: directory basename"
+    },
+    "commands": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Glob pattern for command files"
+        },
+        {
+          "type": "array",
+          "description": "Explicit array of command file paths",
+          "items": {
+            "type": "string"
+          }
+        }
+      ],
+      "description": "Command files. Default: './commands/**/*.md' glob"
+    },
+    "agents": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Glob pattern for agent files"
+        },
+        {
+          "type": "array",
+          "description": "Explicit array of agent file paths",
+          "items": {
+            "type": "string"
+          }
+        }
+      ],
+      "description": "Agent files. Default: './agents/**/*.md' glob"
+    },
+    "skills": {
+      "type": "array",
+      "description": "Skill directory paths. Default: './skills/*/SKILL.md' parent dirs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "hooks": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Path to hooks configuration file"
+        },
+        {
+          "type": "object",
+          "description": "Inline hooks configuration",
+          "properties": {
+            "hooks": {
+              "type": "object",
+              "description": "Hook event definitions",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "matcher": {
+                      "type": "string",
+                      "description": "Tool name pattern (for PreToolUse/PostToolUse/PreCompact/SessionStart)"
+                    },
+                    "hooks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": ["command"],
+                            "description": "Hook type (currently only 'command' supported)"
+                          },
+                          "command": {
+                            "type": "string",
+                            "description": "Script/command path"
+                          },
+                          "timeout": {
+                            "type": "number",
+                            "description": "Execution timeout in seconds",
+                            "default": 60
+                          }
+                        },
+                        "required": ["type", "command"]
+                      }
+                    }
+                  },
+                  "required": ["hooks"]
+                }
+              }
+            }
+          },
+          "required": ["hooks"]
+        }
+      ],
+      "description": "Hooks configuration. Default: './hooks/hooks.json' or './settings.json'"
+    },
+    "mcpServers": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Path to MCP servers configuration file"
+        },
+        {
+          "type": "object",
+          "description": "Inline MCP servers configuration",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "Executable command"
+              },
+              "args": {
+                "type": "array",
+                "description": "Command arguments",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "env": {
+                "type": "object",
+                "description": "Environment variables",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["command"]
+          }
+        }
+      ],
+      "description": "MCP servers configuration. Default: './.mcp.json'"
+    }
+  },
+  "additionalProperties": false
+}

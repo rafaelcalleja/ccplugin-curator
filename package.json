@@ -1,0 +1,55 @@
+{
+  "name": "ccplugin-curator",
+  "version": "0.0.14",
+  "description": "Interactive TUI tool for curating and combining Claude Code plugins",
+  "main": "dist/cli.js",
+  "bin": {
+    "ccplugin-curator": "./dist/cli.js"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "tsc",
+    "generate-types": "json-schema-to-typescript schemas/plugin.schema.json -o src/types/plugin.ts && json-schema-to-typescript schemas/normalized-plugin.schema.json -o src/types/normalized.ts",
+    "test": "jest",
+    "test:integration": "jest --testMatch '**/integration/*.test.ts'",
+    "test:unit": "jest --testMatch '**/unit/**/*.test.ts'",
+    "lint": "eslint src tests",
+    "prepare": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://local_proxy@127.0.0.1:35366/git/rafaelcalleja/ccplugin-curator"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "plugin",
+    "curator",
+    "tui",
+    "cli"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.6",
+    "@typescript-eslint/eslint-plugin": "^8.47.0",
+    "@typescript-eslint/parser": "^8.47.0",
+    "eslint": "^9.39.1",
+    "jest": "^30.2.0",
+    "json-schema-to-typescript": "^15.0.4",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.2",
+    "glob": "^12.0.0",
+    "ink": "^6.5.0",
+    "react": "^19.2.0"
+  }
+}

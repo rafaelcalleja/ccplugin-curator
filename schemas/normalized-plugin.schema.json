@@ -1,0 +1,173 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://code.claude.com/schemas/normalized-plugin.json",
+  "title": "Normalized Plugin Configuration",
+  "description": "Schema for the curator's internal normalized plugin format",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Plugin name (always present)"
+    },
+    "source": {
+      "type": "string",
+      "description": "Absolute path to plugin directory"
+    },
+    "version": {
+      "type": "string",
+      "description": "Plugin version",
+      "default": "0.0.0"
+    },
+    "description": {
+      "type": "string",
+      "description": "Plugin description",
+      "default": ""
+    },
+    "author": {
+      "type": "object",
+      "description": "Plugin author information",
+      "properties": {
+        "name": {
+          "type": "string",
+          "default": ""
+        },
+        "email": {
+          "type": "string",
+          "default": ""
+        },
+        "url": {
+          "type": "string",
+          "default": ""
+        }
+      },
+      "required": ["name", "email", "url"],
+      "additionalProperties": false
+    },
+    "homepage": {
+      "type": "string",
+      "description": "Plugin homepage URL",
+      "default": ""
+    },
+    "repository": {
+      "type": "string",
+      "description": "Plugin repository URL",
+      "default": ""
+    },
+    "license": {
+      "type": "string",
+      "description": "Plugin license",
+      "default": ""
+    },
+    "keywords": {
+      "type": "array",
+      "description": "Plugin keywords",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "commands": {
+      "type": "array",
+      "description": "Array of command file paths (always array, never undefined)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "agents": {
+      "type": "array",
+      "description": "Array of agent file paths (always array, never undefined)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "skills": {
+      "type": "array",
+      "description": "Array of skill directory paths (always array, never undefined)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "hooks": {
+      "type": "array",
+      "description": "Array of hook configurations (always array, never undefined)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "description": "Hook event name (PreToolUse, PostToolUse, UserPromptSubmit, etc.)"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["command"],
+            "description": "Hook type (currently only 'command' is supported)"
+          },
+          "command": {
+            "type": "string",
+            "description": "Command path (may reference ${CLAUDE_PLUGIN_ROOT})"
+          },
+          "matcher": {
+            "type": "string",
+            "description": "Optional tool matcher pattern"
+          },
+          "timeout": {
+            "type": "number",
+            "description": "Optional timeout in seconds"
+          }
+        },
+        "required": ["event", "type", "command"],
+        "additionalProperties": true
+      }
+    },
+    "mcps": {
+      "type": "array",
+      "description": "Array of MCP server configurations (always array, never undefined)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "MCP server name (extracted from mcpServers key)"
+          },
+          "command": {
+            "type": "string",
+            "description": "Executable command"
+          },
+          "args": {
+            "type": "array",
+            "description": "Optional command arguments",
+            "items": {
+              "type": "string"
+            }
+          },
+          "env": {
+            "type": "object",
+            "description": "Optional environment variables",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["name", "command"],
+        "additionalProperties": true
+      }
+    }
+  },
+  "required": [
+    "name",
+    "source",
+    "version",
+    "description",
+    "author",
+    "homepage",
+    "repository",
+    "license",
+    "keywords",
+    "commands",
+    "agents",
+    "skills",
+    "hooks",
+    "mcps"
+  ],
+  "additionalProperties": false
+}
