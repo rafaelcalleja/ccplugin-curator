@@ -1,6 +1,6 @@
 ---
 name: frontmatter-validator
-description: Use this skill when writing or editing markdown files with YAML frontmatter. Validates gate_constraints (single_responsibility, no_cross_references, etc.) and document_covers before writing. Helps decide which file to write to or if a new file should be created based on constraint violations. Always activate before Write or Edit operations on .md files.
+description: Mandatory hooks that allow or deny creating or editing or updating markdown files. Executes before Read / Write / Update operations on markdown files.
 ---
 
 # Frontmatter Validator
