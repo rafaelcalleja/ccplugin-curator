@@ -82,8 +82,15 @@ describe('Save Operation - Integration Tests', () => {
       const selection = getSelection(state, normalized.name);
       selection.commands.add(normalized.commands[0]);
 
+      const testOutputDir = join(OUTPUT_DIR, 'test-overwrite');
+
+      // Clean up before test to ensure clean state
+      if (existsSync(testOutputDir)) {
+        rmSync(testOutputDir, { recursive: true, force: true });
+      }
+
       const options: SaveOptions = {
-        outputDir: join(OUTPUT_DIR, 'test-overwrite'),
+        outputDir: testOutputDir,
         pluginName: 'test-overwrite',
         overwrite: false,
       };
