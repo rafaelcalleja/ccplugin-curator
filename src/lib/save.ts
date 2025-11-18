@@ -97,6 +97,7 @@ export async function savePlugin(
     await copyCommands(selection.commands, selection.source, pluginPath);
     await copyAgents(selection.agents, selection.source, pluginPath);
     await copySkills(selection.skills, selection.source, pluginPath);
+    await copyHookScripts(selection.hooks, selection.source, pluginPath);
   } catch (err: any) {
     return {
       success: false,
@@ -240,6 +241,71 @@ async function copyDirectory(source: string, target: string): Promise<void> {
       await fs.copyFile(sourcePath, targetPath);
     }
   }
+}
+
+/**
+ * Copy hook script files to output directory with executable permissions
+ * Implements spec 007-save-operation-rules.md lines 124-139
+ */
+async function copyHookScripts(
+  hooks: any[],
+  sourceRoot: string,
+  targetRoot: string
+): Promise<void> {
+  const hookScripts = new Set<string>();
+
+  // Extract script paths from hook commands
+  for (const hook of hooks) {
+    if (hook.command) {
+      const scriptPath = extractScriptPath(hook.command);
+      if (scriptPath) {
+        hookScripts.add(scriptPath);
+      }
+    }
+  }
+
+  // Copy each script file with executable permissions
+  for (const scriptPath of hookScripts) {
+    const sourcePath = path.join(sourceRoot, scriptPath);
+    const targetPath = path.join(targetRoot, scriptPath);
+
+    // Create hooks directory if needed
+    await fs.mkdir(path.dirname(targetPath), { recursive: true });
+
+    // Copy file
+    try {
+      await fs.copyFile(sourcePath, targetPath);
+      // Set executable permissions (0o755)
+      await fs.chmod(targetPath, 0o755);
+    } catch (err) {
+      // If file doesn't exist, skip (might be a system command)
+      continue;
+    }
+  }
+}
+
+/**
+ * Extract script file path from hook command
+ * Returns null if command is a system command (npx, node, etc.)
+ */
+function extractScriptPath(command: string): string | null {
+  // Remove ${CLAUDE_PLUGIN_ROOT}/ prefix if present
+  let cleaned = command.replace(/\$\{CLAUDE_PLUGIN_ROOT\}\//, '');
+
+  // Check if it's a script file path
+  if (cleaned.startsWith('/')) {
+    // Remove leading /
+    return cleaned.substring(1);
+  } else if (cleaned.startsWith('./')) {
+    // Remove leading ./
+    return cleaned.substring(2);
+  } else if (!cleaned.includes(' ') && (cleaned.includes('/') || cleaned.endsWith('.sh') || cleaned.endsWith('.ts'))) {
+    // Relative path without spaces, likely a script
+    return cleaned;
+  }
+
+  // System command, not a script file
+  return null;
 }
 
 /**

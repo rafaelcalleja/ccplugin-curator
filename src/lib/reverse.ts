@@ -94,6 +94,31 @@ function addLeadingDot(p: string): string {
 }
 
 /**
+ * Transform hook command path to use ${CLAUDE_PLUGIN_ROOT}
+ * Local script paths are transformed, system commands remain unchanged
+ * Spec: 006-reverse-transformation-rules.md lines 195-210
+ */
+function transformHookCommandPath(command: string): string {
+  // Check if it's a local script file path (starts with /, ./, or relative path)
+  // System commands (npx, node, etc.) should not be transformed
+  if (command.startsWith('/') || command.startsWith('./') || !command.includes(' ')) {
+    // If it starts with / or ./, or is a single path without spaces, it's a script file
+    if (command.startsWith('./')) {
+      // Remove leading ./
+      const withoutLeading = command.substring(2);
+      return `\${CLAUDE_PLUGIN_ROOT}/${withoutLeading}`;
+    } else if (command.startsWith('/')) {
+      return `\${CLAUDE_PLUGIN_ROOT}${command}`;
+    } else if (!command.includes(' ') && (command.includes('/') || command.endsWith('.sh') || command.endsWith('.ts'))) {
+      // Likely a relative script path
+      return `\${CLAUDE_PLUGIN_ROOT}/${command}`;
+    }
+  }
+  // Return unchanged for system commands like "npx tsx script.ts"
+  return command;
+}
+
+/**
  * Group hooks by event and matcher
  * Converts flat array to nested object structure
  */
@@ -108,6 +133,11 @@ function groupHooksByEvent(hooks: any[]): any {
     const config: any = { ...hook };
     delete config.event;
     delete config.matcher;
+
+    // Transform command path if present
+    if (config.command) {
+      config.command = transformHookCommandPath(config.command);
+    }
 
     // Initialize event array if needed
     if (!grouped[event]) {
