@@ -228,21 +228,43 @@ export async function save(
       const selection = getSelection(state, plugin.name);
 
       selection.commands.forEach((cmd) => {
-        const resolved = normalized.commands.find((c) => c.includes(cmd) || c === cmd);
+        // Find matching command considering namespace prefixes
+        // cmd might be "commands/build.md" and resolved might be "./commands/plugin-a--build.md"
+        const cmdBasename = cmd.split('/').pop() || cmd;
+        const resolved = normalized.commands.find((c) => {
+          const resolvedBasename = c.split('/').pop() || c;
+          // Check if basenames match exactly with this plugin's namespace
+          return resolvedBasename === cmdBasename ||
+                 resolvedBasename === `${plugin.name}--${cmdBasename}`;
+        });
         if (resolved) {
           commandItems.push({ original: cmd, resolved, pluginName: plugin.name });
         }
       });
 
       selection.agents.forEach((agent) => {
-        const resolved = normalized.agents.find((a) => a.includes(agent) || a === agent);
+        // Find matching agent considering namespace prefixes
+        const agentBasename = agent.split('/').pop() || agent;
+        const resolved = normalized.agents.find((a) => {
+          const resolvedBasename = a.split('/').pop() || a;
+          // Check if basenames match exactly with this plugin's namespace
+          return resolvedBasename === agentBasename ||
+                 resolvedBasename === `${plugin.name}--${agentBasename}`;
+        });
         if (resolved) {
           agentItems.push({ original: agent, resolved, pluginName: plugin.name });
         }
       });
 
       selection.skills.forEach((skill) => {
-        const resolved = normalized.skills.find((s) => s.includes(skill) || s === skill);
+        // Find matching skill considering namespace prefixes
+        const skillBasename = skill.split('/').pop() || skill;
+        const resolved = normalized.skills.find((s) => {
+          const resolvedBasename = s.split('/').pop() || s;
+          // Check if basenames match exactly with this plugin's namespace
+          return resolvedBasename === skillBasename ||
+                 resolvedBasename === `${plugin.name}--${skillBasename}`;
+        });
         if (resolved) {
           skillItems.push({ original: skill, resolved, pluginName: plugin.name });
         }

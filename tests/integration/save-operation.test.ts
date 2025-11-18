@@ -326,9 +326,10 @@ describe('Save Operation - Integration Tests', () => {
       expect(result.success).toBe(true);
       expect(result.stats.commands).toBe(2);
 
-      // Verify files from both plugins were copied (per spec 007 §3)
-      expect(existsSync(join(OUTPUT_DIR, 'multi-plugin/plugins/multi-plugin/commands/build.md'))).toBe(true);
-      expect(existsSync(join(OUTPUT_DIR, 'multi-plugin/plugins/multi-plugin/commands/deploy.md'))).toBe(true);
+      // Verify files from both plugins were copied with namespace prefixes (per spec 007 §7.3)
+      // Both plugins have build.md, so they get namespace prefixes
+      expect(existsSync(join(OUTPUT_DIR, 'multi-plugin/plugins/multi-plugin/commands/test-plugin-a--build.md'))).toBe(true);
+      expect(existsSync(join(OUTPUT_DIR, 'multi-plugin/plugins/multi-plugin/commands/test-plugin-b--build.md'))).toBe(true);
     });
   });
 });
