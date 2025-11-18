@@ -213,7 +213,8 @@ export function copyHookScripts(
   }
 
   // Resolve conflicts and copy scripts
-  const pathMappings = new Map<string, string>(); // original → resolved
+  // Use (pluginName, scriptPath) as key to handle conflicts correctly
+  const pathMappings = new Map<string, string>(); // "pluginName:scriptPath" → resolved
 
   for (const [scriptPath, items] of scriptsByPath.entries()) {
     if (items.length === 1) {
@@ -227,7 +228,8 @@ export function copyHookScripts(
 
       if (existsSync(sourcePath)) {
         copyHookScriptFile(sourcePath, destPath);
-        pathMappings.set(scriptPath, scriptPath);
+        // Store mapping with plugin name as part of key
+        pathMappings.set(`${pluginName}:${scriptPath}`, scriptPath);
       }
     } else {
       // Conflict - apply namespace prefix
@@ -249,7 +251,8 @@ export function copyHookScripts(
 
         if (existsSync(sourcePath)) {
           copyHookScriptFile(sourcePath, destPath);
-          pathMappings.set(scriptPath, resolvedPath);
+          // Store mapping with plugin name as part of key
+          pathMappings.set(`${pluginName}:${scriptPath}`, resolvedPath);
         }
       }
     }
@@ -262,7 +265,10 @@ export function copyHookScripts(
     }
 
     const scriptPath = extractScriptPath(hook.command);
-    const resolvedPath = pathMappings.get(scriptPath);
+    const pluginName = hooksByPlugin.get(hook) || '';
+
+    // Look up resolved path using plugin name + script path
+    const resolvedPath = pathMappings.get(`${pluginName}:${scriptPath}`);
 
     if (!resolvedPath) {
       return hook; // Script not found or not copied
