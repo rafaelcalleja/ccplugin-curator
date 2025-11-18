@@ -1,59 +1,22 @@
-# BDD Scenario 001: No Cross-References Validation
+# Scenario 1: Detect Cross-Reference
 
-## Feature
-Prevent writing cross-references when `no_cross_references` constraint is active
+## Given
+A document content (markdown text)
 
-## Background
-Documents with `gate_constraints: ["no_cross_references"]` should NOT allow content that links to other internal documents.
+## When
+The content contains a reference to another document
 
-## Scenario 1: Block content with cross-reference
+## Then
+The validation should detect it
 
-**Given** a document with frontmatter:
-```yaml
----
-gate_constraints:
-  - no_cross_references
-document_covers:
-  - concepts_and_definitions
----
-```
+## Examples of cross-references to detect
 
-**When** attempting to write content:
-```markdown
-## What is normalization?
+1. Markdown link: `[text](002-file.md)`
+2. Plain reference: `See 002-file.md`
+3. Relative path: `../other/file.md`
 
-Normalization transforms plugin formats. See 002-plugin-format.md for details.
-```
+## Examples of valid content (no cross-reference)
 
-**Then** the write should be BLOCKED
-
-**And** error message should contain:
-- "no_cross_references violation"
-- "002-plugin-format.md"
-
-## Scenario 2: Allow content without cross-references
-
-**Given** same document with `no_cross_references` constraint
-
-**When** attempting to write content:
-```markdown
-## What is normalization?
-
-Normalization transforms plugin formats to a standard structure.
-```
-
-**Then** the write should be ALLOWED
-
-## Patterns to Detect
-
-Cross-references include:
-- Markdown links: `[text](./file.md)` or `[text](file.md)`
-- Plain references: `See 001-file.md` or `See file.md`
-- Relative paths: `../other/file.md`
-
-## Test Files
-
-- `fixtures/valid.md` - Content without cross-references (should pass)
-- `fixtures/invalid.md` - Content with cross-references (should fail)
-- `hook.sh` - Validation hook implementation
-- `test.sh` - Test runner
+1. Regular text: `Normalization transforms formats`
+2. External link: `[docs](https://example.com)`
+3. Anchor link: `[section](#heading)`
