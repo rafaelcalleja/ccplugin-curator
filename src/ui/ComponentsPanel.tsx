@@ -33,7 +33,21 @@ export function ComponentsPanel({
     ...plugin.mcps.map((m, i) => ({ type: 'mcp' as const, value: m, index: i })),
   ];
 
+  // Check if plugin is empty (spec 003 lines 268-293)
+  const isEmpty = allComponents.length === 0;
+
   let currentIndex = 0;
+
+  if (isEmpty) {
+    return (
+      <Box flexDirection="column" paddingX={1} justifyContent="center" alignItems="center" height="100%">
+        <Text bold color="yellow">COMPONENTS</Text>
+        <Text> </Text>
+        <Text dimColor>No components available</Text>
+        <Text dimColor>This plugin has no commands, agents, skills, hooks, or MCPs</Text>
+      </Box>
+    );
+  }
 
   return (
     <Box flexDirection="column" paddingX={1}>
