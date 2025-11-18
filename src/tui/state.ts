@@ -11,6 +11,7 @@
  */
 
 import type { NormalizedPluginFormatInternal } from '../types/normalized.js';
+import type { ErrorMessage } from './panels/ErrorPanel.js';
 
 /**
  * Component selection state
@@ -46,6 +47,12 @@ export interface TuiState {
 
   /** Selection state per plugin */
   selections: Map<string, ComponentSelection>;
+
+  /** Error messages to display */
+  errors: ErrorMessage[];
+
+  /** Search query for filtering plugins */
+  searchQuery: string;
 }
 
 /**
@@ -58,6 +65,8 @@ export function createInitialState(plugins: NormalizedPluginFormatInternal[]): T
     activePanel: 'components',
     componentCursor: 0,
     selections: new Map(),
+    errors: [],
+    searchQuery: '',
   };
 }
 
@@ -282,4 +291,51 @@ export function getTotalSelectionCount(state: TuiState): number {
   }
 
   return count;
+}
+
+/**
+ * Get filtered plugins based on search query
+ */
+export function getFilteredPlugins(state: TuiState): NormalizedPluginFormatInternal[] {
+  if (!state.searchQuery) {
+    return state.plugins;
+  }
+
+  const query = state.searchQuery.toLowerCase();
+  return state.plugins.filter(plugin =>
+    plugin.name.toLowerCase().includes(query)
+  );
+}
+
+/**
+ * Update search query
+ */
+export function setSearchQuery(state: TuiState, query: string): void {
+  state.searchQuery = query;
+  // Reset to first plugin after filtering
+  state.activePluginIndex = 0;
+}
+
+/**
+ * Add error message to state
+ */
+export function addError(
+  state: TuiState,
+  type: ErrorMessage['type'],
+  message: string,
+  details?: string
+): void {
+  state.errors.push({
+    type,
+    message,
+    details,
+    timestamp: new Date(),
+  });
+}
+
+/**
+ * Clear all errors
+ */
+export function clearErrors(state: TuiState): void {
+  state.errors = [];
 }

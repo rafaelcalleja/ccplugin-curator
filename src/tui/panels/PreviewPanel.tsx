@@ -3,6 +3,7 @@
  *
  * Displays real-time JSON preview of current selection.
  * Shows aggregated selection across all plugins.
+ * Can optionally show component file preview when focused.
  *
  * Spec: docs/spec/003-tui-visual-spec.md (Preview panel)
  */
@@ -10,13 +11,50 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 import type { TuiState } from '../state.js';
-import { getSelection } from '../state.js';
+import { getSelection, getActivePlugin, getComponentItems } from '../state.js';
 
 interface PreviewPanelProps {
   state: TuiState;
+  showComponentDetails?: boolean;
 }
 
-export const PreviewPanel: React.FC<PreviewPanelProps> = ({ state }) => {
+export const PreviewPanel: React.FC<PreviewPanelProps> = ({ state, showComponentDetails = false }) => {
+  const plugin = getActivePlugin(state);
+
+  // If showing component details and we have a cursor position, show file preview
+  if (showComponentDetails && plugin) {
+    const items = getComponentItems(plugin);
+    const currentItem = items[state.componentCursor];
+
+    if (currentItem) {
+      return (
+        <Box flexDirection="column">
+          <Box borderStyle="single" borderColor="cyan" paddingX={1} marginBottom={1}>
+            <Text bold color="cyan">
+              📄 Component Preview
+            </Text>
+          </Box>
+          <Box flexDirection="column">
+            <Text bold>Type: <Text color="cyan">{currentItem.type}</Text></Text>
+            <Text bold>Name: <Text color="cyan">{currentItem.label}</Text></Text>
+            <Box marginTop={1}>
+              <Text dimColor>
+                Component file preview feature.
+              </Text>
+              <Text dimColor>
+                In production, this would show file contents.
+              </Text>
+              <Text dimColor>
+                Current selection: {currentItem.type} - {currentItem.label}
+              </Text>
+            </Box>
+          </Box>
+        </Box>
+      );
+    }
+  }
+
+  // Default: Show JSON preview
   // Aggregate selections from all plugins
   const allCommands: string[] = [];
   const allAgents: string[] = [];

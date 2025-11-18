@@ -2,7 +2,7 @@
 
 > 🎨 Interactive TUI for curating and combining Claude Code plugin components
 
-[![Tests](https://img.shields.io/badge/tests-165%20passing-brightgreen)](tests/)
+[![Tests](https://img.shields.io/badge/tests-184%20passing-brightgreen)](tests/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -10,6 +10,7 @@ A powerful terminal user interface (TUI) tool for creating curated Claude Code p
 
 ## ✨ Features
 
+- 🚀 **Interactive Setup Wizard** - Guided workflow with real-time validation and plugin scanning
 - 🎯 **Interactive TUI** - Navigate and select components with keyboard shortcuts
 - 📦 **Multi-Plugin Support** - Combine components from multiple plugins into one
 - 🔍 **Auto-Discovery** - Automatically discovers commands, agents, skills, hooks, and MCPs
@@ -59,32 +60,53 @@ npm link
 
 ## ⚡ Quick Start
 
-1. **Organize your plugins** in a directory:
-   ```
-   my-plugins/
-   ├── plugin-a/
-   │   └── .claude-plugin/plugin.json
-   ├── plugin-b/
-   │   └── .claude-plugin/plugin.json
-   └── plugin-c/
-       └── .claude-plugin/plugin.json
-   ```
+### Interactive Mode (Recommended)
 
-2. **Launch the curator**:
-   ```bash
-   ccplugin-curator select ./my-plugins
-   ```
+The easiest way to get started is with the interactive setup wizard:
 
-3. **Select components** in the TUI:
-   - Use arrow keys to navigate
-   - Press `SPACE` to select/deselect components
-   - Press `S` to save
+```bash
+ccplugin-curator
+```
 
-4. **Install your curated plugin**:
-   ```bash
-   /plugin marketplace add ./output/curated-plugin
-   /plugin install curated-plugin
-   ```
+The wizard guides you through three simple steps:
+
+1. **Main Menu** - Choose to create a new curated plugin or exit
+2. **Configuration Form** - Set up your plugin with real-time validation:
+   - Marketplace Name (required, auto-validates format)
+   - Plugin Name (required)
+   - Source Directory (required, automatically scans and counts plugins)
+   - Output Directory (optional, auto-fills from marketplace name)
+   - Author Email (optional)
+3. **Component Selection** - Interactive TUI for picking components:
+   - Navigate with arrow keys
+   - Press `SPACE` to select/deselect
+   - Press `S` to save your curated plugin
+
+### Direct Mode
+
+For automation or quick operations, use direct mode:
+
+```bash
+ccplugin-curator select ./my-plugins
+```
+
+**With custom options:**
+```bash
+ccplugin-curator select ./my-plugins \
+  -o ./my-curated-collection \
+  -n my-awesome-plugin \
+  --owner-name "John Doe" \
+  --owner-email "john@example.com"
+```
+
+### Installing Your Curated Plugin
+
+After creation, install in Claude Code:
+
+```bash
+/plugin marketplace add ./output/curated-plugin
+/plugin install curated-plugin
+```
 
 ## 💻 CLI Usage
 
@@ -508,7 +530,7 @@ npm run lint           # Lint code
 
 ### Test Coverage
 
-**161 tests** covering all functionality:
+**184 tests** covering all functionality:
 
 - **123 Unit Tests**
   - Auto-discovery (37 tests)
@@ -517,12 +539,14 @@ npm run lint           # Lint code
   - Plugin loader (9 tests)
   - Conflicts (8 tests)
 
-- **38 Integration Tests**
+- **61 Integration Tests**
   - Save operation (8 tests)
   - Multi-plugin conflicts (3 tests)
   - Marketplace generation (6 tests)
   - TUI state management (13 tests)
   - Schema validation (7 tests)
+  - Setup screens (19 tests)
+  - Comprehensive workflow (4 tests)
   - Simple save (1 test)
 
 ### Run Tests
@@ -544,9 +568,9 @@ npm run test:coverage
 ### Test Output
 
 ```
-Test Files  15 passed (15)
-     Tests  161 passed (161)
-  Duration  4.07s
+Test Files  17 passed (17)
+     Tests  184 passed (184)
+  Duration  4.54s
 ```
 
 ## 📚 Documentation
@@ -646,4 +670,4 @@ Contributions are welcome! Please:
 
 **Version:** 0.0.13
 **Status:** Production Ready ✅
-**Tests:** 161/161 Passing 🎉
+**Tests:** 184/184 Passing 🎉

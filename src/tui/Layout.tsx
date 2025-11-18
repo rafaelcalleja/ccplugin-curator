@@ -10,6 +10,7 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 import type { TuiState } from './state.js';
+import { ErrorPanel } from './panels/ErrorPanel.js';
 
 interface LayoutProps {
   state: TuiState;
@@ -87,7 +88,14 @@ export const Layout: React.FC<LayoutProps> = ({
         </Box>
       </Box>
 
-      {/* Footer - keyboard shortcuts */}
+      {/* Error Panel */}
+      {state.errors.length > 0 && (
+        <Box marginTop={1}>
+          <ErrorPanel errors={state.errors} />
+        </Box>
+      )}
+
+            {/* Footer - keyboard shortcuts */}
       <Box borderStyle="single" borderColor="gray" paddingX={1}>
         <Text dimColor>
           ←→: Switch Panel | ↑↓: Navigate | SPACE: Toggle | A: All | N: None | S: Save | Q: Quit

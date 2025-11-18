@@ -52,17 +52,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({ onSelect }) => {
       {/* Header */}
       <Box borderStyle="single" borderColor="cyan" paddingX={2} paddingY={1}>
         <Text bold color="cyan">
-          ╔═══════════════════════════════════════╗
-        </Text>
-      </Box>
-      <Box borderStyle="single" borderColor="cyan" paddingX={2}>
-        <Text bold color="cyan">
-          ║  CLAUDE MARKETPLACE CURATOR          ║
-        </Text>
-      </Box>
-      <Box borderStyle="single" borderColor="cyan" paddingX={2} paddingBottom={1}>
-        <Text bold color="cyan">
-          ╚═══════════════════════════════════════╝
+          CLAUDE MARKETPLACE CURATOR
         </Text>
       </Box>
 
