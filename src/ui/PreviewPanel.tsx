@@ -1,10 +1,13 @@
 /**
  * Preview panel - right panel showing real-time JSON
+ * Shows full plugin.json structure with hooks grouped by event
  */
 
 import React from 'react';
 import { Box, Text } from 'ink';
+import { join } from 'path';
 import type { NormalizedPluginFormat } from '../types/normalized.js';
+import { officialize } from '../transform/officialize.js';
 
 interface PreviewPanelProps {
   plugins: NormalizedPluginFormat[];
@@ -19,9 +22,23 @@ interface PreviewPanelProps {
   };
 }
 
-export function PreviewPanel({ plugins, selection }: PreviewPanelProps) {
-  // Build preview JSON from selection
-  const preview: any = {
+/**
+ * Build normalized plugin from selection for preview
+ */
+function buildPreviewPlugin(
+  plugins: NormalizedPluginFormat[],
+  selection: PreviewPanelProps['selection']
+): NormalizedPluginFormat {
+  const result: NormalizedPluginFormat = {
+    name: 'curated-plugin',
+    source: join(process.cwd(), 'output/curated-plugin/plugins/curated-plugin'),
+    version: '0.0.0',
+    description: 'Curated plugin components',
+    author: { name: '', email: '', url: '' },
+    homepage: '',
+    repository: '',
+    license: '',
+    keywords: [],
     commands: [],
     agents: [],
     skills: [],
@@ -29,30 +46,48 @@ export function PreviewPanel({ plugins, selection }: PreviewPanelProps) {
     mcps: [],
   };
 
+  // Collect selected components
   for (const plugin of plugins) {
     const sel = selection[plugin.name];
     if (!sel) continue;
 
-    preview.commands.push(...Array.from(sel.commands));
-    preview.agents.push(...Array.from(sel.agents));
-    preview.skills.push(...Array.from(sel.skills));
+    // Add commands
+    result.commands.push(...Array.from(sel.commands));
 
+    // Add agents
+    result.agents.push(...Array.from(sel.agents));
+
+    // Add skills
+    result.skills.push(...Array.from(sel.skills));
+
+    // Add hooks
     for (const hookIndex of sel.hooks) {
       const hook = plugin.hooks[hookIndex];
       if (hook) {
-        preview.hooks.push(`${hook.event}${hook.matcher ? `:${hook.matcher}` : ''} → ${hook.command}`);
+        result.hooks.push(hook);
       }
     }
 
+    // Add MCPs
     for (const mcpIndex of sel.mcps) {
       const mcp = plugin.mcps[mcpIndex];
       if (mcp) {
-        preview.mcps.push(mcp.name);
+        result.mcps.push(mcp);
       }
     }
   }
 
-  const jsonString = JSON.stringify(preview, null, 2);
+  return result;
+}
+
+export function PreviewPanel({ plugins, selection }: PreviewPanelProps) {
+  // Build normalized plugin from selection
+  const normalizedPlugin = buildPreviewPlugin(plugins, selection);
+
+  // Convert to official format for preview
+  const officialPlugin = officialize(normalizedPlugin);
+
+  const jsonString = JSON.stringify(officialPlugin, null, 2);
 
   return (
     <Box flexDirection="column" paddingX={1}>
