@@ -65,11 +65,12 @@ describe('Save Operation - Integration Tests', () => {
       expect(result.errors).toEqual([]);
       expect(result.stats.commands).toBe(2);
 
-      // Verify output structure
+      // Verify output structure (per spec 007 §3)
       expect(existsSync(join(OUTPUT_DIR, 'simple-plugin'))).toBe(true);
-      expect(existsSync(join(OUTPUT_DIR, 'simple-plugin/.claude-plugin/plugin.json'))).toBe(true);
-      expect(existsSync(join(OUTPUT_DIR, 'simple-plugin/commands/build.md'))).toBe(true);
-      expect(existsSync(join(OUTPUT_DIR, 'simple-plugin/commands/test.md'))).toBe(true);
+      expect(existsSync(join(OUTPUT_DIR, 'simple-plugin/.claude-plugin/marketplace.json'))).toBe(true);
+      expect(existsSync(join(OUTPUT_DIR, 'simple-plugin/plugins/simple-plugin/.claude-plugin/plugin.json'))).toBe(true);
+      expect(existsSync(join(OUTPUT_DIR, 'simple-plugin/plugins/simple-plugin/commands/build.md'))).toBe(true);
+      expect(existsSync(join(OUTPUT_DIR, 'simple-plugin/plugins/simple-plugin/commands/test.md'))).toBe(true);
     });
 
     it('should fail if output directory exists and overwrite is false', async () => {
@@ -150,9 +151,9 @@ describe('Save Operation - Integration Tests', () => {
       expect(result.success).toBe(true);
       expect(result.stats.hooks).toBe(2);
 
-      // Verify hook scripts were copied
-      const script1Path = join(OUTPUT_DIR, 'hooks-plugin/hooks/session-start.sh');
-      const script2Path = join(OUTPUT_DIR, 'hooks-plugin/hooks/pre-bash.sh');
+      // Verify hook scripts were copied (per spec 007 §3)
+      const script1Path = join(OUTPUT_DIR, 'hooks-plugin/plugins/hooks-plugin/hooks/session-start.sh');
+      const script2Path = join(OUTPUT_DIR, 'hooks-plugin/plugins/hooks-plugin/hooks/pre-bash.sh');
 
       expect(existsSync(script1Path)).toBe(true);
       expect(existsSync(script2Path)).toBe(true);
@@ -194,13 +195,13 @@ describe('Save Operation - Integration Tests', () => {
       const result = await save(state, options);
       expect(result.success).toBe(true);
 
-      // Read generated plugin.json
-      const pluginJsonPath = join(OUTPUT_DIR, 'hooks-paths/.claude-plugin/plugin.json');
+      // Read generated plugin.json (per spec 007 §3)
+      const pluginJsonPath = join(OUTPUT_DIR, 'hooks-paths/plugins/hooks-paths/.claude-plugin/plugin.json');
       const pluginJson = JSON.parse(readFileSync(pluginJsonPath, 'utf-8'));
 
-      // Verify hook command references the script
+      // Verify hook command references the script with ${CLAUDE_PLUGIN_ROOT}
       expect(pluginJson.hooks.SessionStart).toBeDefined();
-      expect(pluginJson.hooks.SessionStart[0].hooks[0].command).toBe('./hooks/session-start.sh');
+      expect(pluginJson.hooks.SessionStart[0].hooks[0].command).toBe('${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh');
     });
 
     it('should handle hook script conflicts with namespace prefixing', async () => {
@@ -234,9 +235,9 @@ describe('Save Operation - Integration Tests', () => {
       expect(result.success).toBe(true);
       expect(result.stats.hooks).toBe(2);
 
-      // Verify both scripts were copied with namespace prefixes
-      const script1Path = join(OUTPUT_DIR, 'hooks-conflict/hooks/test-plugin-hooks--session-start.sh');
-      const script2Path = join(OUTPUT_DIR, 'hooks-conflict/hooks/test-plugin-hooks2--session-start.sh');
+      // Verify both scripts were copied with namespace prefixes (per spec 007 §3)
+      const script1Path = join(OUTPUT_DIR, 'hooks-conflict/plugins/hooks-conflict/hooks/test-plugin-hooks--session-start.sh');
+      const script2Path = join(OUTPUT_DIR, 'hooks-conflict/plugins/hooks-conflict/hooks/test-plugin-hooks2--session-start.sh');
 
       expect(existsSync(script1Path)).toBe(true);
       expect(existsSync(script2Path)).toBe(true);
@@ -248,16 +249,16 @@ describe('Save Operation - Integration Tests', () => {
       expect(content1).toContain('Session started from script'); // from plugin 1
       expect(content2).toContain('Session started from plugin 2'); // from plugin 2
 
-      // Verify hook commands were updated with resolved paths
-      const pluginJsonPath = join(OUTPUT_DIR, 'hooks-conflict/.claude-plugin/plugin.json');
+      // Verify hook commands were updated with resolved paths and ${CLAUDE_PLUGIN_ROOT}
+      const pluginJsonPath = join(OUTPUT_DIR, 'hooks-conflict/plugins/hooks-conflict/.claude-plugin/plugin.json');
       const pluginJson = JSON.parse(readFileSync(pluginJsonPath, 'utf-8'));
 
       const hookCommands = pluginJson.hooks.SessionStart.flatMap((h: any) =>
         h.hooks.map((hook: any) => hook.command)
       );
 
-      expect(hookCommands).toContain('./hooks/test-plugin-hooks--session-start.sh');
-      expect(hookCommands).toContain('./hooks/test-plugin-hooks2--session-start.sh');
+      expect(hookCommands).toContain('${CLAUDE_PLUGIN_ROOT}/hooks/test-plugin-hooks--session-start.sh');
+      expect(hookCommands).toContain('${CLAUDE_PLUGIN_ROOT}/hooks/test-plugin-hooks2--session-start.sh');
     });
 
     it('should preserve system command hooks without copying', async () => {
@@ -281,12 +282,12 @@ describe('Save Operation - Integration Tests', () => {
       const result = await save(state, options);
       expect(result.success).toBe(true);
 
-      // Verify no hook scripts were copied (only system commands)
-      const hooksDir = join(OUTPUT_DIR, 'system-hooks/hooks');
+      // Verify no hook scripts were copied (only system commands) (per spec 007 §3)
+      const hooksDir = join(OUTPUT_DIR, 'system-hooks/plugins/system-hooks/hooks');
       expect(existsSync(hooksDir)).toBe(false);
 
       // Verify plugin.json still has the echo commands
-      const pluginJsonPath = join(OUTPUT_DIR, 'system-hooks/.claude-plugin/plugin.json');
+      const pluginJsonPath = join(OUTPUT_DIR, 'system-hooks/plugins/system-hooks/.claude-plugin/plugin.json');
       const pluginJson = JSON.parse(readFileSync(pluginJsonPath, 'utf-8'));
 
       expect(pluginJson.hooks.SessionStart[0].hooks[0].command).toBe("echo 'Session started'");
@@ -325,9 +326,9 @@ describe('Save Operation - Integration Tests', () => {
       expect(result.success).toBe(true);
       expect(result.stats.commands).toBe(2);
 
-      // Verify files from both plugins were copied
-      expect(existsSync(join(OUTPUT_DIR, 'multi-plugin/commands/build.md'))).toBe(true);
-      expect(existsSync(join(OUTPUT_DIR, 'multi-plugin/commands/deploy.md'))).toBe(true);
+      // Verify files from both plugins were copied (per spec 007 §3)
+      expect(existsSync(join(OUTPUT_DIR, 'multi-plugin/plugins/multi-plugin/commands/build.md'))).toBe(true);
+      expect(existsSync(join(OUTPUT_DIR, 'multi-plugin/plugins/multi-plugin/commands/deploy.md'))).toBe(true);
     });
   });
 });
