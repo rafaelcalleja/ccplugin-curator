@@ -75,7 +75,7 @@ export async function autoDiscoverCommands(pluginPath: string): Promise<string[]
     return [];
   }
 
-  const pattern = path.join(commandsDir, '**', '*.md');
+  const pattern = 'commands/**/*.md';
   const files = await glob(pattern, { cwd: pluginPath });
 
   // Normalize paths: remove leading ./
@@ -93,7 +93,7 @@ export async function autoDiscoverAgents(pluginPath: string): Promise<string[]> 
     return [];
   }
 
-  const pattern = path.join(agentsDir, '**', '*.md');
+  const pattern = 'agents/**/*.md';
   const files = await glob(pattern, { cwd: pluginPath });
 
   // Normalize paths: remove leading ./
@@ -112,7 +112,7 @@ export async function autoDiscoverSkills(pluginPath: string): Promise<string[]> 
     return [];
   }
 
-  const pattern = path.join(skillsDir, '*', 'SKILL.md');
+  const pattern = 'skills/*/SKILL.md';
   const files = await glob(pattern, { cwd: pluginPath });
 
   // Extract parent directories and normalize
@@ -142,8 +142,9 @@ async function parseComponentPaths(
 
   if (typeof pathConfig === 'string') {
     // String path: apply glob pattern
-    const customDir = path.join(pluginPath, pathConfig.replace(/^\.\//, ''));
-    if (!fs.existsSync(customDir)) {
+    const customDir = pathConfig.replace(/^\.\//, '');
+    const customDirAbs = path.join(pluginPath, customDir);
+    if (!fs.existsSync(customDirAbs)) {
       return [];
     }
 

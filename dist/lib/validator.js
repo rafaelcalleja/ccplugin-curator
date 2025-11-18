@@ -68,7 +68,7 @@ function validateOfficialFormat(plugin) {
             errors: validatePlugin.errors.map(err => `${err.instancePath} ${err.message}`)
         };
     }
-    return { valid: true };
+    return { valid: true, errors: [] };
 }
 /**
  * Validates normalized plugin against internal format schema
@@ -83,7 +83,7 @@ function validateNormalizedFormat(plugin) {
             errors: validateNormalized.errors.map(err => `${err.instancePath} ${err.message}`)
         };
     }
-    return { valid: true };
+    return { valid: true, errors: [] };
 }
 /**
  * Validates marketplace name format

@@ -14,8 +14,16 @@ export default defineConfig({
         'test/',
         '**/*.d.ts',
         '**/*.config.*',
-        '**/types/'
-      ]
+        '**/types/',
+        'src/cli/',
+        'src/tui/'
+      ],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 80,
+        statements: 80
+      }
     }
   }
 });

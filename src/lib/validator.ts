@@ -34,7 +34,7 @@ export function validateOfficialFormat(plugin: any): ValidationResult {
     };
   }
 
-  return { valid: true };
+  return { valid: true, errors: [] };
 }
 
 /**
@@ -54,7 +54,7 @@ export function validateNormalizedFormat(plugin: any): ValidationResult {
     };
   }
 
-  return { valid: true };
+  return { valid: true, errors: [] };
 }
 
 /**

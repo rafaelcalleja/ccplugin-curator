@@ -111,7 +111,7 @@ async function save(selection, config) {
         const normalizedPlugin = {
             name: config.pluginName,
             source: pluginDir,
-            version: '1.0.0',
+            version: '0.0.0',
             description: `Curated plugin from ${selection.plugins.length} source(s)`,
             author: {
                 name: '',

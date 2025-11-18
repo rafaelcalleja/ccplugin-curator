@@ -103,7 +103,7 @@ async function autoDiscoverCommands(pluginPath) {
     if (!fs.existsSync(commandsDir)) {
         return [];
     }
-    const pattern = path.join(commandsDir, '**', '*.md');
+    const pattern = 'commands/**/*.md';
     const files = await (0, glob_1.glob)(pattern, { cwd: pluginPath });
     // Normalize paths: remove leading ./
     return files.map(f => f.replace(/^\.\//, ''));
@@ -118,7 +118,7 @@ async function autoDiscoverAgents(pluginPath) {
     if (!fs.existsSync(agentsDir)) {
         return [];
     }
-    const pattern = path.join(agentsDir, '**', '*.md');
+    const pattern = 'agents/**/*.md';
     const files = await (0, glob_1.glob)(pattern, { cwd: pluginPath });
     // Normalize paths: remove leading ./
     return files.map(f => f.replace(/^\.\//, ''));
@@ -134,7 +134,7 @@ async function autoDiscoverSkills(pluginPath) {
     if (!fs.existsSync(skillsDir)) {
         return [];
     }
-    const pattern = path.join(skillsDir, '*', 'SKILL.md');
+    const pattern = 'skills/*/SKILL.md';
     const files = await (0, glob_1.glob)(pattern, { cwd: pluginPath });
     // Extract parent directories and normalize
     return files.map(f => {
@@ -156,8 +156,9 @@ async function parseComponentPaths(pluginPath, pathConfig, globPattern, returnDi
     }
     if (typeof pathConfig === 'string') {
         // String path: apply glob pattern
-        const customDir = path.join(pluginPath, pathConfig.replace(/^\.\//, ''));
-        if (!fs.existsSync(customDir)) {
+        const customDir = pathConfig.replace(/^\.\//, '');
+        const customDirAbs = path.join(pluginPath, customDir);
+        if (!fs.existsSync(customDirAbs)) {
             return [];
         }
         const pattern = path.join(customDir, globPattern);
