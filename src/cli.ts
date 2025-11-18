@@ -5,20 +5,32 @@ import * as fs from 'fs/promises';
 import { normalizePlugin } from './lib/normalize';
 import { NormalizedPlugin } from './types/normalized';
 import { PluginCuratorTUI } from './tui/app';
+import { MainMenu } from './tui/menu';
+import { ConfigForm, ConfigFormData } from './tui/config-form';
 
 /**
  * CLI Entry Point
  *
- * Usage: ccplugin-curator select <plugins-folder>
+ * Usage:
+ *   ccplugin-curator               (interactive mode)
+ *   ccplugin-curator select <plugins-folder>
  */
 async function main() {
   const args = process.argv.slice(2);
 
-  if (args.length === 0 || args[0] === '--help' || args[0] === '-h') {
+  // Help
+  if (args[0] === '--help' || args[0] === '-h') {
     printHelp();
     process.exit(0);
   }
 
+  // Interactive mode (no arguments)
+  if (args.length === 0) {
+    await runInteractive();
+    return;
+  }
+
+  // Command mode
   const command = args[0];
 
   if (command === 'select') {
@@ -39,6 +51,59 @@ async function main() {
 }
 
 /**
+ * Run interactive mode (setup screens + component selection)
+ */
+async function runInteractive() {
+  try {
+    // Show main menu
+    const menu = new MainMenu();
+    const menuResult = await menu.show();
+
+    if (menuResult === 'exit') {
+      console.log('Goodbye!');
+      process.exit(0);
+    }
+
+    // Show configuration form
+    const configForm = new ConfigForm();
+    const config = await configForm.show();
+
+    if (!config) {
+      console.log('Configuration cancelled');
+      process.exit(0);
+    }
+
+    // Expand ~ in paths
+    const sourceDir = config.sourceDir.replace(/^~/, process.env.HOME || '~');
+    const outputDir = config.outputDir.replace(/^~/, process.env.HOME || '~');
+
+    console.log('\nConfiguration:');
+    console.log(`  Marketplace Name: ${config.marketplaceName}`);
+    console.log(`  Plugin Name: ${config.pluginName}`);
+    console.log(`  Source Directory: ${sourceDir}`);
+    console.log(`  Output Directory: ${outputDir}`);
+    if (config.authorEmail) {
+      console.log(`  Author Email: ${config.authorEmail}`);
+    }
+    console.log('');
+
+    // Run component selection with the configured settings
+    await runSelect(sourceDir, {
+      outputDir,
+      pluginName: config.marketplaceName,
+      displayName: config.pluginName,
+      authorEmail: config.authorEmail,
+    });
+  } catch (error: any) {
+    console.error('Error:', error.message);
+    if (error.stack) {
+      console.error(error.stack);
+    }
+    process.exit(1);
+  }
+}
+
+/**
  * Print help message
  */
 function printHelp() {
@@ -46,17 +111,25 @@ function printHelp() {
 Claude Plugin Curator - TUI tool to curate and combine plugin components
 
 Usage:
+  ccplugin-curator                       Interactive mode (recommended)
   ccplugin-curator select <plugins-folder>
 
 Commands:
+  (no arguments)     Launch interactive mode with setup screens
   select <folder>    Scan plugins in folder and launch TUI to select components
 
 Options:
   -h, --help        Show this help message
 
 Examples:
+  ccplugin-curator                        # Interactive mode
   ccplugin-curator select ~/.claude/plugins
   ccplugin-curator select ./my-plugins
+
+Interactive Mode Flow:
+  1. Main Menu         Choose to create curated plugin or exit
+  2. Configuration     Enter plugin metadata and directories
+  3. Component Selection    Select components from discovered plugins
 
 Keyboard Shortcuts (TUI):
   ←→                Switch between panels
@@ -82,7 +155,15 @@ Installation:
 /**
  * Run select command
  */
-async function runSelect(pluginsFolder: string) {
+async function runSelect(
+  pluginsFolder: string,
+  options?: {
+    outputDir?: string;
+    pluginName?: string;
+    displayName?: string;
+    authorEmail?: string;
+  }
+) {
   try {
     console.log(`Scanning plugins in: ${pluginsFolder}`);
 
@@ -109,7 +190,7 @@ async function runSelect(pluginsFolder: string) {
     console.log('Launching TUI...\n');
 
     // Launch TUI
-    const tui = new PluginCuratorTUI(normalized);
+    const tui = new PluginCuratorTUI(normalized, options);
     tui.run();
   } catch (error: any) {
     console.error('Error:', error.message);

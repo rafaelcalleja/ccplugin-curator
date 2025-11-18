@@ -17,8 +17,23 @@ export class PluginCuratorTUI {
   private componentsPanel: blessed.Widgets.BoxElement;
   private previewPanel: blessed.Widgets.BoxElement;
   private statusBar: blessed.Widgets.BoxElement;
+  private options: {
+    outputDir?: string;
+    pluginName?: string;
+    displayName?: string;
+    authorEmail?: string;
+  };
 
-  constructor(plugins: NormalizedPlugin[]) {
+  constructor(
+    plugins: NormalizedPlugin[],
+    options?: {
+      outputDir?: string;
+      pluginName?: string;
+      displayName?: string;
+      authorEmail?: string;
+    }
+  ) {
+    this.options = options || {};
     this.state = {
       plugins,
       currentPluginIndex: 0,
@@ -334,9 +349,12 @@ export class PluginCuratorTUI {
 
   private async save(): Promise<void> {
     try {
+      const outputDir = this.options.outputDir || './output/curated-plugin';
+      const pluginName = this.options.pluginName || 'curated-plugin';
+
       await saveSelection(this.state.plugins, this.state.selections, {
-        outputDir: './output/curated-plugin',
-        pluginName: 'curated-plugin',
+        outputDir,
+        pluginName,
       });
 
       // Show success message
@@ -352,7 +370,7 @@ export class PluginCuratorTUI {
         },
       });
 
-      msg.display('Plugin saved successfully!\n\nLocation: ./output/curated-plugin\n\nPress any key to continue...', 0, () => {
+      msg.display(`Plugin saved successfully!\n\nLocation: ${outputDir}\n\nPress any key to continue...`, 0, () => {
         this.render();
       });
     } catch (error: any) {

@@ -2,7 +2,7 @@
   "SessionStart": [
     {
       "hooks": [
-        { "type": "command", "command": "/setup-b.sh" }
+        { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/.hooks/setup-b.sh" }
       ]
     }
   ]

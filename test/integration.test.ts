@@ -69,7 +69,7 @@ describe('Integration Test Suite', () => {
         commands: ['commands/analyze.md'],
         agents: ['agents/reviewer.md'],
         skills: ['skills/skill-alpha'],
-        hooks: normalized.hooks.filter(h => h.event === 'SessionStart' && h.command === '/setup-env.sh'),
+        hooks: normalized.hooks.filter(h => h.event === 'SessionStart' && h.command === '${CLAUDE_PLUGIN_ROOT}/.hooks/setup-env.sh'),
         mcps: normalized.mcps.filter(m => m.name === 'tavily'),
       };
 
@@ -285,8 +285,8 @@ describe('Integration Test Suite', () => {
       // Find the hooks array
       const hooksArray = pluginJson.hooks.SessionStart[0].hooks;
       expect(hooksArray.length).toBe(2);
-      expect(hooksArray.some((h: any) => h.command === '/setup-a.sh')).toBe(true);
-      expect(hooksArray.some((h: any) => h.command === '/setup-b.sh')).toBe(true);
+      expect(hooksArray.some((h: any) => h.command === '${CLAUDE_PLUGIN_ROOT}/.hooks/setup-a.sh')).toBe(true);
+      expect(hooksArray.some((h: any) => h.command === '${CLAUDE_PLUGIN_ROOT}/.hooks/setup-b.sh')).toBe(true);
     });
 
     it('should handle MCP name conflicts with namespace prefixing', async () => {
