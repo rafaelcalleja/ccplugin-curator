@@ -72,6 +72,7 @@ export function officialize(
 
 /**
  * Group hooks by event and matcher
+ * Transform script paths to ${CLAUDE_PLUGIN_ROOT}/ (spec 006 lines 191-208)
  */
 function groupHooksByEvent(hooks: NormalizedPluginFormat['hooks']): object {
   const grouped: Record<string, any[]> = {};
@@ -98,12 +99,37 @@ function groupHooksByEvent(hooks: NormalizedPluginFormat['hooks']): object {
       grouped[event].push(matcherGroup);
     }
 
-    // Remove event and matcher from hook config
+    // Remove event and matcher from hook config, transform command paths
     const { matcher: _m, ...hookConfig } = hookWithoutEvent;
+
+    // Transform hook command paths to ${CLAUDE_PLUGIN_ROOT}/ (spec 006 lines 191-208)
+    if (hookConfig.type === 'command' && hookConfig.command) {
+      hookConfig.command = transformHookCommandPath(hookConfig.command);
+    }
+
     matcherGroup.hooks.push(hookConfig);
   }
 
   return grouped;
+}
+
+/**
+ * Transform hook command path to use ${CLAUDE_PLUGIN_ROOT}
+ * Spec 006 lines 191-208, spec 007 lines 272-283
+ */
+function transformHookCommandPath(command: string): string {
+  // Check if it's a script file path (relative path with script extension)
+  if (command.match(/^[^/].*\.(sh|bash|py|js|ts|rb|pl)$/)) {
+    // Already has ${CLAUDE_PLUGIN_ROOT}? Return as-is
+    if (command.includes('${CLAUDE_PLUGIN_ROOT}')) {
+      return command;
+    }
+    // Transform to use ${CLAUDE_PLUGIN_ROOT}/
+    return `\${CLAUDE_PLUGIN_ROOT}/${command}`;
+  }
+
+  // Not a script file, return as-is
+  return command;
 }
 
 /**

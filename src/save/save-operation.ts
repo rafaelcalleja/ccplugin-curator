@@ -3,11 +3,12 @@
  * Based on 007-save-operation-rules.md
  */
 
-import { mkdir, writeFile, copyFile, cp, rm, access } from 'fs/promises';
+import { mkdir, writeFile, copyFile, cp, rm, access, chmod } from 'fs/promises';
 import { join, dirname, basename } from 'path';
 import { confirm } from '@inquirer/prompts';
 import type { NormalizedPluginFormat } from '../types/normalized.js';
 import { officialize } from '../transform/officialize.js';
+import { expandEnvVars } from '../utils/env-vars.js';
 
 interface Selection {
   [pluginName: string]: {
@@ -296,5 +297,84 @@ async function copyComponentFiles(
       const destPath = join(outputDir, finalPath);
       await cp(srcPath, destPath, { recursive: true });
     }
+
+    // Copy hook scripts (spec 007 lines 122-139)
+    await copyHookScripts(plugin, sel, outputDir, plugins, selection);
   }
+}
+
+/**
+ * Copy hook script files with executable permissions
+ * Implements spec 007 lines 122-139 and 261-283
+ */
+async function copyHookScripts(
+  plugin: NormalizedPluginFormat,
+  sel: Selection[string],
+  outputDir: string,
+  allPlugins: NormalizedPluginFormat[],
+  fullSelection: Selection
+): Promise<void> {
+  // Track script conflicts for namespace prefix
+  const scriptCounts = new Map<string, number>();
+
+  // First pass: count all script paths across ALL plugins
+  for (const p of allPlugins) {
+    const s = fullSelection[p.name];
+    if (!s) continue;
+
+    for (const hookIndex of s.hooks) {
+      const hook = p.hooks[hookIndex];
+      if (hook?.type === 'command' && hook.command) {
+        const scriptPath = extractScriptPath(hook.command);
+        if (scriptPath) {
+          scriptCounts.set(scriptPath, (scriptCounts.get(scriptPath) || 0) + 1);
+        }
+      }
+    }
+  }
+
+  // Second pass: copy scripts from current plugin with conflict resolution
+  for (const hookIndex of sel.hooks) {
+    const hook = plugin.hooks[hookIndex];
+    if (hook?.type !== 'command' || !hook.command) continue;
+
+    const scriptPath = extractScriptPath(hook.command);
+    if (!scriptPath) continue;
+
+    const hasConflict = scriptCounts.get(scriptPath)! > 1;
+    const finalPath = hasConflict
+      ? `hooks/${plugin.name}--${basename(scriptPath)}`
+      : `hooks/${basename(scriptPath)}`;
+
+    const srcPath = join(plugin.source, scriptPath);
+    const destPath = join(outputDir, finalPath);
+
+    // Create hooks directory
+    await mkdir(dirname(destPath), { recursive: true });
+
+    // Copy script file
+    try {
+      await copyFile(srcPath, destPath);
+      // Apply executable permissions (spec 007 line 138)
+      await chmod(destPath, 0o755);
+    } catch (error) {
+      console.warn(`Warning: Could not copy hook script ${scriptPath}:`, error);
+    }
+  }
+}
+
+/**
+ * Extract script path from hook command
+ * Returns null if command is not a script file
+ */
+function extractScriptPath(command: string): string | null {
+  // Remove ${CLAUDE_PLUGIN_ROOT}/ prefix if present
+  let path = command.replace(/\$\{CLAUDE_PLUGIN_ROOT\}\//, '');
+
+  // Check if it's a script file (ends with .sh, .py, .js, etc.)
+  if (path.match(/\.(sh|bash|py|js|ts|rb|pl)$/)) {
+    return path;
+  }
+
+  return null;
 }

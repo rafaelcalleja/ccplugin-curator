@@ -47,13 +47,14 @@ export function ComponentsPanel({
           {plugin.commands.map((cmd) => {
             const isSelected = selection.commands.has(cmd);
             const isCursor = currentIndex === cursor;
-            const checkbox = isSelected ? '[✓]' : '[ ]';
             const cursorMark = isCursor && active ? '► ' : '  ';
             currentIndex++;
 
             return (
               <Text key={cmd} backgroundColor={isCursor && active ? 'blue' : undefined}>
-                {cursorMark}{checkbox} {cmd}
+                {cursorMark}
+                <Text color={isSelected ? 'green' : 'dim'}>[{isSelected ? '✓' : ' '}]</Text>
+                {' '}{cmd}
               </Text>
             );
           })}
@@ -68,13 +69,14 @@ export function ComponentsPanel({
           {plugin.agents.map((agent) => {
             const isSelected = selection.agents.has(agent);
             const isCursor = currentIndex === cursor;
-            const checkbox = isSelected ? '[✓]' : '[ ]';
             const cursorMark = isCursor && active ? '► ' : '  ';
             currentIndex++;
 
             return (
               <Text key={agent} backgroundColor={isCursor && active ? 'blue' : undefined}>
-                {cursorMark}{checkbox} {agent}
+                {cursorMark}
+                <Text color={isSelected ? 'green' : 'dim'}>[{isSelected ? '✓' : ' '}]</Text>
+                {' '}{agent}
               </Text>
             );
           })}
@@ -89,13 +91,14 @@ export function ComponentsPanel({
           {plugin.skills.map((skill) => {
             const isSelected = selection.skills.has(skill);
             const isCursor = currentIndex === cursor;
-            const checkbox = isSelected ? '[✓]' : '[ ]';
             const cursorMark = isCursor && active ? '► ' : '  ';
             currentIndex++;
 
             return (
               <Text key={skill} backgroundColor={isCursor && active ? 'blue' : undefined}>
-                {cursorMark}{checkbox} {skill}
+                {cursorMark}
+                <Text color={isSelected ? 'green' : 'dim'}>[{isSelected ? '✓' : ' '}]</Text>
+                {' '}{skill}
               </Text>
             );
           })}
@@ -103,21 +106,22 @@ export function ComponentsPanel({
         </>
       )}
 
-      {/* Hooks */}
+      {/* Hooks (spec 003 lines 341-346) */}
       {plugin.hooks.length > 0 && (
         <>
           <Text color="yellow">HOOKS ({plugin.hooks.length})</Text>
           {plugin.hooks.map((hook, index) => {
             const isSelected = selection.hooks.has(index);
             const isCursor = currentIndex === cursor;
-            const checkbox = isSelected ? '[✓]' : '[ ]';
             const cursorMark = isCursor && active ? '► ' : '  ';
             const display = `${hook.event}${hook.matcher ? `:${hook.matcher}` : ''} → ${hook.command}`;
             currentIndex++;
 
             return (
               <Text key={index} backgroundColor={isCursor && active ? 'blue' : undefined}>
-                {cursorMark}{checkbox} {display}
+                {cursorMark}
+                <Text color={isSelected ? 'green' : 'dim'}>[{isSelected ? '✓' : ' '}]</Text>
+                {' '}{display}
               </Text>
             );
           })}
@@ -132,13 +136,14 @@ export function ComponentsPanel({
           {plugin.mcps.map((mcp, index) => {
             const isSelected = selection.mcps.has(index);
             const isCursor = currentIndex === cursor;
-            const checkbox = isSelected ? '[✓]' : '[ ]';
             const cursorMark = isCursor && active ? '► ' : '  ';
             currentIndex++;
 
             return (
               <Text key={index} backgroundColor={isCursor && active ? 'blue' : undefined}>
-                {cursorMark}{checkbox} {mcp.name}
+                {cursorMark}
+                <Text color={isSelected ? 'green' : 'dim'}>[{isSelected ? '✓' : ' '}]</Text>
+                {' '}{mcp.name}
               </Text>
             );
           })}

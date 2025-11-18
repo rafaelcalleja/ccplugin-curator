@@ -2,8 +2,8 @@
   "SessionStart": [
     {
       "hooks": [
-        { "type": "command", "command": "/setup-env.sh" },
-        { "type": "command", "command": "/init-workspace.sh" }
+        { "type": "command", "command": "hooks/setup-env.sh" },
+        { "type": "command", "command": "hooks/init-workspace.sh" }
       ]
     }
   ],
@@ -11,13 +11,13 @@
     {
       "matcher": "Bash",
       "hooks": [
-        { "type": "command", "command": "/security-check.sh" }
+        { "type": "command", "command": "hooks/security-check.sh" }
       ]
     },
     {
       "matcher": "Write",
       "hooks": [
-        { "type": "command", "command": "/cleanup.sh" }
+        { "type": "command", "command": "hooks/cleanup.sh" }
       ]
     }
   ]

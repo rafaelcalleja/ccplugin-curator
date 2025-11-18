@@ -212,13 +212,24 @@ async function normalizeHooks(
     // Inline configuration
     hooksConfig = hooks;
   } else {
-    // Try default locations
-    try {
-      const defaultPath = join(pluginPath, 'hooks/hooks.json');
-      const content = await readFile(defaultPath, 'utf-8');
-      const parsed = JSON.parse(content);
-      hooksConfig = parsed.hooks || parsed;
-    } catch {
+    // Try default locations: hooks/hooks.json then settings.json (spec 001, 002 line 36)
+    const defaultPaths = ['hooks/hooks.json', 'settings.json'];
+
+    for (const defaultFile of defaultPaths) {
+      try {
+        const defaultPath = join(pluginPath, defaultFile);
+        const content = await readFile(defaultPath, 'utf-8');
+        const parsed = JSON.parse(content);
+        hooksConfig = parsed.hooks || parsed;
+        break; // Found hooks, stop trying
+      } catch {
+        // File not found, try next
+        continue;
+      }
+    }
+
+    // No hooks found in any default location
+    if (Object.keys(hooksConfig).length === 0) {
       return [];
     }
   }

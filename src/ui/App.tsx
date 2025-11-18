@@ -81,6 +81,20 @@ export function App({ plugins }: AppProps) {
       return;
     }
 
+    // TAB - Switch to next plugin (spec 004 lines 233, 261)
+    if (key.tab && !key.shift && plugins.length > 1) {
+      setCurrentPluginIndex((prev) => (prev + 1) % plugins.length);
+      setComponentCursor(0); // Reset cursor when switching plugins
+      return;
+    }
+
+    // SHIFT+TAB - Switch to previous plugin (spec 004 lines 233, 261)
+    if (key.tab && key.shift && plugins.length > 1) {
+      setCurrentPluginIndex((prev) => (prev - 1 + plugins.length) % plugins.length);
+      setComponentCursor(0); // Reset cursor when switching plugins
+      return;
+    }
+
     // Panel switching (left/right arrows)
     if (key.leftArrow) {
       if (currentPanel === 'components') setCurrentPanel('plugins');
@@ -209,9 +223,12 @@ export function App({ plugins }: AppProps) {
 
   return (
     <Box flexDirection="column" height="100%">
-      {/* Header */}
+      {/* Header (spec 004 line 233, spec 003 line 233) */}
       <Box borderStyle="single" paddingX={1}>
         <Text>PLUGIN: {currentPlugin.name}</Text>
+        {plugins.length > 1 && (
+          <Text dimColor> [Tab {currentPluginIndex + 1} of {plugins.length}]</Text>
+        )}
       </Box>
 
       {/* Main 3-panel layout */}
@@ -240,7 +257,7 @@ export function App({ plugins }: AppProps) {
 
       {/* Status bar */}
       <Box borderStyle="single" paddingX={1}>
-        <StatusBar currentPanel={currentPanel} />
+        <StatusBar currentPanel={currentPanel} multiPlugin={plugins.length > 1} />
       </Box>
     </Box>
   );
